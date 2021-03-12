@@ -1,6 +1,8 @@
 defmodule Lanyard.DiscordBot do
   use GenServer
 
+  require Logger
+
   alias Lanyard.Gateway
 
   defstruct token: nil,
@@ -15,8 +17,18 @@ defmodule Lanyard.DiscordBot do
   end
 
   def handle_continue(:setup_bot, state) do
-    {_, pid} = Lanyard.Gateway.Client.start_link(%{token: state.token})
+    {_, pid} = Gateway.Client.start_link(%{token: state.token})
+    Process.monitor(pid)
 
-    {:noreply, state}
+    Logger.info("Discord bot running on #{inspect(pid)}")
+
+    {:noreply, %{state | gateway_client_pid: pid}}
   end
+
+  def handle_info({:DOWN, _ref, :process, _pid, reason}, state) do
+    Logger.warn("Discord bot crashed with reason: #{reason}. Restarting.")
+
+    {:noreply, state, {:continue, :setup_bot}}
+  end
+
 end
