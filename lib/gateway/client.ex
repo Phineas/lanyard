@@ -172,30 +172,8 @@ defmodule Lanyard.Gateway.Client do
   def handle_event({:guild_create, payload}, state) do
     IO.inspect payload
 
-    Task.start(fn ->
-      Enum.each(payload.data.members, fn member ->
-        presence = payload.data.presences
-        |> Enum.find(fn presence -> presence.user.id === member.user.id end)
+    create_member_presences(payload)
 
-        gen_init = %{
-          user_id: Integer.to_string(member.user.id),
-          discord_presence: presence,
-          discord_user: member.user
-        }
-
-        {:ok, pid} = GenRegistry.lookup_or_start(Lanyard.Presence, gen_init.user_id, [gen_init])
-        GenServer.cast pid, {:sync, gen_init}
-      end)
-    end)
-
-    # request_payload = payload_build(opcode(opcodes(), :request_guild_members), %{
-    #   "guild_id" => payload.data.id,
-    #   "query" => "",
-    #   "limit" => 0,
-    #   "presences" => true
-    # })
-
-    # :websocket_client.cast(self(), {:binary, request_payload})
     {:ok, state}
   end
 
@@ -207,11 +185,33 @@ defmodule Lanyard.Gateway.Client do
     {:ok, state}
   end
 
-  def handle_event({event, payload}, state) do
-  #  case event do
-  #   :
-  #  end
+  def handle_event({:guild_member_add, payload}, state) do
+    request_payload = payload_build(opcode(opcodes(), :request_guild_members), %{
+      "guild_id" => payload.data["guild_id"],
+      "user_ids" => [payload.data["user"]["id"]],
+      "limit" => 1,
+      "presences" => true
+    })
 
+    :websocket_client.cast(self(), {:binary, request_payload})
+
+    {:ok, state}
+  end
+
+  def handle_event({:guild_member_remove, payload}, state) do
+    IO.inspect payload
+    GenRegistry.stop(Lanyard.Presence, Integer.to_string(payload.data["user"]["id"]))
+
+    {:ok, state}
+  end
+
+  def handle_event({:guild_members_chunk, payload}, state) do
+    create_member_presences(payload)
+
+    {:ok, state}
+  end
+
+  def handle_event({event, _payload}, state) do
     IO.inspect event
     {:ok, state}
   end
@@ -229,7 +229,7 @@ defmodule Lanyard.Gateway.Client do
       "presence" => %{
         "since" => nil,
         "game" => %{
-          "name" => "lanyard.so",
+          "name" => "lanyard.rest",
           "type" => 0
         },
         "status" => "online",
@@ -246,5 +246,23 @@ defmodule Lanyard.Gateway.Client do
     if state[:agent_seq_num] && data.seq_num do
       agent_update(state[:agent_seq_num], data.seq_num)
     end
+  end
+
+  defp create_member_presences(payload) do
+    Task.start(fn ->
+      Enum.each(payload.data.members, fn member ->
+        presence = payload.data.presences
+        |> Enum.find(fn presence -> presence.user.id === member.user.id end)
+
+        gen_init = %{
+          user_id: Integer.to_string(member.user.id),
+          discord_presence: presence,
+          discord_user: member.user
+        }
+
+        {:ok, pid} = GenRegistry.lookup_or_start(Lanyard.Presence, gen_init.user_id, [gen_init])
+        GenServer.cast pid, {:sync, gen_init}
+      end)
+    end)
   end
 end
