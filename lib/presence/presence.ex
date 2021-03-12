@@ -3,14 +3,15 @@ defmodule Lanyard.Presence do
 
   defstruct user_id: nil,
             discord_user: nil,
-            discord_presence: nil
+            discord_presence: nil,
+            subscriber_pids: nil
 
   def start_link(state) do
     GenServer.start_link(__MODULE__, state, name: :"presence:#{state.user_id}")
   end
 
   def init(state) do
-    {:ok, %__MODULE__{user_id: state.user_id, discord_presence: state.discord_presence, discord_user: state.discord_user}}
+    {:ok, %__MODULE__{user_id: state.user_id, discord_presence: state.discord_presence, discord_user: state.discord_user, subscriber_pids: []}}
   end
 
   def handle_call({:get_raw_data}, _from, state) do
@@ -72,11 +73,15 @@ defmodule Lanyard.Presence do
     }, else: nil
 
     pretty_fields = %{
-      # active_on_discord_desktop: raw_data.discord_presence.client_status.desktop !== nil,
+      discord_user: raw_data.discord_user,
+      discord_status: raw_data.discord_presence.status,
+      active_on_discord_desktop: Map.has_key?(raw_data.discord_presence.client_status, :desktop),
+      active_on_discord_mobile: Map.has_key?(raw_data.discord_presence.client_status, :mobile),
       listening_to_spotify: spotify_activity !== nil,
-      spotify: pretty_spotify
+      spotify: pretty_spotify,
+      activities: raw_data.discord_presence.activities
     }
 
-    {:ok, Map.merge(raw_data, pretty_fields)}
+    {:ok, pretty_fields}
   end
 end
