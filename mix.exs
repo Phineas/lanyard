@@ -14,7 +14,7 @@ defmodule Lanyard.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
+      extra_applications: [:logger, :corsica],
       mod: {Lanyard, []}
     ]
   end
@@ -25,7 +25,8 @@ defmodule Lanyard.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:websocket_client, "~> 1.2.4"},
       {:poison, "~> 4.0"},
-      {:gen_registry, "~> 1.0"}
+      {:gen_registry, "~> 1.0"},
+      {:corsica, "~> 1.0"}
     ]
   end
 end
