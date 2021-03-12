@@ -81,4 +81,5 @@ Example response:
     "active_on_discord_mobile": false,
     "active_on_discord_desktop": true
   }
-}```
+}
+```
