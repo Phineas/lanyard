@@ -17,17 +17,20 @@ Example response:
 {
   "success": true,
   "data": {
+    "active_on_discord_mobile": false,
+    "active_on_discord_desktop": true,
+    "listening_to_spotify": true,
+    // Below is a custom crafted "spotify" object, which will be null if listening_to_spotify is false
     "spotify": {
       "timestamps": {
-        "start": 1615529772305,
-        "end": 1615529984377
+        "start": 1615529820677,
+        "end": 1615530068733
       },
-      "song": "Need You",
-      "artist": "Kidswaste",
-      "album_art_url": "https://i.scdn.co/image/ab67616d0000b2731fe8f7d34b0eb2e3f87571dd",
-      "album": "Need You"
+      "song": "Let Go",
+      "artist": "Ark Patrol; Veronika Redd",
+      "album_art_url": "https://i.scdn.co/image/ab67616d0000b27364840995fe43bb2ec73a241d",
+      "album": "Let Go"
     },
-    "listening_to_spotify": true,
     "discord_user": {
       "username": "Phineas",
       "public_flags": 131584,
@@ -36,15 +39,16 @@ Example response:
       "avatar": "a_7484f82375f47a487f41650f36d30318"
     },
     "discord_status": "online",
+    // activities contains the plain Discord activities array that gets sent down with presences
     "activities": [
       {
         "type": 2,
         "timestamps": {
-          "start": 1615529772305,
-          "end": 1615529984377
+          "start": 1615529820677,
+          "end": 1615530068733
         },
-        "sync_id": "6jilgLoqm0HI7zbdYaGFqG",
-        "state": "Kidswaste",
+        "sync_id": "3kdlVcMVsSkbsUy8eQcBjI",
+        "state": "Ark Patrol; Veronika Redd",
         "session_id": "140ecdfb976bdbf29d4452d492e551c7",
         "party": {
           "id": "spotify:94490510688792576"
@@ -52,34 +56,32 @@ Example response:
         "name": "Spotify",
         "id": "spotify:1",
         "flags": 48,
-        "details": "Need You",
-        "created_at": 1615529816550,
+        "details": "Let Go",
+        "created_at": 1615529838051,
         "assets": {
-          "large_text": "Need You",
-          "large_image": "spotify:ab67616d0000b2731fe8f7d34b0eb2e3f87571dd"
+          "large_text": "Let Go",
+          "large_image": "spotify:ab67616d0000b27364840995fe43bb2ec73a241d"
         }
       },
       {
         "type": 0,
         "timestamps": {
-          "start": 1615503146651
+          "start": 1615438153941
         },
-        "state": "Workspace: honk-server",
+        "state": "Workspace: lanyard",
         "name": "Visual Studio Code",
         "id": "66b84f5317e9de6c",
-        "details": "Editing chat.ts",
-        "created_at": 1615529819828,
+        "details": "Editing README.md",
+        "created_at": 1615529838050,
         "assets": {
           "small_text": "Visual Studio Code",
           "small_image": "565945770067623946",
-          "large_text": "Editing a TYPESCRIPT file",
-          "large_image": "808842276184784916"
+          "large_text": "Editing a MARKDOWN file",
+          "large_image": "565945077491433494"
         },
         "application_id": 383226320970055681
       }
-    ],
-    "active_on_discord_mobile": false,
-    "active_on_discord_desktop": true
+    ]
   }
 }
 ```
