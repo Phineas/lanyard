@@ -87,3 +87,8 @@ Example response:
   }
 }
 ```
+
+## Todo
+- [ ] Finish WebSocket for subscribing to presences
+- [ ] React component that makes it easy for people to embed their presence on a website
+- [ ] Landing page?
