@@ -13,7 +13,7 @@ Just [join this Discord server](https://discord.gg/UrXF2cfJ7F) and your presence
 `GET https://api.lanyard.rest/v1/users/:user_id`
 
 Example response:
-```json
+```js
 {
   "success": true,
   "data": {
