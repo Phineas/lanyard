@@ -43,7 +43,6 @@ defmodule Lanyard.SocketHandler do
       case json["op"] do
         2 ->
           %{"subscribe_to_ids" => ids} = json["d"]
-
           init_state = ids |> Enum.reduce(%{}, fn id, acc ->
             case GenRegistry.lookup(Lanyard.Presence, id) do
               {:ok, pid} ->
@@ -57,8 +56,6 @@ defmodule Lanyard.SocketHandler do
           end)
 
           send(self(), {:remote_send, %{op: 0, t: "INIT_STATE", d: init_state}})
-
-
           {:ok, state}
         3 -> {:ok, state} # Used for heartbeating
         _ -> {:reply, {:close, 4004, "unknown_opcode"}, state}
