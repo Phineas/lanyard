@@ -54,9 +54,7 @@ defmodule Lanyard.SocketHandler do
                 acc
             end
           end)
-
-          send(self(), {:remote_send, %{op: 0, t: "INIT_STATE", d: init_state}})
-          {:ok, state}
+          {:reply, construct_socket_msg(state.compression, %{op: 0, t: "INIT_STATE", d: init_state}), state}
         3 -> {:ok, state} # Used for heartbeating
         _ -> {:reply, {:close, 4004, "unknown_opcode"}, state}
       end
