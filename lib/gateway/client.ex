@@ -170,8 +170,6 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def handle_event({:guild_create, payload}, state) do
-    IO.inspect payload
-
     create_member_presences(payload)
 
     {:ok, state}
@@ -186,6 +184,8 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def handle_event({:guild_member_add, payload}, state) do
+    Logger.debug("User #{payload.data["user"]["id"]} joined guild")
+
     request_payload = payload_build(opcode(opcodes(), :request_guild_members), %{
       "guild_id" => payload.data["guild_id"],
       "user_ids" => [payload.data["user"]["id"]],
@@ -199,7 +199,7 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def handle_event({:guild_member_remove, payload}, state) do
-    IO.inspect payload
+    Logger.debug("User #{payload.data["user"]["id"]} left guild")
     GenRegistry.stop(Lanyard.Presence, Integer.to_string(payload.data["user"]["id"]))
 
     {:ok, state}

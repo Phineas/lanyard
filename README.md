@@ -4,7 +4,7 @@
 
 Lanyard is a service that makes it super easy to export your live Discord presence to an API endpoint (`api.lanyard.rest/v1/users/:your_id`) and to a WebSocket (see below) for you to use wherever you want - for example, I use this to display what I'm listening to on Spotify on my personal website.
 
-You can use Lanyard's API without deploying anything yourself - but if you wan't to self host it, you have the option to, though it'll require a tiny bit of configuration.
+You can use Lanyard's API without deploying anything yourself - but if you want to self host it, you have the option to, though it'll require a tiny bit of configuration.
 
 ## Get started in < 10 seconds
 

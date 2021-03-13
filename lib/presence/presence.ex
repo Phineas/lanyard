@@ -11,6 +11,7 @@ defmodule Lanyard.Presence do
   end
 
   def init(state) do
+    IO.inspect state
     {:ok, %__MODULE__{user_id: state.user_id, discord_presence: state.discord_presence, discord_user: state.discord_user, subscriber_pids: []}}
   end
 
@@ -83,15 +84,29 @@ defmodule Lanyard.Presence do
       timestamps: spotify_activity.timestamps
     }, else: nil
 
-    pretty_fields = %{
-      discord_user: raw_data.discord_user,
-      discord_status: raw_data.discord_presence.status,
-      active_on_discord_desktop: Map.has_key?(raw_data.discord_presence.client_status, :desktop),
-      active_on_discord_mobile: Map.has_key?(raw_data.discord_presence.client_status, :mobile),
-      listening_to_spotify: spotify_activity !== nil,
-      spotify: pretty_spotify,
-      activities: raw_data.discord_presence.activities
-    }
+    has_presence? = raw_data.discord_presence !== nil
+
+    pretty_fields = if has_presence? do
+      %{
+        discord_user: raw_data.discord_user,
+        discord_status: raw_data.discord_presence.status,
+        active_on_discord_desktop: Map.has_key?(raw_data.discord_presence.client_status, :desktop),
+        active_on_discord_mobile: Map.has_key?(raw_data.discord_presence.client_status, :mobile),
+        listening_to_spotify: spotify_activity !== nil,
+        spotify: pretty_spotify,
+        activities: raw_data.discord_presence.activities
+      }
+    else
+      %{
+        discord_user: raw_data.discord_user,
+        discord_status: "offline",
+        active_on_discord_desktop: false,
+        active_on_discord_mobile: false,
+        listening_to_spotify: false,
+        spotify: nil,
+        activities: []
+      }
+    end
 
     {:ok, pretty_fields}
   end
