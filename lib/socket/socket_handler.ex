@@ -1,6 +1,9 @@
 defmodule Lanyard.SocketHandler do
   require Logger
 
+  alias Lanyard.Presence
+
+
   @type t :: %{
     awaiting_init: boolean,
     encoding: String.t(),
@@ -28,17 +31,7 @@ defmodule Lanyard.SocketHandler do
   end
 
   def websocket_init(state) do
-    Process.send_after(self(), {:finish_awaiting}, 10_000)
-
     {:reply, construct_socket_msg(state.compression, %{op: 1, d: %{"heartbeat_interval" => 30000}}), state}
-  end
-
-  def websocket_info({:finish_awaiting}, state) do
-    if state.awaiting_init do
-      {:stop, state}
-    else
-      {:ok, state}
-    end
   end
 
   def websocket_handle({:ping, _binary}, state) do
@@ -46,17 +39,30 @@ defmodule Lanyard.SocketHandler do
   end
 
   def websocket_handle({_type, json}, state) do
-    IO.inspect self()
     with {:ok, json} <- Poison.decode(json) do
       case json["op"] do
         2 ->
           %{"subscribe_to_ids" => ids} = json["d"]
-
-
+          init_state = ids |> Enum.reduce(%{}, fn id, acc ->
+            case GenRegistry.lookup(Lanyard.Presence, id) do
+              {:ok, pid} ->
+                {:ok, raw_data} = Presence.get_presence(id)
+                {_, presence} = Presence.build_pretty_presence(raw_data)
+                GenServer.cast(pid, {:add_subscriber, self()})
+                %{"#{id}": presence} |> Map.merge(acc)
+              _ ->
+                acc
+            end
+          end)
+          {:reply, construct_socket_msg(state.compression, %{op: 0, t: "INIT_STATE", d: init_state}), state}
         3 -> {:ok, state} # Used for heartbeating
         _ -> {:reply, {:close, 4004, "unknown_opcode"}, state}
       end
     end
+  end
+
+  def websocket_info({:remote_send, message}, state) do
+    {:reply, construct_socket_msg(state.compression, message), state}
   end
 
   defp construct_socket_msg(compression, data) do

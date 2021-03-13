@@ -18,13 +18,24 @@ defmodule Lanyard.Presence do
     {:reply, get_public_fields(state), state}
   end
 
+  def handle_cast({:add_subscriber, pid}, state) do
+    Process.monitor(pid)
+    {:noreply, %{state | subscriber_pids: [pid | state.subscriber_pids]}}
+  end
+
   def handle_cast({:sync, new_state}, state) do
+    {_, pretty_presence} = build_pretty_presence(get_public_fields(new_state |> Map.merge(%{discord_user: state.discord_user, user_id: state.user_id})))
+    state.subscriber_pids |> Enum.each(fn sub -> send(sub, {:remote_send, %{op: 0, t: "PRESENCE_UPDATE", d: pretty_presence}}) end)
     {:noreply, Map.merge(state, new_state)}
   end
 
   # def handle_cast({:gateway_presence_update, presence}, state) do
   #   {:noreply, Map.merge(state, new_state)}
   # end
+
+  def handle_info({:DOWN, ref, :process, object, reason}, state) do
+    {:noreply, %{state | subscriber_pids: state.subscriber_pids |> Enum.reject(fn sub -> sub == object end)}}
+  end
 
   @spec get_public_fields(__MODULE__) :: any
   defp get_public_fields(state) do
