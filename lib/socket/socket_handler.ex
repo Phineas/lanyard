@@ -1,6 +1,9 @@
 defmodule Lanyard.SocketHandler do
   require Logger
 
+  alias Lanyard.Presence
+
+
   @type t :: %{
     awaiting_init: boolean,
     encoding: String.t(),
@@ -40,11 +43,22 @@ defmodule Lanyard.SocketHandler do
       case json["op"] do
         2 ->
           %{"subscribe_to_ids" => ids} = json["d"]
-          ids |> Enum.each(fn id ->
-            with {:ok, pid} <- GenRegistry.lookup(Lanyard.Presence, id) do
-              GenServer.cast(pid, {:add_subscriber, self()})
+
+          init_state = ids |> Enum.reduce(%{}, fn id, acc ->
+            case GenRegistry.lookup(Lanyard.Presence, id) do
+              {:ok, pid} ->
+                {:ok, raw_data} = Presence.get_presence(id)
+                {_, presence} = Presence.build_pretty_presence(raw_data)
+                GenServer.cast(pid, {:add_subscriber, self()})
+                %{"#{id}": presence} |> Map.merge(acc)
+              _ ->
+                acc
             end
           end)
+
+          send(self(), {:remote_send, %{op: 0, t: "INIT_STATE", d: init_state}})
+
+
           {:ok, state}
         3 -> {:ok, state} # Used for heartbeating
         _ -> {:reply, {:close, 4004, "unknown_opcode"}, state}
