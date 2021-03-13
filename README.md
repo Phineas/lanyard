@@ -11,10 +11,13 @@ You can use Lanyard's API without deploying anything yourself - but if you want 
 Just [join this Discord server](https://discord.gg/UrXF2cfJ7F) and your presence will start showing up when you `GET api.lanyard.rest/v1/users/:your_id`. It's that easy.
 
 ## API Docs
+
 #### Getting a user's presence data
+
 `GET https://api.lanyard.rest/v1/users/:user_id`
 
 Example response:
+
 ```js
 {
   "success": true,
@@ -88,7 +91,75 @@ Example response:
 }
 ```
 
+## Socket Docs
+
+The websocket is available at `wss://api.lanyard.rest/socket`. If you would like to use compression, please specify `?compression=zlib` at the end of the URL.
+
+Once connected, you will receive Opcode 1: Hello which will contain heartbeat_interval in the data field. You should set a repeating interval for the time specified in heartbeat_interval which should send Opcode 3: Heartbeat on the interval. You should also be sending Opcode 2: Initialize immediately once connected.
+
+Example of `Opcode 2: Initialize`:
+
+```js
+{
+  op: 2,
+  d: {
+    // subscribe_to_ids should be an array of user IDs you want to subscribe to presences from
+    // if Lanyard doesn't monitor an ID specified, it won't be included in INIT_STATE
+    subscribe_to_ids: ["94490510688792576"]
+  }
+}
+```
+
+Once sent, you should immediately receive a `INIT_STATE` event payload if connected successfully. If not, you will be disconnected with an error (see below).
+
+### List of Opcodes
+| Opcode | Name      | Description                                                                                       | Client Send/Recv |
+|--------|-----------|---------------------------------------------------------------------------------------------------|------------------|
+| 0      | Event     | This is the default opcode when receiving core events from Lanyard, like `INIT_STATE`                    | Receive     |
+| 1      | Hello     | Lanyard sends this when clients initially connect, and it includes the heartbeat interval           | Receive Only     |
+| 2      | Initialize  | This is what the client sends when receiving Opcode 1 from Lanyard - it should contain an array of user IDs to subscribe to | Send only        |
+| 3      | Heartbeat | Clients should send Opcode 3 every 30 seconds (or whatever the Hello Opcode says to heartbeat at) | Send only        |
+
+### Events
+Events are received on `Opcode 0: Event` - the event type will be part of the root message object under the `e` key.
+
+#### Example Event Message Objects
+
+#### `INIT_STATE`
+```js
+{
+  op: 0,
+  seq: 1,
+  e: "INIT_STATE",
+  d: {
+    "94490510688792576": {
+      // Full Lanyard presence (see API docs above for example)
+    }
+  }
+}
+```
+
+#### `PRESENCE_UPDATE`
+```js
+{
+  op: 0,
+  seq: 2,
+  e: "PRESENCE_UPDATE",
+  d: {
+    // Full Lanyard presence and an extra "user_id" field
+  }
+}
+```
+
+## Error Codes
+Lanyard can disconnect clients for multiple reasons, usually to do with messages being badly formatted. Please refer to your WebSocket client to see how you should handle errors - they do not get received as regular messages.
+
+### Types of Errors
+| Name                    | Code | Data                     |
+|-------------------------|------|--------------------------|
+| Invalid/Unknown Opcode  | 4004 | `unknown_opcode`      |
+
 ## Todo
-- [ ] Finish WebSocket for subscribing to presences
+
 - [ ] React component that makes it easy for people to embed their presence on a website
 - [ ] Landing page?
