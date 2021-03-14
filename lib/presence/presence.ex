@@ -92,10 +92,7 @@ defmodule Lanyard.Presence do
         nil
       end
 
-      %{
-        activity |
-        application_id: application_id
-      }
+      Map.put(activity, application_id, application_id)
     end)
 
     has_presence? = raw_data.discord_presence !== nil
