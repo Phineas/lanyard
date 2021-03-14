@@ -84,6 +84,20 @@ defmodule Lanyard.Presence do
       timestamps: spotify_activity.timestamps
     }, else: nil
 
+    activities = raw_data.discord_presence.activities
+    |> Enum.map(fn activity ->
+      application_id = if Map.has_key?(activity, :application_id) do
+        "#{activity.application_id}"
+      else
+        nil
+      end
+
+      %{
+        activity |
+        application_id: application_id
+      }
+    end)
+
     has_presence? = raw_data.discord_presence !== nil
 
     pretty_fields = if has_presence? do
@@ -94,7 +108,7 @@ defmodule Lanyard.Presence do
         active_on_discord_mobile: Map.has_key?(raw_data.discord_presence.client_status, :mobile),
         listening_to_spotify: spotify_activity !== nil,
         spotify: pretty_spotify,
-        activities: raw_data.discord_presence.activities
+        activities: activities
       }
     else
       %{

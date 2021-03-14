@@ -39,7 +39,7 @@ Example response:
     "discord_user": {
       "username": "Phineas",
       "public_flags": 131584,
-      "id": 94490510688792576,
+      "id": "94490510688792576",
       "discriminator": "0001",
       "avatar": "a_7484f82375f47a487f41650f36d30318"
     },
