@@ -95,7 +95,7 @@ defmodule Lanyard.Presence do
           nil
         end
 
-        Map.put(activity, application_id, application_id)
+        Map.put(activity, :application_id, application_id)
       end)
 
       %{
