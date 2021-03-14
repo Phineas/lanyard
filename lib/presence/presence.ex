@@ -88,7 +88,7 @@ defmodule Lanyard.Presence do
 
     pretty_fields = if has_presence? do
       %{
-        discord_user: raw_data.discord_user,
+        discord_user: Map.put(raw_data.discord_user, :id, "#{raw_data.discord_user.id}"),
         discord_status: raw_data.discord_presence.status,
         active_on_discord_desktop: Map.has_key?(raw_data.discord_presence.client_status, :desktop),
         active_on_discord_mobile: Map.has_key?(raw_data.discord_presence.client_status, :mobile),
