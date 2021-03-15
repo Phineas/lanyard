@@ -123,7 +123,7 @@ Once sent, you should immediately receive a `INIT_STATE` event payload if connec
 | 3      | Heartbeat | Clients should send Opcode 3 every 30 seconds (or whatever the Hello Opcode says to heartbeat at) | Send only        |
 
 ### Events
-Events are received on `Opcode 0: Event` - the event type will be part of the root message object under the `e` key.
+Events are received on `Opcode 0: Event` - the event type will be part of the root message object under the `t` key.
 
 #### Example Event Message Objects
 
@@ -132,7 +132,7 @@ Events are received on `Opcode 0: Event` - the event type will be part of the ro
 {
   op: 0,
   seq: 1,
-  e: "INIT_STATE",
+  t: "INIT_STATE",
   d: {
     "94490510688792576": {
       // Full Lanyard presence (see API docs above for example)
@@ -146,7 +146,7 @@ Events are received on `Opcode 0: Event` - the event type will be part of the ro
 {
   op: 0,
   seq: 2,
-  e: "PRESENCE_UPDATE",
+  t: "PRESENCE_UPDATE",
   d: {
     // Full Lanyard presence and an extra "user_id" field
   }
