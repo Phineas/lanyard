@@ -110,6 +110,8 @@ Example of `Opcode 2: Initialize`:
 }
 ```
 
+If you just want to subscribe to one user, you can send `subscribe_to_id` instead with a string of a single user ID to subscribe to. Then, the INIT_STATE's data will just contain the presence object for the user you've subscribed to instead of a user_id->presence map.
+
 Once sent, you should immediately receive a `INIT_STATE` event payload if connected successfully. If not, you will be disconnected with an error (see below).
 
 ### List of Opcodes

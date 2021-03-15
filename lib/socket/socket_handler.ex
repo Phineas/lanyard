@@ -42,18 +42,25 @@ defmodule Lanyard.SocketHandler do
     with {:ok, json} <- Poison.decode(json) do
       case json["op"] do
         2 ->
-          %{"subscribe_to_ids" => ids} = json["d"]
-          init_state = ids |> Enum.reduce(%{}, fn id, acc ->
-            case GenRegistry.lookup(Lanyard.Presence, id) do
-              {:ok, pid} ->
-                {:ok, raw_data} = Presence.get_presence(id)
-                {_, presence} = Presence.build_pretty_presence(raw_data)
-                GenServer.cast(pid, {:add_subscriber, self()})
-                %{"#{id}": presence} |> Map.merge(acc)
-              _ ->
-                acc
-            end
-          end)
+          init_state = case json["d"] do
+            %{"subscribe_to_ids" => ids} ->
+              ids |> Enum.reduce(%{}, fn id, acc ->
+                case GenRegistry.lookup(Lanyard.Presence, id) do
+                  {:ok, pid} ->
+                    {:ok, raw_data} = Presence.get_presence(id)
+                    {_, presence} = Presence.build_pretty_presence(raw_data)
+                    GenServer.cast(pid, {:add_subscriber, self()})
+                    %{"#{id}": presence} |> Map.merge(acc)
+                  _ ->
+                    acc
+                end
+              end)
+            %{"subscribe_to_id" => id} ->
+              {:ok, raw_data} = Presence.get_presence(id)
+              {_, presence} = Presence.build_pretty_presence(raw_data)
+
+              presence
+          end
           {:reply, construct_socket_msg(state.compression, %{op: 0, t: "INIT_STATE", d: init_state}), state}
         3 -> {:ok, state} # Used for heartbeating
         _ -> {:reply, {:close, 4004, "unknown_opcode"}, state}
