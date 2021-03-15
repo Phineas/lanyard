@@ -56,8 +56,12 @@ defmodule Lanyard.SocketHandler do
                 end
               end)
             %{"subscribe_to_id" => id} ->
+              {:ok, pid} = GenRegistry.lookup(Lanyard.Presence, id)
+
               {:ok, raw_data} = Presence.get_presence(id)
               {_, presence} = Presence.build_pretty_presence(raw_data)
+
+              GenServer.cast(pid, {:add_subscriber, self()})
 
               presence
           end
