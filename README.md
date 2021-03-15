@@ -1,6 +1,6 @@
 <img src="https://storage.googleapis.com/lanyard/static/lanyardtemplogo.png" alt="Lanyard Logo" width="300"/>
 
-# Expose your Discord presence and activities to a RESTful API and WebSocket in less than 10 seconds
+# 🏷️ Expose your Discord presence and activities to a RESTful API and WebSocket in less than 10 seconds
 
 Lanyard is a service that makes it super easy to export your live Discord presence to an API endpoint (`api.lanyard.rest/v1/users/:your_id`) and to a WebSocket (see below) for you to use wherever you want - for example, I use this to display what I'm listening to on Spotify on my personal website.
 
@@ -161,7 +161,15 @@ Lanyard can disconnect clients for multiple reasons, usually to do with messages
 |-------------------------|------|--------------------------|
 | Invalid/Unknown Opcode  | 4004 | `unknown_opcode`      |
 
+
+## Used By
+Below is a list of sites using Lanyard right now, check them out! A lot of them will only show an activity when they're active. Create a PR to add your site below!
+
+- [alistair.cloud](https://alistair.cloud)
+- [timcole.me](https://timcole.me)
+- [dustin.sh](https://dustin.sh)
+- [phineas.io](https://phineas.io)
+
 ## Todo
 
-- [ ] React component that makes it easy for people to embed their presence on a website
 - [ ] Landing page?

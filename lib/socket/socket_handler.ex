@@ -3,7 +3,6 @@ defmodule Lanyard.SocketHandler do
 
   alias Lanyard.Presence
 
-
   @type t :: %{
     awaiting_init: boolean,
     encoding: String.t(),
@@ -44,6 +43,7 @@ defmodule Lanyard.SocketHandler do
         2 ->
           init_state = case json["d"] do
             %{"subscribe_to_ids" => ids} ->
+              Logger.debug("Sockets | Socket initialized and subscribed to list: #{inspect(ids)}")
               ids |> Enum.reduce(%{}, fn id, acc ->
                 case GenRegistry.lookup(Lanyard.Presence, id) do
                   {:ok, pid} ->
@@ -55,6 +55,7 @@ defmodule Lanyard.SocketHandler do
                     acc
                 end
               end)
+
             %{"subscribe_to_id" => id} ->
               {:ok, pid} = GenRegistry.lookup(Lanyard.Presence, id)
 
@@ -63,6 +64,7 @@ defmodule Lanyard.SocketHandler do
 
               GenServer.cast(pid, {:add_subscriber, self()})
 
+              Logger.debug("Sockets | Socket initialized and subscribed to singleton: #{id}")
               presence
           end
           {:reply, construct_socket_msg(state.compression, %{op: 0, t: "INIT_STATE", d: init_state}), state}
@@ -72,6 +74,19 @@ defmodule Lanyard.SocketHandler do
     end
   end
 
+  @spec websocket_info({:remote_send, any}, atom | %{:compression => any, optional(any) => any}) ::
+          {:reply,
+           {:binary,
+            maybe_improper_list(
+              binary | maybe_improper_list(any, binary | []) | byte,
+              binary | []
+            )}
+           | {:text,
+              binary
+              | maybe_improper_list(
+                  binary | maybe_improper_list(any, binary | []) | byte,
+                  binary | []
+                )}, atom | %{:compression => any, optional(any) => any}}
   def websocket_info({:remote_send, message}, state) do
     {:reply, construct_socket_msg(state.compression, message), state}
   end
