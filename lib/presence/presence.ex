@@ -77,11 +77,12 @@ defmodule Lanyard.Presence do
     end
 
     pretty_spotify = if spotify_activity !== nil, do: %{
+      track_id: spotify_activity.sync_id,
       artist: spotify_activity.state,
       song: spotify_activity.details,
       album: spotify_activity.assets.large_text,
       album_art_url: "https://i.scdn.co/image/#{spotify_album_art_id}",
-      timestamps: spotify_activity.timestamps
+      timestamps: spotify_activity.timestamps,
     }, else: nil
 
     has_presence? = raw_data.discord_presence !== nil
