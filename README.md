@@ -169,6 +169,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [timcole.me](https://timcole.me)
 - [dustin.sh](https://dustin.sh)
 - [phineas.io](https://phineas.io)
+- [juan.engineer](https://juan.engineer)
 
 ## Todo
 
