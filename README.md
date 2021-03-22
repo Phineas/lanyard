@@ -170,6 +170,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [dustin.sh](https://dustin.sh)
 - [phineas.io](https://phineas.io)
 - [juan.engineer](https://juan.engineer)
+- [slayter.dev](https://slayter.dev)
 
 ## Todo
 
