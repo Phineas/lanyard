@@ -177,6 +177,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [astn.me](https://astn.me)
 - [eggsy.xyz](https://eggsy.xyz)
 - [crugg.de](https://crugg.de)
+- [igalaxy.dev](https://igalaxy.dev)
 
 ## Todo
 
