@@ -173,6 +173,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [slayter.dev](https://slayter.dev)
 - [lafond.dev](https://lafond.dev)
 - [atzu.studio](https://atzu.studio)
+- [itspolar.dev](https://itspolar.dev)
 - [dont-ping.me](https://dont-ping.me)
 - [astn.me](https://astn.me)
 - [eggsy.xyz](https://eggsy.xyz)
