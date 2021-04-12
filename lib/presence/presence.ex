@@ -69,11 +69,13 @@ defmodule Lanyard.Presence do
       activity.id == Application.get_env(:lanyard, :discord_spotify_activity_id)
     end)
 
-    [_asset_host_id, spotify_album_art_id] = unless spotify_activity == nil do
-      spotify_activity.assets.large_image
+    spotify_album_art_link = unless spotify_activity == nil or spotify_activity.assets.large_image === nil do
+      [_asset_resource_type, art_id] = spotify_activity.assets.large_image
       |> String.split(":")
+
+      "https://i.scdn.co/image/#{art_id}"
     else
-      ["spotify", nil]
+      nil
     end
 
     pretty_spotify = if spotify_activity !== nil, do: %{
@@ -81,7 +83,7 @@ defmodule Lanyard.Presence do
       artist: spotify_activity.state,
       song: spotify_activity.details,
       album: spotify_activity.assets.large_text,
-      album_art_url: "https://i.scdn.co/image/#{spotify_album_art_id}",
+      album_art_url: spotify_album_art_link,
       timestamps: spotify_activity.timestamps,
     }, else: nil
 
