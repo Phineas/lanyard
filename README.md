@@ -169,6 +169,17 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [timcole.me](https://timcole.me)
 - [dustin.sh](https://dustin.sh)
 - [phineas.io](https://phineas.io)
+- [juan.engineer](https://juan.engineer)
+- [slayter.dev](https://slayter.dev)
+- [lafond.dev](https://lafond.dev)
+- [atzu.studio](https://atzu.studio)
+- [dont-ping.me](https://dont-ping.me)
+- [astn.me](https://astn.me)
+- [eggsy.xyz](https://eggsy.xyz)
+- [crugg.de](https://crugg.de)
+- [igalaxy.dev](https://igalaxy.dev)
+- [itspolar.dev](https://itspolar.dev)
+- [v30xy.github.io](https://v30xy.github.io)
 
 ## Todo
 
