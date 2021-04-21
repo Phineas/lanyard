@@ -179,7 +179,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [crugg.de](https://crugg.de)
 - [igalaxy.dev](https://igalaxy.dev)
 - [itspolar.dev](https://itspolar.dev)
-- [v30xy.github.io](https://v30xy.gitlab.io)
+- [v30xy.gitlab.io](https://v30xy.gitlab.io)
 - [vasc.dev](https://vasc.dev)
 
 ## Todo
