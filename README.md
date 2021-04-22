@@ -181,6 +181,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [itspolar.dev](https://itspolar.dev)
 - [v30xy.gitlab.io](https://v30xy.gitlab.io)
 - [vasc.dev](https://vasc.dev)
+- [eri.gg](https://eri.gg)
 
 ## Todo
 
