@@ -182,7 +182,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [v30xy.gitlab.io](https://v30xy.gitlab.io)
 - [vasc.dev](https://vasc.dev)
 - [eri.gg](https://eri.gg)
-- [ademcancertel-github-io.vercel.app](https://ademcancertel-github-io.vercel.app)
+- [ademcancertel.tech](http://ademcancertel.tech)
 
 ## Todo
 
