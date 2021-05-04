@@ -166,7 +166,6 @@ Lanyard can disconnect clients for multiple reasons, usually to do with messages
 Below is a list of sites using Lanyard right now, check them out! A lot of them will only show an activity when they're active. Create a PR to add your site below!
 
 - [alistair.cloud](https://alistair.cloud)
-- [chezzer.dev](https://chezzer.dev)
 - [timcole.me](https://timcole.me)
 - [dustin.sh](https://dustin.sh)
 - [phineas.io](https://phineas.io)
@@ -183,6 +182,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [v30xy.gitlab.io](https://v30xy.gitlab.io)
 - [vasc.dev](https://vasc.dev)
 - [eri.gg](https://eri.gg)
+- [chezzer.dev](https://chezzer.dev)
 
 ## Todo
 
