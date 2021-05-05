@@ -182,6 +182,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [v30xy.gitlab.io](https://v30xy.gitlab.io)
 - [vasc.dev](https://vasc.dev)
 - [eri.gg](https://eri.gg)
+- [voided.dev](https://voided.dev)
 - [thicc-thighs.de](https://thicc-thighs.de)
 
 ## Todo
