@@ -186,6 +186,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [thicc-thighs.de](https://thicc-thighs.de)
 - [ademcancertel.tech](http://ademcancertel.tech)
 - [chezzer.dev](https://chezzer.dev)
+- [arda.codes](https://arda.codes)
 
 ## Todo
 
