@@ -69,7 +69,7 @@ defmodule Lanyard.Presence do
       activity.id == Application.get_env(:lanyard, :discord_spotify_activity_id)
     end)
 
-    spotify_album_art_link = unless spotify_activity == nil or spotify_activity.assets.large_image === nil do
+    spotify_album_art_link = unless spotify_activity == nil or not Map.has_key?(spotify_activity.assets, :large_image) do
       [_asset_resource_type, art_id] = spotify_activity.assets.large_image
       |> String.split(":")
 
@@ -79,7 +79,11 @@ defmodule Lanyard.Presence do
     end
 
     pretty_spotify = if spotify_activity !== nil, do: %{
-      track_id: spotify_activity.sync_id,
+      track_id: if Map.has_key?(spotify_activity, :sync_id) do
+        spotify_activity.sync_id
+      else
+        nil
+      end,
       artist: spotify_activity.state,
       song: spotify_activity.details,
       album: spotify_activity.assets.large_text,
