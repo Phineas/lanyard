@@ -187,6 +187,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [ademcancertel.tech](http://ademcancertel.tech)
 - [chezzer.dev](https://chezzer.dev)
 - [arda.codes](https://arda.codes)
+- [looskie.com](https://looskie.com)
 
 ## Todo
 
