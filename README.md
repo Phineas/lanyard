@@ -189,6 +189,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [arda.codes](https://arda.codes)
 - [looskie.com](https://looskie.com)
 - [bariscodes.me](https://bariscodes.me)
+- [marino.codes](https://marino.codes)
 
 ## Todo
 
