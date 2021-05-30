@@ -52,7 +52,7 @@ defmodule Lanyard.Presence do
   #   {:noreply, Map.merge(state, new_state)}
   # end
 
-  def handle_info({:DOWN, ref, :process, object, reason}, state) do
+  def handle_info({:DOWN, _ref, :process, object, _reason}, state) do
     {:noreply,
      %{state | subscriber_pids: state.subscriber_pids |> Enum.reject(fn sub -> sub == object end)}}
   end
