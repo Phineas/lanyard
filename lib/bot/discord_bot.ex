@@ -30,5 +30,4 @@ defmodule Lanyard.DiscordBot do
 
     {:noreply, state, {:continue, :setup_bot}}
   end
-
 end

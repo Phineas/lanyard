@@ -1,7 +1,7 @@
 defmodule Lanyard.Gateway.Heartbeat do
   use GenServer
   require Logger
-  import Lanyard.Gateway.Client , only: [opcodes: 0]
+  import Lanyard.Gateway.Client, only: [opcodes: 0]
   import Lanyard.Gateway.Utility
 
   def start_link(agent_seq_num, interval, socket_pid, opts \\ []) do
@@ -22,8 +22,9 @@ defmodule Lanyard.Gateway.Heartbeat do
       interval: interval,
       socket_pid: socket_pid,
       timer: nil,
-      ack?: true,
+      ack?: true
     }
+
     send(self(), :beat)
     {:ok, state}
   end
@@ -49,6 +50,7 @@ defmodule Lanyard.Gateway.Heartbeat do
     send(self(), :beat)
     {:reply, :ok, %{state | ack?: true}}
   end
+
   def handle_call(:reset, _from, %{timer: timer} = state) do
     Process.cancel_timer(timer)
     send(self(), :beat)
@@ -56,7 +58,7 @@ defmodule Lanyard.Gateway.Heartbeat do
   end
 
   def handle_call(msg, _from, state) do
-    Logger.debug(fn -> "Heartbeat called with invalid message #{inspect msg}" end)
+    Logger.debug(fn -> "Heartbeat called with invalid message #{inspect(msg)}" end)
     {:noreply, state}
   end
 end
