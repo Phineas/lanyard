@@ -174,6 +174,22 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [lafond.dev](https://lafond.dev)
 - [atzu.studio](https://atzu.studio)
 - [dont-ping.me](https://dont-ping.me)
+- [astn.me](https://astn.me)
+- [eggsy.xyz](https://eggsy.xyz)
+- [crugg.de](https://crugg.de)
+- [igalaxy.dev](https://igalaxy.dev)
+- [itspolar.dev](https://itspolar.dev)
+- [vasc.dev](https://vasc.dev)
+- [eri.gg](https://eri.gg)
+- [voided.dev](https://voided.dev)
+- [thicc-thighs.de](https://thicc-thighs.de)
+- [ademcancertel.tech](http://ademcancertel.tech)
+- [chezzer.dev](https://chezzer.dev)
+- [arda.codes](https://arda.codes)
+- [looskie.com](https://looskie.com)
+- [bariscodes.me](https://bariscodes.me)
+- [marino.codes](https://marino.codes)
+- [stealthwave.dev](https://stealthwave.dev)
 
 ## Todo
 
