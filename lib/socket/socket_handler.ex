@@ -4,10 +4,10 @@ defmodule Lanyard.SocketHandler do
   alias Lanyard.Presence
 
   @type t :: %{
-    awaiting_init: boolean,
-    encoding: String.t(),
-    compression: String.t()
-  }
+          awaiting_init: boolean,
+          encoding: String.t(),
+          compression: String.t()
+        }
 
   defstruct awaiting_init: true,
             encoding: nil,
@@ -16,13 +16,14 @@ defmodule Lanyard.SocketHandler do
   @behaviour :cowboy_websocket
 
   def init(request, _state) do
-    compression = request
-    |> :cowboy_req.parse_qs
-    |> Enum.find(fn {name, _value} -> name == "compression" end)
-    |> case do
-      {_name, "zlib_json"} -> :zlib
-      _ -> :json
-    end
+    compression =
+      request
+      |> :cowboy_req.parse_qs()
+      |> Enum.find(fn {name, _value} -> name == "compression" end)
+      |> case do
+        {_name, "zlib_json"} -> :zlib
+        _ -> :json
+      end
 
     state = %__MODULE__{awaiting_init: true, encoding: "json", compression: compression}
 
@@ -30,7 +31,9 @@ defmodule Lanyard.SocketHandler do
   end
 
   def websocket_init(state) do
-    {:reply, construct_socket_msg(state.compression, %{op: 1, d: %{"heartbeat_interval" => 30000}}), state}
+    {:reply,
+     construct_socket_msg(state.compression, %{op: 1, d: %{"heartbeat_interval" => 30000}}),
+     state}
   end
 
   def websocket_handle({:ping, _binary}, state) do
@@ -41,35 +44,49 @@ defmodule Lanyard.SocketHandler do
     with {:ok, json} <- Poison.decode(json) do
       case json["op"] do
         2 ->
-          init_state = case json["d"] do
-            %{"subscribe_to_ids" => ids} ->
-              Logger.debug("Sockets | Socket initialized and subscribed to list: #{inspect(ids)}")
-              ids |> Enum.reduce(%{}, fn id, acc ->
-                case GenRegistry.lookup(Lanyard.Presence, id) do
-                  {:ok, pid} ->
-                    {:ok, raw_data} = Presence.get_presence(id)
-                    {_, presence} = Presence.build_pretty_presence(raw_data)
-                    GenServer.cast(pid, {:add_subscriber, self()})
-                    %{"#{id}": presence} |> Map.merge(acc)
-                  _ ->
-                    acc
-                end
-              end)
+          init_state =
+            case json["d"] do
+              %{"subscribe_to_ids" => ids} ->
+                Logger.debug(
+                  "Sockets | Socket initialized and subscribed to list: #{inspect(ids)}"
+                )
 
-            %{"subscribe_to_id" => id} ->
-              {:ok, pid} = GenRegistry.lookup(Lanyard.Presence, id)
+                ids
+                |> Enum.reduce(%{}, fn id, acc ->
+                  case GenRegistry.lookup(Lanyard.Presence, id) do
+                    {:ok, pid} ->
+                      {:ok, raw_data} = Presence.get_presence(id)
+                      {_, presence} = Presence.build_pretty_presence(raw_data)
+                      GenServer.cast(pid, {:add_subscriber, self()})
+                      %{"#{id}": presence} |> Map.merge(acc)
 
-              {:ok, raw_data} = Presence.get_presence(id)
-              {_, presence} = Presence.build_pretty_presence(raw_data)
+                    _ ->
+                      acc
+                  end
+                end)
 
-              GenServer.cast(pid, {:add_subscriber, self()})
+              %{"subscribe_to_id" => id} ->
+                {:ok, pid} = GenRegistry.lookup(Lanyard.Presence, id)
 
-              Logger.debug("Sockets | Socket initialized and subscribed to singleton: #{id}")
-              presence
-          end
-          {:reply, construct_socket_msg(state.compression, %{op: 0, t: "INIT_STATE", d: init_state}), state}
-        3 -> {:ok, state} # Used for heartbeating
-        _ -> {:reply, {:close, 4004, "unknown_opcode"}, state}
+                {:ok, raw_data} = Presence.get_presence(id)
+                {_, presence} = Presence.build_pretty_presence(raw_data)
+
+                GenServer.cast(pid, {:add_subscriber, self()})
+
+                Logger.debug("Sockets | Socket initialized and subscribed to singleton: #{id}")
+                presence
+            end
+
+          {:reply,
+           construct_socket_msg(state.compression, %{op: 0, t: "INIT_STATE", d: init_state}),
+           state}
+
+        # Used for heartbeating
+        3 ->
+          {:ok, state}
+
+        _ ->
+          {:reply, {:close, 4004, "unknown_opcode"}, state}
       end
     end
   end
@@ -94,7 +111,7 @@ defmodule Lanyard.SocketHandler do
   defp construct_socket_msg(compression, data) do
     case compression do
       :zlib ->
-        data = data |> Poison.encode!
+        data = data |> Poison.encode!()
 
         z = :zlib.open()
         :zlib.deflateInit(z)
@@ -104,9 +121,11 @@ defmodule Lanyard.SocketHandler do
         :zlib.deflateEnd(z)
 
         {:binary, data}
+
       _ ->
-        data = data
-        |> Poison.encode!
+        data =
+          data
+          |> Poison.encode!()
 
         {:text, data}
     end

@@ -10,18 +10,18 @@ defmodule Lanyard.Gateway.Client do
 
   def opcodes do
     %{
-      :dispatch               => 0,
-      :heartbeat              => 1,
-      :identify               => 2,
-      :status_update          => 3,
-      :voice_state_update     => 4,
-      :voice_server_ping      => 5,
-      :resume                 => 6,
-      :reconnect              => 7,
-      :request_guild_members  => 8,
-      :invalid_session        => 9,
-      :hello                  => 10,
-      :heartbeat_ack          => 11
+      :dispatch => 0,
+      :heartbeat => 1,
+      :identify => 2,
+      :status_update => 3,
+      :voice_state_update => 4,
+      :voice_server_ping => 5,
+      :resume => 6,
+      :reconnect => 7,
+      :request_guild_members => 8,
+      :invalid_session => 9,
+      :hello => 10,
+      :heartbeat_ack => 11
     }
   end
 
@@ -37,14 +37,18 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def init([state]) do
-    {:ok, agent_seq_num} = Agent.start_link fn -> nil end
+    {:ok, agent_seq_num} = Agent.start_link(fn -> nil end)
 
-    new_state = state
-      |> Map.put(:client_pid, self()) # Pass the client state to use it
-      |> Map.put(:agent_seq_num, agent_seq_num) # Pass agent sequence num
-      |> Map.put(:heartbeat_pid, nil) # Place for Heartbeat process pid
+    new_state =
+      state
+      # Pass the client state to use it
+      |> Map.put(:client_pid, self())
+      # Pass agent sequence num
+      |> Map.put(:agent_seq_num, agent_seq_num)
+      # Place for Heartbeat process pid
+      |> Map.put(:heartbeat_pid, nil)
 
-      IO.puts inspect(self())
+    IO.puts(inspect(self()))
     {:once, new_state}
   end
 
@@ -72,11 +76,13 @@ defmodule Lanyard.Gateway.Client do
     # Discord sends hello op immediately after connection
     # Start sending heartbeat with interval defined by the hello packet
     Logger.debug("Discord: Hello")
-    {:ok, heartbeat_pid} = Heartbeat.start_link(
-      state[:agent_seq_num],
-      data.data.heartbeat_interval,
-      self()
-    )
+
+    {:ok, heartbeat_pid} =
+      Heartbeat.start_link(
+        state[:agent_seq_num],
+        data.data.heartbeat_interval,
+        self()
+      )
 
     {:ok, %{state | heartbeat_pid: heartbeat_pid}}
   end
@@ -93,8 +99,9 @@ defmodule Lanyard.Gateway.Client do
     # Dispatch op carries actual content like channel messages
     if event_name == :READY do
       # Client is ready
-      #Logger.debug(fn -> "Discord: Dispatch #{event_name}" end)
+      # Logger.debug(fn -> "Discord: Dispatch #{event_name}" end)
     end
+
     event = normalize_atom(event_name)
 
     handle_event({event, data}, state)
@@ -152,16 +159,15 @@ defmodule Lanyard.Gateway.Client do
 
   @spec websocket_terminate(any(), any(), nil | keyword() | map()) :: :ok
   def websocket_terminate(reason, _conn_state, state) do
-    Logger.info "Websocket closed in state #{inspect state} with reason #{inspect reason}"
-    Logger.info "Killing seq_num process!"
+    Logger.info("Websocket closed in state #{inspect(state)} with reason #{inspect(reason)}")
+    Logger.info("Killing seq_num process!")
     Process.exit(state[:agent_seq_num], :kill)
-    Logger.info "Killing rest_client process!"
+    Logger.info("Killing rest_client process!")
     Process.exit(state[:rest_client], :kill)
-    Logger.info "Killing heartbeat process!"
+    Logger.info("Killing heartbeat process!")
     Process.exit(state[:heartbeat_pid], :kill)
     :ok
   end
-
 
   def handle_event({:ready, payload}, state) do
     new_state = Map.put(state, :session_id, payload.data[:session_id])
@@ -176,8 +182,9 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def handle_event({:presence_update, payload}, state) do
-    with {:ok, pid} <- GenRegistry.lookup(Lanyard.Presence, Integer.to_string(payload.data.user.id)) do
-      GenServer.cast pid, {:sync, %{discord_presence: payload.data}}
+    with {:ok, pid} <-
+           GenRegistry.lookup(Lanyard.Presence, Integer.to_string(payload.data.user.id)) do
+      GenServer.cast(pid, {:sync, %{discord_presence: payload.data}})
     end
 
     {:ok, state}
@@ -186,12 +193,13 @@ defmodule Lanyard.Gateway.Client do
   def handle_event({:guild_member_add, payload}, state) do
     Logger.debug("User #{payload.data["user"]["id"]} joined guild")
 
-    request_payload = payload_build(opcode(opcodes(), :request_guild_members), %{
-      "guild_id" => payload.data["guild_id"],
-      "user_ids" => [payload.data["user"]["id"]],
-      "limit" => 1,
-      "presences" => true
-    })
+    request_payload =
+      payload_build(opcode(opcodes(), :request_guild_members), %{
+        "guild_id" => payload.data["guild_id"],
+        "user_ids" => [payload.data["user"]["id"]],
+        "limit" => 1,
+        "presences" => true
+      })
 
     :websocket_client.cast(self(), {:binary, request_payload})
 
@@ -212,7 +220,7 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def handle_event({event, _payload}, state) do
-    IO.inspect event
+    IO.inspect(event)
     {:ok, state}
   end
 
@@ -232,12 +240,13 @@ defmodule Lanyard.Gateway.Client do
           "name" => "lanyard.rest",
           "type" => 0
         },
-        "status" => "online",
+        "status" => "online"
       },
       "compress" => false,
       "large_threshold" => 250,
       "intents" => 259
     }
+
     payload = payload_build(opcode(opcodes(), :identify), data)
     :websocket_client.cast(self(), {:binary, payload})
   end
@@ -251,8 +260,9 @@ defmodule Lanyard.Gateway.Client do
   defp create_member_presences(payload) do
     Task.start(fn ->
       Enum.each(payload.data.members, fn member ->
-        presence = payload.data.presences
-        |> Enum.find(fn presence -> presence.user.id === member.user.id end)
+        presence =
+          payload.data.presences
+          |> Enum.find(fn presence -> presence.user.id === member.user.id end)
 
         gen_init = %{
           user_id: Integer.to_string(member.user.id),
@@ -261,7 +271,7 @@ defmodule Lanyard.Gateway.Client do
         }
 
         {:ok, pid} = GenRegistry.lookup_or_start(Lanyard.Presence, gen_init.user_id, [gen_init])
-        GenServer.cast pid, {:sync, gen_init}
+        GenServer.cast(pid, {:sync, gen_init})
       end)
     end)
   end

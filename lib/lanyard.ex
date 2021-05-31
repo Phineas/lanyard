@@ -6,8 +6,12 @@ defmodule Lanyard do
 
     children = [
       {GenRegistry, worker_module: Lanyard.Presence},
-      Plug.Cowboy.child_spec(scheme: :http, plug: Lanyard.Router, options: [port: 4001, dispatch: dispatch(), protocol_options: [idle_timeout: :infinity]]),
-      {Lanyard.DiscordBot, %{token: Application.get_env(:lanyard, :bot_token)}},
+      Plug.Cowboy.child_spec(
+        scheme: :http,
+        plug: Lanyard.Router,
+        options: [port: 4001, dispatch: dispatch(), protocol_options: [idle_timeout: :infinity]]
+      ),
+      {Lanyard.DiscordBot, %{token: Application.get_env(:lanyard, :bot_token)}}
     ]
 
     opts = [strategy: :one_for_one, name: Lanyard.Supervisor]
@@ -17,11 +21,10 @@ defmodule Lanyard do
   defp dispatch do
     [
       {:_,
-        [
-          {"/socket", Lanyard.SocketHandler, []},
-          {:_, Plug.Cowboy.Handler, {Lanyard.Api.Router, []}}
-        ]
-      }
+       [
+         {"/socket", Lanyard.SocketHandler, []},
+         {:_, Plug.Cowboy.Handler, {Lanyard.Api.Router, []}}
+       ]}
     ]
   end
 end

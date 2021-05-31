@@ -1,6 +1,13 @@
 defmodule Lanyard.Api.Util do
   import Plug.Conn
 
+  @spec redirect(Plug.Conn.t(), binary) :: Plug.Conn.t()
+  def redirect(conn, url) do
+    conn
+    |> put_resp_header("location", url)
+    |> send_resp(:found, url)
+  end
+
   @spec respond(Plug.Conn.t(), {:ok, any}) :: Plug.Conn.t()
   def respond(conn, {:ok, data}) do
     conn
@@ -12,9 +19,15 @@ defmodule Lanyard.Api.Util do
   def respond(conn, {:error, code, reason}) do
     conn
     |> put_resp_content_type("application/json")
-    |> send_resp(404, Poison.encode!(%{success: false, error: %{
-      code: Atom.to_string(code),
-      message: reason
-    }}))
+    |> send_resp(
+      404,
+      Poison.encode!(%{
+        success: false,
+        error: %{
+          code: Atom.to_string(code),
+          message: reason
+        }
+      })
+    )
   end
 end
