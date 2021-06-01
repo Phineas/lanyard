@@ -187,7 +187,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [chezzer.dev](https://chezzer.dev)
 - [arda.codes](https://arda.codes)
 - [looskie.com](https://looskie.com)
-- [bariscodes.me](https://barbarbar338.fly.dev)
+- [barbarbar338.fly.dev](https://barbarbar338.fly.dev)
 - [marino.codes](https://marino.codes)
 - [stealthwave.dev](https://stealthwave.dev)
 - [miraichu.co](https://miraichu.co)
