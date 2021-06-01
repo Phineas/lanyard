@@ -190,6 +190,8 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [bariscodes.me](https://bariscodes.me)
 - [marino.codes](https://marino.codes)
 - [stealthwave.dev](https://stealthwave.dev)
+- [bobby.systems](https://bobby.systems/Core.Home)
+- [dann.systems](https://dann.systems)
 
 ## Todo
 
