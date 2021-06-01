@@ -193,6 +193,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [miraichu.co](https://miraichu.co)
 - [bobby.systems](https://bobby.systems/Core.Home)
 - [dann.systems](https://dann.systems)
+- [meric.vercel.app](https://meric.vercel.app)
 
 ## Todo
 
