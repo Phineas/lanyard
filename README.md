@@ -198,6 +198,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [nith.codes](https://nith.codes)
 - [callumdev.xyz](https://callumdev.xyz)
 - [domm.me](https://domm.me)
+- [rafstech.link](https://rafstech.link)
 
 ## Todo
 
