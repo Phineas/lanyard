@@ -199,6 +199,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [callumdev.xyz](https://callumdev.xyz)
 - [domm.me](https://domm.me)
 - [rafstech.link](https://rafstech.link)
+- [veny.xyz](https://veny.xyz)
 
 ## Todo
 
