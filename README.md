@@ -201,7 +201,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [rafstech.link](https://rafstech.link)
 - [veny.xyz](https://veny.xyz)
 - [5elenay.github.io](https://5elenay.github.io)
-
+- [marcuscodes.me](https://marcuscodes.me)
 
 ## Todo
 
