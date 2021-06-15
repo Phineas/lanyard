@@ -200,6 +200,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [domm.me](https://domm.me)
 - [rafstech.link](https://rafstech.link)
 - [veny.xyz](https://veny.xyz)
+- [marcuscodes.me](https://marcuscodes.me)
 
 ## Todo
 
