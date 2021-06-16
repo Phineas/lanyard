@@ -195,6 +195,13 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [dann.systems](https://dann.systems)
 - [meric.vercel.app](https://meric.vercel.app)
 - [spotsync.me](https://spotsync.me/?utm_source=lanyardgithub&utm_medium=link&utm_campaign=lanyard)
+- [nith.codes](https://nith.codes)
+- [callumdev.xyz](https://callumdev.xyz)
+- [domm.me](https://domm.me)
+- [rafstech.link](https://rafstech.link)
+- [veny.xyz](https://veny.xyz)
+- [5elenay.github.io](https://5elenay.github.io)
+- [marcuscodes.me](https://marcuscodes.me)
 - [encrypteddev.com](https://encrypteddev.com)
 
 ## Todo
