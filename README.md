@@ -10,6 +10,16 @@ You can use Lanyard's API without deploying anything yourself - but if you want 
 
 Just [join this Discord server](https://discord.gg/UrXF2cfJ7F) and your presence will start showing up when you `GET api.lanyard.rest/v1/users/:your_id`. It's that easy.
 
+## Community Projects
+
+The Lanyard community has worked on some pretty cool projects that allows you to extend the functionality of Lanyard. PR to add a project!
+
+[lanyard-profile-readme](https://github.com/cnrad/lanyard-profile-readme) - Utilize Lanyard to display your Discord Presence in your GitHub Profile  
+[spotsync.me](https://spotsync.me) - Stream music from your Discord presence to your friends in realtime through a slick UI  
+[vue-lanyard](https://github.com/eggsy/vue-lanyard) - Lanyard API plugin for Vue. Supports REST and WebSocket methods  
+[react-use-lanyard](https://github.com/barbarbar338/react-use-lanyard) - React hook for Lanyard - supports REST & WebSocket  
+[use-lanyard](https://github.com/alii/use-lanyard) - Another React hook for Lanyard that uses SWR
+
 ## API Docs
 
 #### Getting a user's presence data
@@ -115,19 +125,22 @@ If you just want to subscribe to one user, you can send `subscribe_to_id` instea
 Once sent, you should immediately receive a `INIT_STATE` event payload if connected successfully. If not, you will be disconnected with an error (see below).
 
 ### List of Opcodes
-| Opcode | Name      | Description                                                                                       | Client Send/Recv |
-|--------|-----------|---------------------------------------------------------------------------------------------------|------------------|
-| 0      | Event     | This is the default opcode when receiving core events from Lanyard, like `INIT_STATE`                    | Receive     |
-| 1      | Hello     | Lanyard sends this when clients initially connect, and it includes the heartbeat interval           | Receive Only     |
-| 2      | Initialize  | This is what the client sends when receiving Opcode 1 from Lanyard - it should contain an array of user IDs to subscribe to | Send only        |
-| 3      | Heartbeat | Clients should send Opcode 3 every 30 seconds (or whatever the Hello Opcode says to heartbeat at) | Send only        |
+
+| Opcode | Name       | Description                                                                                                                 | Client Send/Recv |
+| ------ | ---------- | --------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| 0      | Event      | This is the default opcode when receiving core events from Lanyard, like `INIT_STATE`                                       | Receive          |
+| 1      | Hello      | Lanyard sends this when clients initially connect, and it includes the heartbeat interval                                   | Receive Only     |
+| 2      | Initialize | This is what the client sends when receiving Opcode 1 from Lanyard - it should contain an array of user IDs to subscribe to | Send only        |
+| 3      | Heartbeat  | Clients should send Opcode 3 every 30 seconds (or whatever the Hello Opcode says to heartbeat at)                           | Send only        |
 
 ### Events
+
 Events are received on `Opcode 0: Event` - the event type will be part of the root message object under the `t` key.
 
 #### Example Event Message Objects
 
 #### `INIT_STATE`
+
 ```js
 {
   op: 0,
@@ -142,6 +155,7 @@ Events are received on `Opcode 0: Event` - the event type will be part of the ro
 ```
 
 #### `PRESENCE_UPDATE`
+
 ```js
 {
   op: 0,
@@ -154,15 +168,17 @@ Events are received on `Opcode 0: Event` - the event type will be part of the ro
 ```
 
 ## Error Codes
+
 Lanyard can disconnect clients for multiple reasons, usually to do with messages being badly formatted. Please refer to your WebSocket client to see how you should handle errors - they do not get received as regular messages.
 
 ### Types of Errors
-| Name                    | Code | Data                     |
-|-------------------------|------|--------------------------|
-| Invalid/Unknown Opcode  | 4004 | `unknown_opcode`      |
 
+| Name                   | Code | Data             |
+| ---------------------- | ---- | ---------------- |
+| Invalid/Unknown Opcode | 4004 | `unknown_opcode` |
 
 ## Used By
+
 Below is a list of sites using Lanyard right now, check them out! A lot of them will only show an activity when they're active. Create a PR to add your site below!
 
 - [alistair.cloud](https://alistair.cloud)
