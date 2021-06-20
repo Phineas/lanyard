@@ -19,6 +19,7 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [vue-lanyard](https://github.com/eggsy/vue-lanyard) - Lanyard API plugin for Vue. Supports REST and WebSocket methods  
 [react-use-lanyard](https://github.com/barbarbar338/react-use-lanyard) - React hook for Lanyard - supports REST & WebSocket  
 [use-lanyard](https://github.com/alii/use-lanyard) - Another React hook for Lanyard that uses SWR
+[lanyard-visualizer](https://lanyard-visualizer.netlify.app/) - Beautifully display your Discord presence on a website
 
 ## API Docs
 
