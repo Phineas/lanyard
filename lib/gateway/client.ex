@@ -48,7 +48,6 @@ defmodule Lanyard.Gateway.Client do
       # Place for Heartbeat process pid
       |> Map.put(:heartbeat_pid, nil)
 
-    IO.puts(inspect(self()))
     {:once, new_state}
   end
 
@@ -182,8 +181,7 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def handle_event({:presence_update, payload}, state) do
-    with {:ok, pid} <-
-           GenRegistry.lookup(Lanyard.Presence, Integer.to_string(payload.data.user.id)) do
+    with {:ok, pid} <- GenRegistry.lookup(Lanyard.Presence, Integer.to_string(payload.data.user.id)) do
       GenServer.cast(pid, {:sync, %{discord_presence: payload.data}})
     end
 
@@ -206,6 +204,16 @@ defmodule Lanyard.Gateway.Client do
     {:ok, state}
   end
 
+  def handle_event({:guild_member_update, payload}, state) do
+    Logger.debug("User object for #{payload.data.user.id} was updated")
+
+    with {:ok, pid} <- GenRegistry.lookup(Lanyard.Presence, Integer.to_string(payload.data.user.id)) do
+      GenServer.cast(pid, {:sync, %{discord_user: payload.data.user}})
+    end
+
+    {:ok, state}
+  end
+
   def handle_event({:guild_member_remove, payload}, state) do
     Logger.debug("User #{payload.data["user"]["id"]} left guild")
     GenRegistry.stop(Lanyard.Presence, Integer.to_string(payload.data["user"]["id"]))
@@ -220,7 +228,6 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def handle_event({event, _payload}, state) do
-    IO.inspect(event)
     {:ok, state}
   end
 

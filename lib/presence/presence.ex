@@ -1,3 +1,9 @@
+defmodule Lanyard.Presence.PublicFields do
+  defstruct [:user_id,
+            :discord_user,
+            :discord_presence]
+end
+
 defmodule Lanyard.Presence do
   use GenServer
 
@@ -11,8 +17,6 @@ defmodule Lanyard.Presence do
   end
 
   def init(state) do
-    IO.inspect(state)
-
     {:ok,
      %__MODULE__{
        user_id: state.user_id,
@@ -35,8 +39,8 @@ defmodule Lanyard.Presence do
     {_, pretty_presence} =
       build_pretty_presence(
         get_public_fields(
-          new_state
-          |> Map.merge(%{discord_user: state.discord_user, user_id: state.user_id})
+          %{discord_user: state.discord_user, discord_presence: state.discord_presence, user_id: state.user_id}
+          |> Map.merge(new_state)
         )
       )
 
@@ -48,18 +52,14 @@ defmodule Lanyard.Presence do
     {:noreply, Map.merge(state, new_state)}
   end
 
-  # def handle_cast({:gateway_presence_update, presence}, state) do
-  #   {:noreply, Map.merge(state, new_state)}
-  # end
-
   def handle_info({:DOWN, _ref, :process, object, _reason}, state) do
     {:noreply,
      %{state | subscriber_pids: state.subscriber_pids |> Enum.reject(fn sub -> sub == object end)}}
   end
 
-  @spec get_public_fields(__MODULE__) :: any
+  @spec get_public_fields(any()) :: Lanyard.Presence.PublicFields
   defp get_public_fields(state) do
-    %{
+    %Lanyard.Presence.PublicFields{
       user_id: state.user_id,
       discord_user: state.discord_user,
       discord_presence: state.discord_presence
@@ -132,7 +132,15 @@ defmodule Lanyard.Presence do
                 nil
               end
 
+            emoji = if Map.has_key?(activity, :emoji) and Map.has_key?(activity.emoji, :id) and is_number(activity.emoji.id) do
+              Map.put(activity.emoji, :id, "#{activity.emoji.id}")
+            else
+              nil
+            end
+
+
             Map.put(activity, :application_id, application_id)
+            Map.put(activity, :emoji, emoji)
           end)
 
         %{
