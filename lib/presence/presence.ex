@@ -138,9 +138,9 @@ defmodule Lanyard.Presence do
               nil
             end
 
-
-            Map.put(activity, :application_id, application_id)
-            Map.put(activity, :emoji, emoji)
+            activity
+            |> Map.put(:application_id, application_id)
+            |> Map.put(:emoji, emoji)
           end)
 
         %{
