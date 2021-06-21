@@ -221,6 +221,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [marcuscodes.me](https://marcuscodes.me)
 - [nickdev.org](https://nickdev.org)
 - [encrypteddev.com](https://encrypteddev.com)
+- [kevinthomas.codes](https://kevinthomas.codes)
 
 ## Todo
 
