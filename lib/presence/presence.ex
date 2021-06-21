@@ -132,11 +132,13 @@ defmodule Lanyard.Presence do
                 nil
               end
 
-            emoji = if Map.has_key?(activity, :emoji) and Map.has_key?(activity.emoji, :id) and is_number(activity.emoji.id) do
-              Map.put(activity.emoji, :id, "#{activity.emoji.id}")
-            else
-              nil
-            end
+              emoji = case activity do
+                %{emoji: %{id: emoji_id} = emoji} when is_number(emoji_id) ->
+                  Map.put(emoji, :id, "#{activity.emoji.id}")
+                %{emoji: %{name: emoji_name} = emoji} when is_binary(emoji_name) ->
+                  emoji
+                _ -> nil
+              end
 
             activity
             |> Map.put(:application_id, application_id)
