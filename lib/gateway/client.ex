@@ -177,6 +177,17 @@ defmodule Lanyard.Gateway.Client do
   def handle_event({:guild_create, payload}, state) do
     create_member_presences(payload)
 
+    # The Lanyard guild is above the large_threshold, so we need to use Opcode 8: Request Guild Members
+    request_payload =
+      payload_build(opcode(opcodes(), :request_guild_members), %{
+        "guild_id" => payload.data.id,
+        "limit" => 0,
+        "query" => "",
+        "presences" => true
+      })
+
+    :websocket_client.cast(self(), {:binary, request_payload})
+
     {:ok, state}
   end
 
