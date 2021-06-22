@@ -106,7 +106,7 @@ Example response:
 
 The websocket is available at `wss://api.lanyard.rest/socket`. If you would like to use compression, please specify `?compression=zlib` at the end of the URL.
 
-Once connected, you will receive Opcode 1: Hello which will contain heartbeat_interval in the data field. You should set a repeating interval for the time specified in heartbeat_interval which should send Opcode 3: Heartbeat on the interval. You should also be sending Opcode 2: Initialize immediately once connected.
+Once connected, you will receive Opcode 1: Hello which will contain heartbeat_interval in the data field. You should set a repeating interval for the time specified in heartbeat_interval which should send Opcode 3: Heartbeat on the interval. You should also be sending Opcode 2: Initialize immediately after receiving Opcode 1.
 
 Example of `Opcode 2: Initialize`:
 

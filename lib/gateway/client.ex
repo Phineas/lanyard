@@ -244,8 +244,8 @@ defmodule Lanyard.Gateway.Client do
       "presence" => %{
         "since" => nil,
         "game" => %{
-          "name" => "lanyard.rest",
-          "type" => 0
+          "name" => "you <3",
+          "type" => 3
         },
         "status" => "online"
       },
