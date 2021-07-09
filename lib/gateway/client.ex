@@ -33,7 +33,7 @@ defmodule Lanyard.Gateway.Client do
     :crypto.start()
     :ssl.start()
 
-    :websocket_client.start_link("wss://gateway.discord.gg/?encoding=etf", __MODULE__, [state])
+    :websocket_client.start_link("wss://gateway.discord.gg/?v=9&encoding=etf", __MODULE__, [state])
   end
 
   def init([state]) do
@@ -64,6 +64,7 @@ defmodule Lanyard.Gateway.Client do
 
   def websocket_handle({:binary, payload}, _socket, state) do
     data = payload_decode(opcodes(), {:binary, payload})
+
     # Keeps the sequence tracker process updated
     _update_agent_sequence(data, state)
 
@@ -192,7 +193,8 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def handle_event({:presence_update, payload}, state) do
-    with {:ok, pid} <- GenRegistry.lookup(Lanyard.Presence, Integer.to_string(payload.data.user.id)) do
+    with {:ok, pid} <-
+           GenRegistry.lookup(Lanyard.Presence, Integer.to_string(payload.data.user.id)) do
       GenServer.cast(pid, {:sync, %{discord_presence: payload.data}})
     end
 
@@ -218,7 +220,8 @@ defmodule Lanyard.Gateway.Client do
   def handle_event({:guild_member_update, payload}, state) do
     Logger.debug("User object for #{payload.data.user.id} was updated")
 
-    with {:ok, pid} <- GenRegistry.lookup(Lanyard.Presence, Integer.to_string(payload.data.user.id)) do
+    with {:ok, pid} <-
+           GenRegistry.lookup(Lanyard.Presence, Integer.to_string(payload.data.user.id)) do
       GenServer.cast(pid, {:sync, %{discord_user: payload.data.user}})
     end
 
@@ -238,7 +241,7 @@ defmodule Lanyard.Gateway.Client do
     {:ok, state}
   end
 
-  def handle_event({event, _payload}, state) do
+  def handle_event({_event, _payload}, state) do
     {:ok, state}
   end
 

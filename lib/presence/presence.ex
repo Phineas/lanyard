@@ -1,7 +1,5 @@
 defmodule Lanyard.Presence.PublicFields do
-  defstruct [:user_id,
-            :discord_user,
-            :discord_presence]
+  defstruct [:user_id, :discord_user, :discord_presence]
 end
 
 defmodule Lanyard.Presence do
@@ -39,7 +37,11 @@ defmodule Lanyard.Presence do
     {_, pretty_presence} =
       build_pretty_presence(
         get_public_fields(
-          %{discord_user: state.discord_user, discord_presence: state.discord_presence, user_id: state.user_id}
+          %{
+            discord_user: state.discord_user,
+            discord_presence: state.discord_presence,
+            user_id: state.user_id
+          }
           |> Map.merge(new_state)
         )
       )
@@ -132,12 +134,16 @@ defmodule Lanyard.Presence do
                 nil
               end
 
-              emoji = case activity do
+            emoji =
+              case activity do
                 %{emoji: %{id: emoji_id} = emoji} when is_number(emoji_id) ->
                   Map.put(emoji, :id, "#{activity.emoji.id}")
+
                 %{emoji: %{name: emoji_name} = emoji} when is_binary(emoji_name) ->
                   emoji
-                _ -> nil
+
+                _ ->
+                  nil
               end
 
             activity
