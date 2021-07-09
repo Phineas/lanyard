@@ -30,4 +30,9 @@ defmodule Lanyard.Api.Util do
       })
     )
   end
+
+  @spec not_found(Plug.Conn.t()) :: Plug.Conn.t()
+  def not_found(conn) do
+    respond(conn, {:error, :not_found, "Route does not exist"})
+  end
 end

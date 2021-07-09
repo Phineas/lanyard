@@ -1,7 +1,7 @@
 defmodule Lanyard.Api.Router do
   import Plug.Conn
 
-  alias Lanyard.Api.Routes.Users
+  alias Lanyard.Api.Routes.V1
   alias Lanyard.Api.Routes.Discord
   alias Lanyard.Api.Util
 
@@ -15,7 +15,7 @@ defmodule Lanyard.Api.Router do
   plug(:match)
   plug(:dispatch)
 
-  forward("/v1/users", to: Users)
+  forward("/v1", to: V1)
   forward("/discord", to: Discord)
 
   options _ do
@@ -23,7 +23,7 @@ defmodule Lanyard.Api.Router do
     |> send_resp(204, "")
   end
 
-  get _ do
-    Util.respond(conn, {:error, :not_found, "Route does not exist"})
+  match _ do
+    Util.not_found(conn)
   end
 end
