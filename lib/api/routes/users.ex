@@ -5,6 +5,7 @@ defmodule Lanyard.Api.Routes.Users do
   alias Lanyard.Presence
 
   use Plug.Router
+
   plug(:match)
   plug(:dispatch)
 
