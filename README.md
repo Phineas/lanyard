@@ -224,6 +224,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [encrypteddev.com](https://encrypteddev.com)
 - [kevinthomas.codes](https://kevinthomas.codes)
 - [anaxes.xyz](https://anaxes.xyz)
+- [amine.im](https://amine.im)
 
 ## Todo
 
