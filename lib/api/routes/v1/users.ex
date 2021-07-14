@@ -1,10 +1,11 @@
-defmodule Lanyard.Api.Routes.Users do
+defmodule Lanyard.Api.Routes.V1.Users do
   import Plug.Conn
 
   alias Lanyard.Api.Util
   alias Lanyard.Presence
 
   use Plug.Router
+
   plug(:match)
   plug(:dispatch)
 
@@ -18,5 +19,9 @@ defmodule Lanyard.Api.Routes.Users do
       other ->
         Util.respond(conn, other)
     end
+  end
+
+  match _ do
+    Util.not_found(conn)
   end
 end
