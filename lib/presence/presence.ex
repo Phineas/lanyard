@@ -1,11 +1,12 @@
 defmodule Lanyard.Presence.PublicFields do
-  defstruct [:user_id,
-            :discord_user,
-            :discord_presence]
+  defstruct [:user_id, :discord_user, :discord_presence]
 end
 
 defmodule Lanyard.Presence do
   use GenServer
+
+  alias Lanyard.Presence.Spotify
+  alias Lanyard.Presence.Activity
 
   defstruct user_id: nil,
             discord_user: nil,
@@ -39,7 +40,11 @@ defmodule Lanyard.Presence do
     {_, pretty_presence} =
       build_pretty_presence(
         get_public_fields(
-          %{discord_user: state.discord_user, discord_presence: state.discord_presence, user_id: state.user_id}
+          %{
+            discord_user: state.discord_user,
+            discord_presence: state.discord_presence,
+            user_id: state.user_id
+          }
           |> Map.merge(new_state)
         )
       )
@@ -90,61 +95,10 @@ defmodule Lanyard.Presence do
         activity.id == Application.get_env(:lanyard, :discord_spotify_activity_id)
       end)
 
-    spotify_album_art_link =
-      unless spotify_activity == nil or not Map.has_key?(spotify_activity.assets, :large_image) do
-        [_asset_resource_type, art_id] =
-          spotify_activity.assets.large_image
-          |> String.split(":")
-
-        "https://i.scdn.co/image/#{art_id}"
-      else
-        nil
-      end
-
-    pretty_spotify =
-      if spotify_activity !== nil,
-        do: %{
-          track_id:
-            if Map.has_key?(spotify_activity, :sync_id) do
-              spotify_activity.sync_id
-            else
-              nil
-            end,
-          artist: spotify_activity.state,
-          song: spotify_activity.details,
-          album: spotify_activity.assets.large_text,
-          album_art_url: spotify_album_art_link,
-          timestamps: spotify_activity.timestamps
-        },
-        else: nil
-
     has_presence? = raw_data.discord_presence !== nil
 
     pretty_fields =
       if has_presence? do
-        activities =
-          raw_data.discord_presence.activities
-          |> Enum.map(fn activity ->
-            application_id =
-              if Map.has_key?(activity, :application_id) do
-                "#{activity.application_id}"
-              else
-                nil
-              end
-
-              emoji = case activity do
-                %{emoji: %{id: emoji_id} = emoji} when is_number(emoji_id) ->
-                  Map.put(emoji, :id, "#{activity.emoji.id}")
-                %{emoji: %{name: emoji_name} = emoji} when is_binary(emoji_name) ->
-                  emoji
-                _ -> nil
-              end
-
-            activity
-            |> Map.put(:application_id, application_id)
-            |> Map.put(:emoji, emoji)
-          end)
-
         %{
           discord_user: Map.put(raw_data.discord_user, :id, "#{raw_data.discord_user.id}"),
           discord_status: raw_data.discord_presence.status,
@@ -153,8 +107,8 @@ defmodule Lanyard.Presence do
           active_on_discord_mobile:
             Map.has_key?(raw_data.discord_presence.client_status, :mobile),
           listening_to_spotify: spotify_activity !== nil,
-          spotify: pretty_spotify,
-          activities: activities
+          spotify: Spotify.build_pretty_spotify(spotify_activity),
+          activities: Activity.build_pretty_activities(raw_data.discord_presence.activities)
         }
       else
         %{
