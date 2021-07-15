@@ -26,7 +26,8 @@ defmodule Lanyard.MixProject do
       {:websocket_client, "~> 1.2.4"},
       {:poison, "~> 4.0"},
       {:gen_registry, "~> 1.0"},
-      {:corsica, "~> 1.0"}
+      {:corsica, "~> 1.0"},
+      {:manifold, "~> 1.0"}
     ]
   end
 end

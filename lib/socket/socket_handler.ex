@@ -51,19 +51,7 @@ defmodule Lanyard.SocketHandler do
                   "Sockets | Socket initialized and subscribed to list: #{inspect(ids)}"
                 )
 
-                ids
-                |> Enum.reduce(%{}, fn id, acc ->
-                  case GenRegistry.lookup(Lanyard.Presence, id) do
-                    {:ok, pid} ->
-                      {:ok, raw_data} = Presence.get_presence(id)
-                      {_, presence} = Presence.build_pretty_presence(raw_data)
-                      GenServer.cast(pid, {:add_subscriber, self()})
-                      %{"#{id}": presence} |> Map.merge(acc)
-
-                    _ ->
-                      acc
-                  end
-                end)
+                Presence.subscribe_to_ids_and_build(ids)
 
               %{"subscribe_to_id" => id} ->
                 {:ok, pid} = GenRegistry.lookup(Lanyard.Presence, id)
@@ -71,10 +59,25 @@ defmodule Lanyard.SocketHandler do
                 {:ok, raw_data} = Presence.get_presence(id)
                 {_, presence} = Presence.build_pretty_presence(raw_data)
 
-                GenServer.cast(pid, {:add_subscriber, self()})
+                send(pid, {:add_subscriber, self()})
 
                 Logger.debug("Sockets | Socket initialized and subscribed to singleton: #{id}")
                 presence
+
+              %{"subscribe_to_all" => true} ->
+                ids =
+                  GenRegistry.reduce(Lanyard.Presence, [], fn {id, _pid}, acc ->
+                    [id | acc]
+                  end)
+
+                :ets.insert(
+                  :global_subscribers,
+                  {"subscribers", [self() | get_global_subscriber_list()]}
+                )
+
+                Process.flag(:trap_exit, true)
+
+                Presence.subscribe_to_ids_and_build(ids)
             end
 
           {:reply,
@@ -91,21 +94,29 @@ defmodule Lanyard.SocketHandler do
     end
   end
 
-  @spec websocket_info({:remote_send, any}, atom | %{:compression => any, optional(any) => any}) ::
-          {:reply,
-           {:binary,
-            maybe_improper_list(
-              binary | maybe_improper_list(any, binary | []) | byte,
-              binary | []
-            )}
-           | {:text,
-              binary
-              | maybe_improper_list(
-                  binary | maybe_improper_list(any, binary | []) | byte,
-                  binary | []
-                )}, atom | %{:compression => any, optional(any) => any}}
   def websocket_info({:remote_send, message}, state) do
     {:reply, construct_socket_msg(state.compression, message), state}
+  end
+
+  def terminate(_reason, _req, state) do
+    IO.inspect(self())
+
+    :ets.insert(
+      :global_subscribers,
+      {"subscribers", List.delete(get_global_subscriber_list(), self())}
+    )
+
+    {:ok, state}
+  end
+
+  def get_global_subscriber_list do
+    case :ets.lookup(:global_subscribers, "subscribers") do
+      [{_, subscribers}] ->
+        subscribers
+
+      _ ->
+        []
+    end
   end
 
   defp construct_socket_msg(compression, data) do

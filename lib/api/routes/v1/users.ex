@@ -12,13 +12,15 @@ defmodule Lanyard.Api.Routes.V1.Users do
   get "/:id" do
     %Plug.Conn{params: %{"id" => user_id}} = conn
 
-    case Presence.get_presence(user_id) do
-      {:ok, raw_data} ->
-        Util.respond(conn, Presence.build_pretty_presence(raw_data))
+    Util.respond(conn, Presence.get_pretty_presence(user_id))
 
-      other ->
-        Util.respond(conn, other)
-    end
+    # case Presence.get_presence(user_id) do
+    #   {:ok, raw_data} ->
+    #     Util.respond(conn, Presence.build_pretty_presence(raw_data))
+
+    #   other ->
+    #     Util.respond(conn, other)
+    # end
   end
 
   match _ do

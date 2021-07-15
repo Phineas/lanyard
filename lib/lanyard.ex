@@ -4,6 +4,9 @@ defmodule Lanyard do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
+    :ets.new(:cached_presences, [:named_table, :set, :public])
+    :ets.new(:global_subscribers, [:named_table, :set, :public])
+
     children = [
       {GenRegistry, worker_module: Lanyard.Presence},
       Plug.Cowboy.child_spec(

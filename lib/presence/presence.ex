@@ -18,12 +18,24 @@ defmodule Lanyard.Presence do
   end
 
   def init(state) do
+    {:ok, pretty_presence} =
+      state
+      |> get_public_fields()
+      |> build_pretty_presence()
+
+    subscriber_pids = Lanyard.SocketHandler.get_global_subscriber_list()
+
+    Manifold.send(
+      subscriber_pids,
+      {:remote_send, %{op: 0, t: "PRESENCE_UPDATE", d: pretty_presence}}
+    )
+
     {:ok,
      %__MODULE__{
        user_id: state.user_id,
        discord_presence: state.discord_presence,
        discord_user: state.discord_user,
-       subscriber_pids: []
+       subscriber_pids: subscriber_pids
      }}
   end
 
@@ -31,7 +43,7 @@ defmodule Lanyard.Presence do
     {:reply, get_public_fields(state), state}
   end
 
-  def handle_cast({:add_subscriber, pid}, state) do
+  def handle_info({:add_subscriber, pid}, state) do
     Process.monitor(pid)
     {:noreply, %{state | subscriber_pids: [pid | state.subscriber_pids]}}
   end
@@ -49,10 +61,10 @@ defmodule Lanyard.Presence do
         )
       )
 
-    state.subscriber_pids
-    |> Enum.each(fn sub ->
-      send(sub, {:remote_send, %{op: 0, t: "PRESENCE_UPDATE", d: pretty_presence}})
-    end)
+    Manifold.send(
+      state.subscriber_pids,
+      {:remote_send, %{op: 0, t: "PRESENCE_UPDATE", d: pretty_presence}}
+    )
 
     {:noreply, Map.merge(state, new_state)}
   end
@@ -83,6 +95,27 @@ defmodule Lanyard.Presence do
 
       {:error, _reason} ->
         {:error, :user_not_monitored, "User is not being monitored by Lanyard"}
+    end
+  end
+
+  @doc """
+  Returns the given user IDs pretty presence.
+  Tries to hit cache first - if no result, builds from raw data
+  """
+  @spec get_pretty_presence(binary) :: {:ok, any} | {:error, atom, binary}
+  def get_pretty_presence(user_id) do
+    case :ets.lookup(:cached_presences, user_id) do
+      [{_id, cached}] ->
+        {:ok, cached}
+
+      _ ->
+        case get_presence(user_id) do
+          {:ok, raw_presence} ->
+            build_pretty_presence(raw_presence)
+
+          err ->
+            err
+        end
     end
   end
 
@@ -122,6 +155,23 @@ defmodule Lanyard.Presence do
         }
       end
 
+    :ets.insert(:cached_presences, {"#{raw_data.discord_user.id}", pretty_fields})
+
     {:ok, pretty_fields}
+  end
+
+  def subscribe_to_ids_and_build(ids) do
+    ids
+    |> Enum.reduce(%{}, fn id, acc ->
+      case GenRegistry.lookup(__MODULE__, id) do
+        {:ok, pid} ->
+          {:ok, presence} = get_pretty_presence(id)
+          send(pid, {:add_subscriber, self()})
+          %{"#{id}": presence} |> Map.merge(acc)
+
+        _ ->
+          acc
+      end
+    end)
   end
 end
