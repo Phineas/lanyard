@@ -99,8 +99,6 @@ defmodule Lanyard.SocketHandler do
   end
 
   def terminate(_reason, _req, state) do
-    IO.inspect(self())
-
     :ets.insert(
       :global_subscribers,
       {"subscribers", List.delete(get_global_subscriber_list(), self())}

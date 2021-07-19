@@ -230,7 +230,11 @@ defmodule Lanyard.Gateway.Client do
 
   def handle_event({:guild_member_remove, payload}, state) do
     Logger.debug("User #{payload.data["user"]["id"]} left guild")
-    GenRegistry.stop(Lanyard.Presence, Integer.to_string(payload.data["user"]["id"]))
+
+    str_id = Integer.to_string(payload.data["user"]["id"])
+
+    GenRegistry.stop(Lanyard.Presence, str_id)
+    :ets.delete(:cached_presences, str_id)
 
     {:ok, state}
   end
