@@ -240,6 +240,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [amine.im](https://amine.im)
 - [loom4k.me](https://loom4k.me)
 - [katsie.xyz](https://katsie.xyz)
+- [rexulec.com](https://rexulec.com)
 
 ## Todo
 
