@@ -18,6 +18,7 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [spotsync.me](https://spotsync.me) - Stream music from your Discord presence to your friends in realtime through a slick UI  
 [vue-lanyard](https://github.com/eggsy/vue-lanyard) - Lanyard API plugin for Vue. Supports REST and WebSocket methods  
 [react-use-lanyard](https://github.com/barbarbar338/react-use-lanyard) - React hook for Lanyard - supports REST & WebSocket  
+[go-lanyard](https://github.com/barbarbar338/go-lanyard) - Lanyard API wrapper for GoLang - supports REST & WebSocket 
 [use-lanyard](https://github.com/alii/use-lanyard) - Another React hook for Lanyard that uses SWR  
 [lanyard-visualizer](https://lanyard-visualizer.netlify.app/) - Beautifully display your Discord presence on a website  
 [hawser](https://github.com/5elenay/hawser) - Lanyard API wrapper for python. Supports both REST and WebSocket.
