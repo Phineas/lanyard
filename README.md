@@ -22,6 +22,7 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [use-lanyard](https://github.com/alii/use-lanyard) - Another React hook for Lanyard that uses SWR  
 [lanyard-visualizer](https://lanyard-visualizer.netlify.app/) - Beautifully display your Discord presence on a website  
 [hawser](https://github.com/5elenay/hawser) - Lanyard API wrapper for python. Supports both REST and WebSocket.
+[js-lanyard](https://github.com/xaronnn/js-lanyard/) - Use Lanyard in your Web App.
 
 ## API Docs
 
