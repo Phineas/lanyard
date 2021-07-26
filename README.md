@@ -134,7 +134,7 @@ If you just want to subscribe to one user, you can send `subscribe_to_id` instea
 
 #### Subscribing to every user presence
 
-If you want to subscribe to every presence being monitored by Lanyard, you can specify `subscribed_to_all` with (bool) `true` in the data object, and you will then receive a user_id->presence map with every user presence in INIT_STATE, and their respective PRESENCE_UPDATES when they happen.
+If you want to subscribe to every presence being monitored by Lanyard, you can specify `subscribe_to_all` with (bool) `true` in the data object, and you will then receive a user_id->presence map with every user presence in INIT_STATE, and their respective PRESENCE_UPDATES when they happen.
 
 
 Once Op 2 is sent, you should immediately receive an `INIT_STATE` event payload if connected successfully. If not, you will be disconnected with an error (see below).
