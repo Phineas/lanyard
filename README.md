@@ -243,6 +243,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [loom4k.me](https://loom4k.me)
 - [katsie.xyz](https://katsie.xyz)
 - [presence.im](https://presence.im/)
+- [maisakurajima.netlify.app](https://maisakurajima.netlify.app/)
 
 ## Todo
 
