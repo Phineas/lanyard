@@ -184,7 +184,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [eri.gg](https://eri.gg)
 - [voided.dev](https://voided.dev)
 - [thicc-thighs.de](https://thicc-thighs.de)
-- [ademcancertel.tech](http://ademcancertel.tech)
+- [ademcancertel.github.io](ademcancertel.github.io)
 
 ## Todo
 
