@@ -41,6 +41,7 @@ Example response:
     "listening_to_spotify": true,
     // Below is a custom crafted "spotify" object, which will be null if listening_to_spotify is false
     "spotify": {
+      "track_id": "3kdlVcMVsSkbsUy8eQcBjI",
       "timestamps": {
         "start": 1615529820677,
         "end": 1615530068733
