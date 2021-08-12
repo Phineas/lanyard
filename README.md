@@ -246,6 +246,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [presence.im](https://presence.im/)
 - [maisakurajima.netlify.app](https://maisakurajima.netlify.app/)
 - [eleven.codes](https://eleven.codes)
+- [lyertia.wtf](https://lyertia.wtf/)
 
 ## Todo
 
