@@ -15,7 +15,7 @@ Just [join this Discord server](https://discord.gg/UrXF2cfJ7F) and your presence
 The Lanyard community has worked on some pretty cool projects that allows you to extend the functionality of Lanyard. PR to add a project!
 
 [lanyard-profile-readme](https://github.com/cnrad/lanyard-profile-readme) - Utilize Lanyard to display your Discord Presence in your GitHub Profile  
-[hiven-status](https://github.com/cancodes/hiven-status) - Transfer your discord status in real time to hiven using Lanyard API.  
+[hiven-status](https://github.com/cancodes/hiven-status) - Transfer your Discord status in real time to Hiven using the Lanyard API.  
 [spotsync.me](https://spotsync.me) - Stream music from your Discord presence to your friends in realtime through a slick UI  
 [vue-lanyard](https://github.com/eggsy/vue-lanyard) - Lanyard API plugin for Vue. Supports REST and WebSocket methods  
 [react-use-lanyard](https://github.com/barbarbar338/react-use-lanyard) - React hook for Lanyard - supports REST & WebSocket  
