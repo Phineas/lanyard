@@ -249,6 +249,8 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [eleven.codes](https://eleven.codes)
 - [mehmetali345.xyz](https://mehmetali345.xyz)
 - [jackbailey.uk](https://jackbailey.uk)
+- [d3r1n.com](https://d3r1n.com/)
+
 
 ## Todo
 
