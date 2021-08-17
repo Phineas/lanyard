@@ -235,7 +235,6 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [rafstech.link](https://rafstech.link)
 - [veny.xyz](https://veny.xyz)
 - [5elenay.github.io](https://5elenay.github.io)
-- [d3r1n.com](https://d3r1n.com/)
 - [marcuscodes.me](https://marcuscodes.me)
 - [nickdev.org](https://nickdev.org)
 - [encrypteddev.com](https://encrypteddev.com)
@@ -247,6 +246,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [presence.im](https://presence.im/)
 - [maisakurajima.netlify.app](https://maisakurajima.netlify.app/)
 - [eleven.codes](https://eleven.codes)
+- [d3r1n.com](https://d3r1n.com/)
 
 ## Todo
 
