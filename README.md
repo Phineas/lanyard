@@ -23,6 +23,7 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [hawser](https://github.com/5elenay/hawser) - Lanyard API wrapper for python. Supports both REST and WebSocket.  
 [js-lanyard](https://github.com/xaronnn/js-lanyard/) - Use Lanyard in your Web App.  
 [go-lanyard](https://github.com/barbarbar338/go-lanyard) - Lanyard API wrapper for GoLang - supports REST & WebSocket  
+[hiven-status](https://github.com/cancodes/hiven-status) - Transfer your Discord status in real time to Hiven using the Lanyard API.  
 
 ## API Docs
 
@@ -246,6 +247,10 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [presence.im](https://presence.im/)
 - [maisakurajima.netlify.app](https://maisakurajima.netlify.app/)
 - [eleven.codes](https://eleven.codes)
+- [mehmetali345.xyz](https://mehmetali345.xyz)
+- [jackbailey.uk](https://jackbailey.uk)
+- [d3r1n.com](https://d3r1n.com/)
+
 
 ## Todo
 
