@@ -149,6 +149,7 @@ defmodule Lanyard.Presence do
         %{
           discord_user: Map.put(raw_data.discord_user, :id, "#{raw_data.discord_user.id}"),
           discord_status: "offline",
+          active_on_discord_web: false,
           active_on_discord_desktop: false,
           active_on_discord_mobile: false,
           listening_to_spotify: false,
