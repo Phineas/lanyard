@@ -223,7 +223,6 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [arda.codes](https://arda.codes)
 - [looskie.com](https://looskie.com)
 - [barbarbar338.fly.dev](https://barbarbar338.fly.dev)
-- [vops.cc](https://vops.cc)
 - [marino.codes](https://marino.codes)
 - [stealthwave.dev](https://stealthwave.dev)
 - [miraichu.co](https://miraichu.co)
@@ -251,7 +250,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [mehmetali345.xyz](https://mehmetali345.xyz)
 - [jackbailey.uk](https://jackbailey.uk)
 - [d3r1n.com](https://d3r1n.com/)
-
+- [vops.cc](https://vops.cc)
 
 ## Todo
 
