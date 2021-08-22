@@ -23,6 +23,7 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [hawser](https://github.com/5elenay/hawser) - Lanyard API wrapper for python. Supports both REST and WebSocket.  
 [js-lanyard](https://github.com/xaronnn/js-lanyard/) - Use Lanyard in your Web App.  
 [go-lanyard](https://github.com/barbarbar338/go-lanyard) - Lanyard API wrapper for GoLang - supports REST & WebSocket  
+[hiven-status](https://github.com/cancodes/hiven-status) - Transfer your Discord status in real time to Hiven using the Lanyard API.  
 
 ## API Docs
 
@@ -41,6 +42,7 @@ Example response:
     "listening_to_spotify": true,
     // Below is a custom crafted "spotify" object, which will be null if listening_to_spotify is false
     "spotify": {
+      "track_id": "3kdlVcMVsSkbsUy8eQcBjI",
       "timestamps": {
         "start": 1615529820677,
         "end": 1615530068733
@@ -136,7 +138,7 @@ If you just want to subscribe to one user, you can send `subscribe_to_id` instea
 
 #### Subscribing to every user presence
 
-If you want to subscribe to every presence being monitored by Lanyard, you can specify `subscribed_to_all` with (bool) `true` in the data object, and you will then receive a user_id->presence map with every user presence in INIT_STATE, and their respective PRESENCE_UPDATES when they happen.
+If you want to subscribe to every presence being monitored by Lanyard, you can specify `subscribe_to_all` with (bool) `true` in the data object, and you will then receive a user_id->presence map with every user presence in INIT_STATE, and their respective PRESENCE_UPDATES when they happen.
 
 
 Once Op 2 is sent, you should immediately receive an `INIT_STATE` event payload if connected successfully. If not, you will be disconnected with an error (see below).
@@ -242,6 +244,12 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [amine.im](https://amine.im)
 - [loom4k.me](https://loom4k.me)
 - [katsie.xyz](https://katsie.xyz)
+- [presence.im](https://presence.im/)
+- [maisakurajima.netlify.app](https://maisakurajima.netlify.app/)
+- [eleven.codes](https://eleven.codes)
+- [mehmetali345.xyz](https://mehmetali345.xyz)
+- [jackbailey.uk](https://jackbailey.uk)
+- [d3r1n.com](https://d3r1n.com/)
 - [evilcube.eu](https://evilcube.eu/leo)
 
 ## Todo
