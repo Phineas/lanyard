@@ -24,6 +24,7 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [js-lanyard](https://github.com/xaronnn/js-lanyard/) - Use Lanyard in your Web App.  
 [go-lanyard](https://github.com/barbarbar338/go-lanyard) - Lanyard API wrapper for GoLang - supports REST & WebSocket  
 [hiven-status](https://github.com/cancodes/hiven-status) - Transfer your Discord status in real time to Hiven using the Lanyard API.  
+[use-listen-along](https://github.com/punctuations/use-listen-along) - Mock the discord 'Listen Along' feature within a react hook powered by the Lanyard API.
 
 ## API Docs
 
