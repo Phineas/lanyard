@@ -252,6 +252,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [mehmetali345.xyz](https://mehmetali345.xyz)
 - [jackbailey.uk](https://jackbailey.uk)
 - [d3r1n.com](https://d3r1n.com/)
+- [wosleyv.dev](https://www.wosleyv.dev)
 
 
 ## Todo
