@@ -240,6 +240,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [jackbailey.uk](https://jackbailey.uk)
 - [d3r1n.com](https://d3r1n.com/)
 - [anaxes.xyz](https://anaxes.xyz)
+- [ymarc.us](https://ymarc.us)
 
 
 ## Todo
