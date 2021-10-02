@@ -199,6 +199,47 @@ Lanyard can disconnect clients for multiple reasons, usually to do with messages
 | ---------------------- | ---- | ---------------- |
 | Invalid/Unknown Opcode | 4004 | `unknown_opcode` |
 
+## Self-host with Docker
+
+Build the Docker image by cloning this repo and running:
+
+```bash
+docker build -t lanyard/lanyard:latest .
+```
+
+And run Lanyard API server using:
+
+```bash
+docker run --rm -it -p 4001:4001 -e BOT_TOKEN=<token> lanyard/lanyard:latest
+```
+
+You'll be able to access the API using **port 4001**.
+
+You also need to create a Discord bot and use its token above.
+
+Create a bot here: https://discord.com/developers/applications
+
+**Make sure you enable** these settings in your bot settings:
+
+-   Privileged Gateway Intents > **PRESENCE INTENT**
+-   Privileged Gateway Intents > **SERVER MEMBERS INTENT**
+
+If you'd like to run Lanyard with `docker-compose`, here's an example:
+
+```yml
+version: "3.8"
+services:
+    lanyard:
+        image: lanyard/lanyard:latest
+        restart: always
+        ports:
+            - 4001:4001
+        environment:
+            BOT_TOKEN: <token>
+```
+
+Note, that you're **hosting a http server, not https**. You'll need to use a **reverse proxy** such as [traefik](https://traefik.io/traefik/) if you want to secure your API endpoint.
+
 ## Used By
 
 Below is a list of sites using Lanyard right now, check them out! A lot of them will only show an activity when they're active. Create a PR to add your site below!
