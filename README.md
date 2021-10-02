@@ -143,7 +143,6 @@ If you just want to subscribe to one user, you can send `subscribe_to_id` instea
 
 If you want to subscribe to every presence being monitored by Lanyard, you can specify `subscribe_to_all` with (bool) `true` in the data object, and you will then receive a user_id->presence map with every user presence in INIT_STATE, and their respective PRESENCE_UPDATES when they happen.
 
-
 Once Op 2 is sent, you should immediately receive an `INIT_STATE` event payload if connected successfully. If not, you will be disconnected with an error (see below).
 
 ### List of Opcodes
@@ -204,13 +203,13 @@ Lanyard can disconnect clients for multiple reasons, usually to do with messages
 Build the Docker image by cloning this repo and running:
 
 ```bash
-docker build -t lanyard/lanyard:latest .
+docker build -t phineas/lanyard:latest .
 ```
 
 And run Lanyard API server using:
 
 ```bash
-docker run --rm -it -p 4001:4001 -e BOT_TOKEN=<token> lanyard/lanyard:latest
+docker run --rm -it -p 4001:4001 -e BOT_TOKEN=<token> phineas/lanyard:latest
 ```
 
 You'll be able to access the API using **port 4001**.
@@ -221,21 +220,21 @@ Create a bot here: https://discord.com/developers/applications
 
 **Make sure you enable** these settings in your bot settings:
 
--   Privileged Gateway Intents > **PRESENCE INTENT**
--   Privileged Gateway Intents > **SERVER MEMBERS INTENT**
+- Privileged Gateway Intents > **PRESENCE INTENT**
+- Privileged Gateway Intents > **SERVER MEMBERS INTENT**
 
 If you'd like to run Lanyard with `docker-compose`, here's an example:
 
 ```yml
 version: "3.8"
 services:
-    lanyard:
-        image: lanyard/lanyard:latest
-        restart: always
-        ports:
-            - 4001:4001
-        environment:
-            BOT_TOKEN: <token>
+  lanyard:
+    image: phineas/lanyard:latest
+    restart: always
+    ports:
+      - 4001:4001
+    environment:
+      BOT_TOKEN: <token>
 ```
 
 Note, that you're **hosting a http server, not https**. You'll need to use a **reverse proxy** such as [traefik](https://traefik.io/traefik/) if you want to secure your API endpoint.
@@ -282,7 +281,6 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [jackbailey.uk](https://jackbailey.uk)
 - [d3r1n.com](https://d3r1n.com/)
 - [anaxes.xyz](https://anaxes.xyz)
-
 
 ## Todo
 
