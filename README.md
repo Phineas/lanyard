@@ -249,6 +249,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [phineas.io](https://phineas.io)
 - [slayter.dev](https://slayter.dev)
 - [lafond.dev](https://lafond.dev)
+- [cnrad.dev](https://cnrad.dev)
 - [atzu.studio](https://atzu.studio)
 - [dont-ping.me](https://dont-ping.me)
 - [eggsy.xyz](https://eggsy.xyz)
