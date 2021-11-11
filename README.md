@@ -14,19 +14,19 @@ Just [join this Discord server](https://discord.gg/UrXF2cfJ7F) and your presence
 
 The Lanyard community has worked on some pretty cool projects that allows you to extend the functionality of Lanyard. PR to add a project!
 
-[lanyard-profile-readme](https://github.com/cnrad/lanyard-profile-readme) - Utilize Lanyard to display your Discord Presence in your GitHub Profile  
-[spotsync.me](https://spotsync.me) - Stream music from your Discord presence to your friends in realtime through a slick UI  
-[vue-lanyard](https://github.com/eggsy/vue-lanyard) - Lanyard API plugin for Vue. Supports REST and WebSocket methods  
-[react-use-lanyard](https://github.com/barbarbar338/react-use-lanyard) - React hook for Lanyard - supports REST & WebSocket  
-[use-lanyard](https://github.com/alii/use-lanyard) - Another React hook for Lanyard that uses SWR  
-[lanyard-visualizer](https://lanyard-visualizer.netlify.app/) - Beautifully display your Discord presence on a website  
-[hawser](https://github.com/5elenay/hawser) - Lanyard API wrapper for python. Supports both REST and WebSocket.  
-[js-lanyard](https://github.com/xaronnn/js-lanyard/) - Use Lanyard in your Web App.  
-[go-lanyard](https://github.com/barbarbar338/go-lanyard) - Lanyard API wrapper for GoLang - supports REST & WebSocket  
-[use-lanyard](https://github.com/LeonardSSH/use-lanyard) - Lanyard with Composition API for Vue. Supports REST and WebSocket methods
-[hiven-status](https://github.com/cancodes/hiven-status) - Transfer your Discord status in real time to Hiven using the Lanyard API.  
-[use-listen-along](https://github.com/punctuations/use-listen-along) - Mock the discord 'Listen Along' feature within a react hook powered by the Lanyard API.
-[lanyard-graphql](https://github.com/DevSnowflake/lanyard-graphql) - A GraphQL port of the Lanyard API.
+- [lanyard-profile-readme](https://github.com/cnrad/lanyard-profile-readme) - Utilize Lanyard to display your Discord Presence in your GitHub Profile  
+- [spotsync.me](https://spotsync.me) - Stream music from your Discord presence to your friends in realtime through a slick UI  
+- [vue-lanyard](https://github.com/eggsy/vue-lanyard) - Lanyard API plugin for Vue. Supports REST and WebSocket methods  
+- [react-use-lanyard](https://github.com/barbarbar338/react-use-lanyard) - React hook for Lanyard - supports REST & WebSocket  
+- [use-lanyard](https://github.com/alii/use-lanyard) - Another React hook for Lanyard that uses SWR  
+- [lanyard-visualizer](https://lanyard-visualizer.netlify.app/) - Beautifully display your Discord presence on a website  
+- [hawser](https://github.com/5elenay/hawser) - Lanyard API wrapper for python. Supports both REST and WebSocket.  
+- [js-lanyard](https://github.com/xaronnn/js-lanyard/) - Use Lanyard in your Web App.  
+- [go-lanyard](https://github.com/barbarbar338/go-lanyard) - Lanyard API wrapper for GoLang - supports REST & WebSocket  
+- [use-lanyard](https://github.com/LeonardSSH/use-lanyard) - Lanyard with Composition API for Vue. Supports REST and WebSocket methods
+- [hiven-status](https://github.com/cancodes/hiven-status) - Transfer your Discord status in real time to Hiven using the Lanyard API.  
+- [use-listen-along](https://github.com/punctuations/use-listen-along) - Mock the discord 'Listen Along' feature within a react hook powered by the Lanyard API.
+- [lanyard-graphql](https://github.com/DevSnowflake/lanyard-graphql) - A GraphQL port of the Lanyard API.
 
 ## API Docs
 
