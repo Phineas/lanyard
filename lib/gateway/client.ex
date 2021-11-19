@@ -175,6 +175,14 @@ defmodule Lanyard.Gateway.Client do
     {:ok, new_state}
   end
 
+  def handle_event({:message_create, payload}, state) do
+    Task.start(fn ->
+      Lanyard.DiscordBot.CommandHandler.handle_message(payload)
+    end)
+
+    {:ok, state}
+  end
+
   def handle_event({:guild_create, payload}, state) do
     create_member_presences(payload)
 
@@ -269,7 +277,7 @@ defmodule Lanyard.Gateway.Client do
       },
       "compress" => false,
       "large_threshold" => 250,
-      "intents" => 259
+      "intents" => 4867
     }
 
     payload = payload_build(opcode(opcodes(), :identify), data)
