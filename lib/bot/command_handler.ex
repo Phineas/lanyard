@@ -1,7 +1,8 @@
 defmodule Lanyard.DiscordBot.CommandHandler do
   @command_map %{
     "set" => Lanyard.DiscordBot.Commands.Set,
-    "del" => Lanyard.DiscordBot.Commands.Del
+    "del" => Lanyard.DiscordBot.Commands.Del,
+    "apikey" => Lanyard.DiscordBot.Commands.ApiKey
   }
 
   def handle_message(payload) do
@@ -29,21 +30,6 @@ defmodule Lanyard.DiscordBot.CommandHandler do
       _ ->
         :ok
     end
-  end
-
-  def handle_command("set", [key, value], payload) do
-    IO.inspect("set")
-
-    :ok
-  end
-
-  def handle_command("set", _any, payload) do
-    DiscordApi.send_message(
-      payload["channel_id"],
-      "Invalid usage. Example `set` command usage:\n`.set <key> <value>`"
-    )
-
-    :ok
   end
 
   def handle_command(_unknown_command, _args), do: :ok

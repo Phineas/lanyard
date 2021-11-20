@@ -17,6 +17,18 @@ defmodule Lanyard.Connectivity.Redis do
     {:reply, value, state}
   end
 
+  def handle_call({:hget, key, field}, _from, state) do
+    value = Redix.command(state[:client], ["HGET", key, field])
+
+    {:reply, value, state}
+  end
+
+  def handle_call({:get, key}, _from, state) do
+    value = Redix.command(state[:client], ["GET", key])
+
+    {:reply, value, state}
+  end
+
   def handle_cast({:set, key, value}, state) do
     Redix.command(state.client, ["SET", key, value])
 
@@ -61,6 +73,24 @@ defmodule Lanyard.Connectivity.Redis do
     {:ok, response} = GenServer.call(:local_redis_client, {:hgetall, key})
 
     response
+    |> normalize_kv()
+  end
+
+  def hget(key, field) do
+    {:ok, response} = GenServer.call(:local_redis_client, {:hget, key, field})
+
+    response
+    |> normalize_kv()
+  end
+
+  def get(key) do
+    {:ok, response} = GenServer.call(:local_redis_client, {:get, key})
+
+    response
+  end
+
+  defp normalize_kv(l) do
+    l
     |> Enum.chunk_every(2)
     |> Map.new(fn [k, v] -> {k, v} end)
   end
