@@ -116,7 +116,13 @@ Example response:
 
 ### KV
 
-Lanyard KV is a a dynamic, real-time key->value store which is added to the Lanyard user API response.
+Lanyard KV is a a dynamic, real-time key->value store which is added to the Lanyard user API response. When a KV pair is updated, a PRESENCE_UPDATE for the user will also be emitted through the Lanyard socket.
+
+#### Use cases
+
+- Configuration values for your website
+- Configuration values for Lanyard 3rd party projects
+- Dynamic data for your website/profile (e.g. current location)
 
 #### Limits
 
