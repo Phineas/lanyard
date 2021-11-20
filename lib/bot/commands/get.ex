@@ -17,7 +17,7 @@ defmodule Lanyard.DiscordBot.Commands.Get do
   def handle(_, payload) do
     DiscordApi.send_message(
       payload["channel_id"],
-      "Invalid usage. Example `del` command usage:\n`.del <key>`"
+      "Invalid usage. Example `get` command usage:\n`.get <key>`"
     )
 
     :ok
