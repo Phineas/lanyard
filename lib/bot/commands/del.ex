@@ -2,7 +2,7 @@ defmodule Lanyard.DiscordBot.Commands.Del do
   alias Lanyard.DiscordBot.DiscordApi
 
   def handle([key], payload) do
-    Lanyard.Connectivity.Redis.hdel("lanyard_kv:#{payload["author_id"]}", key)
+    Lanyard.KV.Interface.del(payload["author"]["id"], key)
 
     DiscordApi.send_message(payload["channel_id"], ":white_check_mark: Deleted key: `#{key}`")
   end

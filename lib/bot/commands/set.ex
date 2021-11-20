@@ -14,7 +14,7 @@ defmodule Lanyard.DiscordBot.Commands.Set do
         )
 
       true ->
-        Redis.hset("lanyard_kv:#{payload["author"]["id"]}", key, value)
+        Lanyard.KV.Interface.set(payload["author"]["id"], key, value)
 
         DiscordApi.send_message(
           payload["channel_id"],

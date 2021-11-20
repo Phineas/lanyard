@@ -95,6 +95,11 @@ defmodule Lanyard.Presence do
   #
 
   @spec get_presence(binary) :: {:ok, any} | {:error, atom, binary}
+  def get_presence(user_id) when is_number(user_id) do
+    get_presence(Integer.to_string(user_id))
+  end
+
+  @spec get_presence(binary) :: {:ok, any} | {:error, atom, binary}
   def get_presence(user_id) when is_binary(user_id) do
     case GenRegistry.lookup(__MODULE__, user_id) do
       {:ok, pid} ->
@@ -184,5 +189,12 @@ defmodule Lanyard.Presence do
           acc
       end
     end)
+  end
+
+  def sync(user_id, payload) do
+    with {:ok, pid} <-
+           GenRegistry.lookup(__MODULE__, Integer.to_string(user_id)) do
+      GenServer.cast(pid, {:sync, payload})
+    end
   end
 end
