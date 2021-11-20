@@ -20,7 +20,7 @@ defmodule Lanyard.DiscordBot.Commands.ApiKey do
 
     DiscordApi.send_message(
       payload["channel_id"],
-      ":white_check_mark: Your new Lanyard API key is `#{key}`\n*React with :wastebasket: to delete this message*"
+      ":white_check_mark: Your new Lanyard API key is `#{key}`\n*Run this command again to re-generate your key*"
     )
   end
 
