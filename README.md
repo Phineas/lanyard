@@ -2,7 +2,7 @@
 
 # 🏷️ Expose your Discord presence and activities to a RESTful API and WebSocket in less than 10 seconds
 
-Lanyard is a service that makes it super easy to export your live Discord presence to an API endpoint (`api.lanyard.rest/v1/users/:your_id`) and to a WebSocket (see below) for you to use wherever you want - for example, I use this to display what I'm listening to on Spotify on my personal website.
+Lanyard is a service that makes it super easy to export your live Discord presence to an API endpoint (`api.lanyard.rest/v1/users/:your_id`) and to a WebSocket (see below) for you to use wherever you want - for example, I use this to display what I'm listening to on Spotify on my personal website. It also acts as a globally-accessible KV store which you can update from the Lanyard Discord bot or from the Lanyard API.
 
 You can use Lanyard's API without deploying anything yourself - but if you want to self host it, you have the option to, though it'll require a tiny bit of configuration.
 
@@ -43,6 +43,10 @@ Example response:
     "active_on_discord_mobile": false,
     "active_on_discord_desktop": true,
     "listening_to_spotify": true,
+    // Lanyard KV
+    "kv": {
+      "location": "Los Angeles, CA"
+    },
     // Below is a custom crafted "spotify" object, which will be null if listening_to_spotify is false
     "spotify": {
       "track_id": "3kdlVcMVsSkbsUy8eQcBjI",
@@ -109,6 +113,44 @@ Example response:
   }
 }
 ```
+
+### KV
+
+Lanyard KV is a a dynamic, real-time key->value store which is added to the Lanyard user API response.
+
+#### Limits
+
+1. Keys and values can only be strings
+2. Values can be 30,000 characters maximum
+3. Keys must be alphanumeric (a-zA-Z0-9) and 255 characters max length
+4. Your user can have a maximum of 512 key->value pairs linked
+
+#### Getting an API Key
+
+DM the Lanyard bot (`Lanyard#5766`) with `.apikey` to get your API key.
+
+When making Lanyard KV API requests, set an `Authorization` header with the API key you received from the Lanyard bot as the value.
+
+#### Setting a key->value pair
+
+##### Discord
+
+`.set <key> <value>`
+
+##### HTTP
+
+`PUT https://api.lanyard.rest/v1/users/:user_id/:key`  
+The value will be set to the body of the request. The body can be any type of data, but it will be string-encoded when set in Lanyard KV.
+
+#### Deleting a key
+
+##### Discord
+
+`.del <key>`
+
+##### HTTP
+
+`DELETE https://api.lanyard.rest/v1/users/:user_id/:key`
 
 ## Socket Docs
 
