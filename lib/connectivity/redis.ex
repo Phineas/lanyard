@@ -62,7 +62,7 @@ defmodule Lanyard.Connectivity.Redis do
   end
 
   def hdel(key, field) do
-    GenServer.cast(:self, {:hdel, key, field})
+    GenServer.cast(:local_redis_client, {:hdel, key, field})
   end
 
   def hset(key, field, value) do
