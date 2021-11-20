@@ -14,7 +14,8 @@ defmodule Lanyard do
         plug: Lanyard.Router,
         options: [port: 4001, dispatch: dispatch(), protocol_options: [idle_timeout: :infinity]]
       ),
-      {Lanyard.DiscordBot, %{token: Application.get_env(:lanyard, :bot_token)}}
+      {Lanyard.DiscordBot, %{token: Application.get_env(:lanyard, :bot_token)}},
+      {Lanyard.Connectivity.Redis, []}
     ]
 
     opts = [strategy: :one_for_one, name: Lanyard.Supervisor]
