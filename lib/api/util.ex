@@ -21,6 +21,11 @@ defmodule Lanyard.Api.Util do
     |> send_resp(200, Poison.encode!(%{success: true, data: data}))
   end
 
+  @spec respond(Plug.Conn.t(), {:error, atom, binary}) :: Plug.Conn.t()
+  def respond(conn, {:error, code, reason}) do
+    respond(conn, {:error, 404, code, reason})
+  end
+
   @spec respond(Plug.Conn.t(), {:error, integer, atom, binary}) :: Plug.Conn.t()
   def respond(conn, {:error, http_code, code, reason}) do
     conn
