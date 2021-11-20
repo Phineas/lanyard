@@ -16,16 +16,6 @@ defmodule Lanyard.Api.Routes.V1.Users do
     Util.respond(conn, Presence.get_pretty_presence(user_id))
   end
 
-  patch "/:id/kv" do
-    case validate_resource_access(conn) do
-      :ok ->
-        IO.inspect("Yo")
-
-      :no_permission ->
-        Util.no_permission(conn)
-    end
-  end
-
   put "/:id/kv/:field" do
     %Plug.Conn{params: %{"id" => user_id, "field" => field}} = conn
 

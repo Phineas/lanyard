@@ -3,7 +3,6 @@ defmodule Lanyard.DiscordBot.Commands.ApiKey do
   alias Lanyard.DiscordBot.DiscordApi
 
   def handle(_, %{"channel_id" => channel_id, guild_id: _guild_id} = p) do
-    IO.inspect(p)
     DiscordApi.send_message(channel_id, ":x: You can only perform this command in DMs with me")
   end
 

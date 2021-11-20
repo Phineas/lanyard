@@ -22,8 +22,6 @@ defmodule Lanyard.DiscordBot.CommandHandler do
             |> to_string()
             |> String.split(" ")
 
-          IO.inspect([attempted_command, args])
-
           unless @command_map[attempted_command] == nil do
             @command_map[attempted_command].handle(args, payload.data)
           end
