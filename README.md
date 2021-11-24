@@ -252,6 +252,7 @@ Lanyard can disconnect clients for multiple reasons, usually to do with messages
 Build the Docker image by cloning this repo and running:
 
 ```bash
+# The latest version is already on the docker hub, you can skip this step unless you would like to run a modified version.
 docker build -t phineas/lanyard:latest .
 ```
 
