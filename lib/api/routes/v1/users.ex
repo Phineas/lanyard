@@ -23,7 +23,7 @@ defmodule Lanyard.Api.Routes.V1.Users do
 
     case validate_resource_access(conn) do
       :ok ->
-        Lanyard.KV.Interface.set(user_id, field, put_body)
+        Lanyard.KV.Interface.set(String.to_integer(user_id), field, put_body)
 
         Util.respond(conn, {:ok})
 
@@ -37,7 +37,7 @@ defmodule Lanyard.Api.Routes.V1.Users do
 
     case validate_resource_access(conn) do
       :ok ->
-        Lanyard.KV.Interface.del(user_id, field)
+        Lanyard.KV.Interface.del(String.to_integer(user_id), field)
         Util.respond(conn, {:ok})
 
       :no_permission ->
