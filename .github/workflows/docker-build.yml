@@ -3,6 +3,14 @@ name: Docker Build CI
 on:
   pull_request:
     branches: [main]
+    paths:
+      - "config/**"
+      - "lib/**"
+      - "**.exs"
+      - "**.ex"
+      - "**.lock"
+      - "Dockerfile"
+      - ".dockerignore"
 
 jobs:
   build:
