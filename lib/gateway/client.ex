@@ -270,8 +270,8 @@ defmodule Lanyard.Gateway.Client do
       "presence" => %{
         "since" => nil,
         "game" => %{
-          "name" => "you <3",
-          "type" => 3
+          "name" => Application.get_env(:lanyard, :bot_presence),
+          "type" => Application.get_env(:lanyard, :bot_presence_type)
         },
         "status" => "online"
       },

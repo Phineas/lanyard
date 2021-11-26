@@ -14,7 +14,7 @@ defmodule Lanyard.DiscordBot.Commands.Set do
       _ ->
         DiscordApi.send_message(
           payload["channel_id"],
-          ":white_check_mark: `#{key}` was set. View it with `.get #{key}` or go to https://api.lanyard.rest/v1/users/#{payload["author"]["id"]}"
+          ":white_check_mark: `#{key}` was set. View it with `#{Application.get_env(:lanyard, :command_prefix)}get #{key}` or go to https://api.lanyard.rest/v1/users/#{payload["author"]["id"]}"
         )
     end
 
@@ -24,7 +24,7 @@ defmodule Lanyard.DiscordBot.Commands.Set do
   def handle(_any, payload) do
     DiscordApi.send_message(
       payload["channel_id"],
-      "Invalid usage. Example `set` command usage:\n`.set <key> <value>`"
+      "Invalid usage. Example `set` command usage:\n`#{Application.get_env(:lanyard, :command_prefix)}set <key> <value>`"
     )
 
     :ok

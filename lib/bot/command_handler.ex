@@ -14,7 +14,7 @@ defmodule Lanyard.DiscordBot.CommandHandler do
         :ok
 
       %{"content" => content} ->
-        if String.starts_with?(content, ".") do
+        if String.starts_with?(content, Application.get_env(:lanyard, :command_prefix)) do
           [attempted_command | args] =
             content
             |> String.to_charlist()
