@@ -146,7 +146,7 @@ When making Lanyard KV API requests, set an `Authorization` header with the API 
 
 ##### HTTP
 
-`PUT https://api.lanyard.rest/v1/users/:user_id/:key`  
+`PUT https://api.lanyard.rest/v1/users/:user_id/kv/:key`  
 The value will be set to the body of the request. The body can be any type of data, but it will be string-encoded when set in Lanyard KV.
 
 #### Deleting a key
@@ -157,7 +157,7 @@ The value will be set to the body of the request. The body can be any type of da
 
 ##### HTTP
 
-`DELETE https://api.lanyard.rest/v1/users/:user_id/:key`
+`DELETE https://api.lanyard.rest/v1/users/:user_id/kv/:key`
 
 ## Socket Docs
 
