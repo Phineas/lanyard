@@ -1,0 +1,21 @@
+name: Docker Build CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "config/**"
+      - "lib/**"
+      - "**.exs"
+      - "**.ex"
+      - "**.lock"
+      - "Dockerfile"
+      - ".dockerignore"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag phineas/lanyard:latest

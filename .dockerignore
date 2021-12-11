@@ -1,3 +1,5 @@
+Dockerfile
+
 # The directory Mix will write compiled artifacts to.
 /_build/
 
@@ -27,5 +29,3 @@ lanyard-*.tar
 
 # VSCode Elixir LS Extension
 .elixir_ls/
-
-dump.rdb
