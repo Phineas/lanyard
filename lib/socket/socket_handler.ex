@@ -88,6 +88,19 @@ defmodule Lanyard.SocketHandler do
         3 ->
           {:ok, state}
 
+        # Unsubscribe
+        4 ->
+          case json["d"] do
+            %{"unsubscribe_from_id" => id} ->
+              {:ok, pid} = GenRegistry.lookup(Lanyard.Presence, id)
+
+              unless not Process.alive?(pid) do
+                send(pid, {:remove_subscriber, pid})
+              end
+          end
+
+          {:ok, state}
+
         _ ->
           {:reply, {:close, 4004, "unknown_opcode"}, state}
       end

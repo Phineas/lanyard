@@ -47,6 +47,12 @@ defmodule Lanyard.Connectivity.Redis do
     {:noreply, state}
   end
 
+  def handle_cast({:hincrby, key, field, amount}, state) do
+    Redix.command(state.client, ["HINCRBY", key, field, amount])
+
+    {:noreply, state}
+  end
+
   def handle_cast({:hdel, key, field}, state) do
     Redix.command(state.client, ["HDEL", key, field])
 
@@ -67,6 +73,10 @@ defmodule Lanyard.Connectivity.Redis do
 
   def hset(key, field, value) do
     GenServer.cast(:local_redis_client, {:hset, key, field, value})
+  end
+
+  def hincrby(key, field, amount) do
+    GenServer.cast(:local_redis_client, {:hincrby, key, field, amount})
   end
 
   def hgetall(key) do
