@@ -1,7 +1,7 @@
 defmodule Lanyard.DiscordBot.Commands.Set do
   alias Lanyard.DiscordBot.DiscordApi
 
-  def handle([key | value_s], payload) when length(value_s) > 1 do
+  def handle([key | value_s], payload) when length(value_s) > 0 do
     value = Enum.join(value_s, " ")
 
     case Lanyard.KV.Interface.set(payload["author"]["id"], key, value) do
