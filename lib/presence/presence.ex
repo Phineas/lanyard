@@ -62,9 +62,13 @@ defmodule Lanyard.Presence do
   end
 
   def handle_info({:remove_subscriber, pid}, state) do
-    # unless Enum.find(st)
-    Process.demonitor(pid)
-    {:noreply, %{state | subscriber_pids: List.delete(state.subcriber_pids, pid)}}
+    ref = Map.get(state.refmap, pid)
+
+    unless ref == nil do
+      Process.demonitor(ref)
+    end
+
+    {:noreply, %{state | subscriber_pids: Map.delete(state.subcriber_pids, pid)}}
   end
 
   def handle_cast({:sync, new_state}, state) do
