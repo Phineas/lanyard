@@ -68,7 +68,12 @@ defmodule Lanyard.Presence do
       Process.demonitor(ref)
     end
 
-    {:noreply, %{state | subscriber_pids: Map.delete(state.subscriber_pids, pid)}}
+    {:noreply,
+     %{
+       state
+       | refmap: Map.delete(state.refmap, pid),
+         subscriber_pids: List.delete(state.subscriber_pids, pid)
+     }}
   end
 
   def handle_cast({:sync, new_state}, state) do
