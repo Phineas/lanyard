@@ -335,7 +335,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [nith.codes](https://nith.codes)
 - [veny.xyz](https://veny.xyz)
 - [5elenay.github.io](https://5elenay.github.io)
-- [nickdev.org](https://nickdev.org)
+- [notnick.io](https://notnick.io)
 - [encrypteddev.com](https://encrypteddev.com)
 - [kevinthomas.codes](https://kevinthomas.codes)
 - [amine.im](https://amine.im)
