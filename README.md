@@ -348,6 +348,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [d3r1n.com](https://d3r1n.com/)
 - [anaxes.xyz](https://anaxes.xyz)
 - [maki.cafe](https://maki.cafe)
+- [noirscode.github.io](https://noirscode.github.io/website/)
 
 ## Todo
 
