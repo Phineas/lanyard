@@ -4,7 +4,8 @@ defmodule Lanyard.DiscordBot.CommandHandler do
     "set" => Lanyard.DiscordBot.Commands.Set,
     "del" => Lanyard.DiscordBot.Commands.Del,
     "apikey" => Lanyard.DiscordBot.Commands.ApiKey,
-    "kv" => Lanyard.DiscordBot.Commands.KV
+    "kv" => Lanyard.DiscordBot.Commands.KV,
+    "help" => Lanyard.DiscordBot.Commands.KV
   }
 
   def handle_message(payload) do
