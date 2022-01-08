@@ -343,7 +343,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [presence.im](https://presence.im/)
 - [maisakurajima.netlify.app](https://maisakurajima.netlify.app/)
 - [eleven.codes](https://eleven.codes)
-- [mehmetali345.xyz](https://mehmetali345.xyz)
+- [https://345dev.me](https://345dev.me)
 - [jackbailey.uk](https://jackbailey.uk)
 - [d3r1n.com](https://d3r1n.com/)
 - [anaxes.xyz](https://anaxes.xyz)
