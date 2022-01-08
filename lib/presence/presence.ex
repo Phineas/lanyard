@@ -1,5 +1,5 @@
 defmodule Lanyard.Presence.PublicFields do
-  defstruct [:user_id, :discord_user, :discord_presence]
+  defstruct [:user_id, :discord_user, :discord_presence, :kv]
 end
 
 defmodule Lanyard.Presence do
@@ -11,15 +11,20 @@ defmodule Lanyard.Presence do
   defstruct user_id: nil,
             discord_user: nil,
             discord_presence: nil,
-            subscriber_pids: nil
+            kv: nil,
+            subscriber_pids: nil,
+            refmap: nil
 
   def start_link(state) do
     GenServer.start_link(__MODULE__, state, name: :"presence:#{state.user_id}")
   end
 
   def init(state) do
+    kv = Lanyard.Connectivity.Redis.hgetall("lanyard_kv:#{state.user_id}")
+
     {:ok, pretty_presence} =
       state
+      |> Map.put(:kv, kv)
       |> get_public_fields()
       |> build_pretty_presence()
 
@@ -35,7 +40,9 @@ defmodule Lanyard.Presence do
        user_id: state.user_id,
        discord_presence: state.discord_presence,
        discord_user: state.discord_user,
-       subscriber_pids: subscriber_pids
+       kv: kv,
+       subscriber_pids: subscriber_pids,
+       refmap: %{}
      }}
   end
 
@@ -44,8 +51,29 @@ defmodule Lanyard.Presence do
   end
 
   def handle_info({:add_subscriber, pid}, state) do
-    Process.monitor(pid)
-    {:noreply, %{state | subscriber_pids: [pid | state.subscriber_pids]}}
+    ref = Process.monitor(pid)
+
+    {:noreply,
+     %{
+       state
+       | subscriber_pids: [pid | state.subscriber_pids],
+         refmap: Map.put(state.refmap, pid, ref)
+     }}
+  end
+
+  def handle_info({:remove_subscriber, pid}, state) do
+    ref = Map.get(state.refmap, pid)
+
+    unless ref == nil do
+      Process.demonitor(ref)
+    end
+
+    {:noreply,
+     %{
+       state
+       | refmap: Map.delete(state.refmap, pid),
+         subscriber_pids: List.delete(state.subscriber_pids, pid)
+     }}
   end
 
   def handle_cast({:sync, new_state}, state) do
@@ -55,7 +83,8 @@ defmodule Lanyard.Presence do
           %{
             discord_user: state.discord_user,
             discord_presence: state.discord_presence,
-            user_id: state.user_id
+            user_id: state.user_id,
+            kv: state.kv
           }
           |> Map.merge(new_state)
         )
@@ -65,6 +94,10 @@ defmodule Lanyard.Presence do
       state.subscriber_pids,
       {:remote_send, %{op: 0, t: "PRESENCE_UPDATE", d: pretty_presence}}
     )
+
+    Task.start(fn ->
+      Lanyard.Analytics.presence_tick(state.user_id, pretty_presence)
+    end)
 
     {:noreply, Map.merge(state, new_state)}
   end
@@ -79,13 +112,19 @@ defmodule Lanyard.Presence do
     %Lanyard.Presence.PublicFields{
       user_id: state.user_id,
       discord_user: state.discord_user,
-      discord_presence: state.discord_presence
+      discord_presence: state.discord_presence,
+      kv: state.kv
     }
   end
 
   #
   # Public API
   #
+
+  @spec get_presence(binary) :: {:ok, any} | {:error, atom, binary}
+  def get_presence(user_id) when is_number(user_id) do
+    get_presence(Integer.to_string(user_id))
+  end
 
   @spec get_presence(binary) :: {:ok, any} | {:error, atom, binary}
   def get_presence(user_id) when is_binary(user_id) do
@@ -135,15 +174,15 @@ defmodule Lanyard.Presence do
         %{
           discord_user: Map.put(raw_data.discord_user, :id, "#{raw_data.discord_user.id}"),
           discord_status: raw_data.discord_presence.status,
-          active_on_discord_web:
-            Map.has_key?(raw_data.discord_presence.client_status, :web),
+          active_on_discord_web: Map.has_key?(raw_data.discord_presence.client_status, :web),
           active_on_discord_desktop:
             Map.has_key?(raw_data.discord_presence.client_status, :desktop),
           active_on_discord_mobile:
             Map.has_key?(raw_data.discord_presence.client_status, :mobile),
           listening_to_spotify: spotify_activity !== nil,
           spotify: Spotify.build_pretty_spotify(spotify_activity),
-          activities: Activity.build_pretty_activities(raw_data.discord_presence.activities)
+          activities: Activity.build_pretty_activities(raw_data.discord_presence.activities),
+          kv: raw_data.kv
         }
       else
         %{
@@ -154,7 +193,8 @@ defmodule Lanyard.Presence do
           active_on_discord_mobile: false,
           listening_to_spotify: false,
           spotify: nil,
-          activities: []
+          activities: [],
+          kv: raw_data.kv
         }
       end
 
@@ -176,5 +216,12 @@ defmodule Lanyard.Presence do
           acc
       end
     end)
+  end
+
+  def sync(user_id, payload) do
+    with {:ok, pid} <-
+           GenRegistry.lookup(__MODULE__, Integer.to_string(user_id)) do
+      GenServer.cast(pid, {:sync, payload})
+    end
   end
 end

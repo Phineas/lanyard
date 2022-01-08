@@ -54,15 +54,22 @@ defmodule Lanyard.SocketHandler do
                 Presence.subscribe_to_ids_and_build(ids)
 
               %{"subscribe_to_id" => id} ->
-                {:ok, pid} = GenRegistry.lookup(Lanyard.Presence, id)
+                case GenRegistry.lookup(Lanyard.Presence, id) do
+                  {:ok, pid} ->
+                    {:ok, raw_data} = Presence.get_presence(id)
+                    {_, presence} = Presence.build_pretty_presence(raw_data)
 
-                {:ok, raw_data} = Presence.get_presence(id)
-                {_, presence} = Presence.build_pretty_presence(raw_data)
+                    send(pid, {:add_subscriber, self()})
 
-                send(pid, {:add_subscriber, self()})
+                    Logger.debug(
+                      "Sockets | Socket initialized and subscribed to singleton: #{id}"
+                    )
 
-                Logger.debug("Sockets | Socket initialized and subscribed to singleton: #{id}")
-                presence
+                    presence
+
+                  _ ->
+                    %{}
+                end
 
               %{"subscribe_to_all" => true} ->
                 ids =
@@ -86,6 +93,19 @@ defmodule Lanyard.SocketHandler do
 
         # Used for heartbeating
         3 ->
+          {:ok, state}
+
+        # Unsubscribe
+        4 ->
+          case json["d"] do
+            %{"unsubscribe_from_id" => id} ->
+              {:ok, pid} = GenRegistry.lookup(Lanyard.Presence, id)
+
+              unless not Process.alive?(pid) do
+                send(pid, {:remove_subscriber, pid})
+              end
+          end
+
           {:ok, state}
 
         _ ->

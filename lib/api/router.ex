@@ -9,7 +9,9 @@ defmodule Lanyard.Api.Router do
 
   plug(Corsica,
     origins: "*",
-    max_age: 600
+    max_age: 600,
+    allow_methods: :all,
+    allow_headers: :all
   )
 
   plug(:match)

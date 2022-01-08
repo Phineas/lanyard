@@ -2,7 +2,7 @@
 
 # 🏷️ Expose your Discord presence and activities to a RESTful API and WebSocket in less than 10 seconds
 
-Lanyard is a service that makes it super easy to export your live Discord presence to an API endpoint (`api.lanyard.rest/v1/users/:your_id`) and to a WebSocket (see below) for you to use wherever you want - for example, I use this to display what I'm listening to on Spotify on my personal website.
+Lanyard is a service that makes it super easy to export your live Discord presence to an API endpoint (`api.lanyard.rest/v1/users/:your_id`) and to a WebSocket (see below) for you to use wherever you want - for example, I use this to display what I'm listening to on Spotify on my personal website. It also acts as a globally-accessible KV store which you can update from the Lanyard Discord bot or from the Lanyard API.
 
 You can use Lanyard's API without deploying anything yourself - but if you want to self host it, you have the option to, though it'll require a tiny bit of configuration.
 
@@ -14,17 +14,20 @@ Just [join this Discord server](https://discord.gg/UrXF2cfJ7F) and your presence
 
 The Lanyard community has worked on some pretty cool projects that allows you to extend the functionality of Lanyard. PR to add a project!
 
-[lanyard-profile-readme](https://github.com/cnrad/lanyard-profile-readme) - Utilize Lanyard to display your Discord Presence in your GitHub Profile  
-[spotsync.me](https://spotsync.me) - Stream music from your Discord presence to your friends in realtime through a slick UI  
-[vue-lanyard](https://github.com/eggsy/vue-lanyard) - Lanyard API plugin for Vue. Supports REST and WebSocket methods  
-[react-use-lanyard](https://github.com/barbarbar338/react-use-lanyard) - React hook for Lanyard - supports REST & WebSocket  
-[use-lanyard](https://github.com/alii/use-lanyard) - Another React hook for Lanyard that uses SWR  
-[lanyard-visualizer](https://lanyard-visualizer.netlify.app/) - Beautifully display your Discord presence on a website  
-[hawser](https://github.com/5elenay/hawser) - Lanyard API wrapper for python. Supports both REST and WebSocket.  
-[js-lanyard](https://github.com/xaronnn/js-lanyard/) - Use Lanyard in your Web App.  
-[go-lanyard](https://github.com/barbarbar338/go-lanyard) - Lanyard API wrapper for GoLang - supports REST & WebSocket  
-[hiven-status](https://github.com/cancodes/hiven-status) - Transfer your Discord status in real time to Hiven using the Lanyard API.  
-[use-listen-along](https://github.com/punctuations/use-listen-along) - Mock the discord 'Listen Along' feature within a react hook powered by the Lanyard API.
+[lanyard-profile-readme](https://github.com/cnrad/lanyard-profile-readme) - Utilize Lanyard to display your Discord Presence in your GitHub Profile \
+[spotsync.me](https://spotsync.me) - Stream music from your Discord presence to your friends in realtime through a slick UI \
+[vue-lanyard](https://github.com/eggsy/vue-lanyard) - Lanyard API plugin for Vue. Supports REST and WebSocket methods \
+[react-use-lanyard](https://github.com/barbarbar338/react-use-lanyard) - React hook for Lanyard - supports REST & WebSocket \
+[use-lanyard](https://github.com/alii/use-lanyard) - Another React hook for Lanyard that uses SWR \
+[lanyard-visualizer](https://lanyard-visualizer.netlify.app/) - Beautifully display your Discord presence on a website \
+[hawser](https://github.com/5elenay/hawser) - Lanyard API wrapper for python. Supports both REST and WebSocket. \
+[js-lanyard](https://github.com/xaronnn/js-lanyard/) - Use Lanyard in your Web App. \
+[go-lanyard](https://github.com/barbarbar338/go-lanyard) - Lanyard API wrapper for GoLang - supports REST & WebSocket \
+[use-lanyard](https://github.com/LeonardSSH/use-lanyard) - Lanyard with Composition API for Vue. Supports REST and WebSocket methods \
+[hiven-status](https://github.com/cancodes/hiven-status) - Transfer your Discord status in real time to Hiven using the Lanyard API. \
+[use-listen-along](https://github.com/punctuations/use-listen-along) - Mock the discord 'Listen Along' feature within a react hook powered by the Lanyard API. \
+[lanyard-graphql](https://github.com/DevSnowflake/lanyard-graphql) - A GraphQL port of the Lanyard API. \
+[svelte-lanyard](https://github.com/iGalaxyYT/svelte-lanyard) - A Lanyard API wrapper for Svelte. Supports REST & WebSocket.
 
 ## API Docs
 
@@ -41,6 +44,10 @@ Example response:
     "active_on_discord_mobile": false,
     "active_on_discord_desktop": true,
     "listening_to_spotify": true,
+    // Lanyard KV
+    "kv": {
+      "location": "Los Angeles, CA"
+    },
     // Below is a custom crafted "spotify" object, which will be null if listening_to_spotify is false
     "spotify": {
       "track_id": "3kdlVcMVsSkbsUy8eQcBjI",
@@ -108,6 +115,50 @@ Example response:
 }
 ```
 
+### KV
+
+Lanyard KV is a a dynamic, real-time key->value store which is added to the Lanyard user API response. When a KV pair is updated, a PRESENCE_UPDATE for the user will also be emitted through the Lanyard socket.
+
+#### Use cases
+
+- Configuration values for your website
+- Configuration values for Lanyard 3rd party projects
+- Dynamic data for your website/profile (e.g. current location)
+
+#### Limits
+
+1. Keys and values can only be strings
+2. Values can be 30,000 characters maximum
+3. Keys must be alphanumeric (a-zA-Z0-9) and 255 characters max length
+4. Your user can have a maximum of 512 key->value pairs linked
+
+#### Getting an API Key
+
+DM the Lanyard bot (`Lanyard#5766`) with `.apikey` to get your API key.
+
+When making Lanyard KV API requests, set an `Authorization` header with the API key you received from the Lanyard bot as the value.
+
+#### Setting a key->value pair
+
+##### Discord
+
+`.set <key> <value>`
+
+##### HTTP
+
+`PUT https://api.lanyard.rest/v1/users/:user_id/kv/:key`  
+The value will be set to the body of the request. The body can be any type of data, but it will be string-encoded when set in Lanyard KV.
+
+#### Deleting a key
+
+##### Discord
+
+`.del <key>`
+
+##### HTTP
+
+`DELETE https://api.lanyard.rest/v1/users/:user_id/kv/:key`
+
 ## Socket Docs
 
 The websocket is available at `wss://api.lanyard.rest/socket`. If you would like to use compression, please specify `?compression=zlib_json` at the end of the URL.
@@ -140,7 +191,6 @@ If you just want to subscribe to one user, you can send `subscribe_to_id` instea
 #### Subscribing to every user presence
 
 If you want to subscribe to every presence being monitored by Lanyard, you can specify `subscribe_to_all` with (bool) `true` in the data object, and you will then receive a user_id->presence map with every user presence in INIT_STATE, and their respective PRESENCE_UPDATES when they happen.
-
 
 Once Op 2 is sent, you should immediately receive an `INIT_STATE` event payload if connected successfully. If not, you will be disconnected with an error (see below).
 
@@ -197,20 +247,76 @@ Lanyard can disconnect clients for multiple reasons, usually to do with messages
 | ---------------------- | ---- | ---------------- |
 | Invalid/Unknown Opcode | 4004 | `unknown_opcode` |
 
+## Self-host with Docker
+
+Build the Docker image by cloning this repo and running:
+
+```bash
+# The latest version is already on the docker hub, you can skip this step unless you would like to run a modified version.
+docker build -t phineas/lanyard:latest .
+```
+
+If you don't already have a redis server you'll need to run one, here's the docker command to run one:
+
+```bash
+docker run -d --name lanyard-redis -v docker_mount_location_on_host:/data redis
+```
+
+And run Lanyard API server using:
+
+```bash
+docker run --rm -it -p 4001:4001 -e REDIS_HOST=redis -e BOT_TOKEN=<token> --link lanyard-redis:redis phineas/lanyard:latest
+```
+
+You'll be able to access the API using **port 4001**.
+
+You also need to create a Discord bot and use its token above.
+
+Create a bot here: https://discord.com/developers/applications
+
+**Make sure you enable** these settings in your bot settings:
+
+- Privileged Gateway Intents > **PRESENCE INTENT**
+- Privileged Gateway Intents > **SERVER MEMBERS INTENT**
+
+If you'd like to run Lanyard with `docker-compose`, here's an example:
+
+```yml
+version: "3.8"
+
+services:
+  redis:
+    image: redis
+    restart: always
+    container_name: lanyard_redis
+  lanyard:
+    image: phineas/lanyard:latest
+    restart: always
+    container_name: lanyard
+    depends_on:
+      - redis
+    ports:
+      - 4001:4001
+    environment:
+      BOT_TOKEN: <token>
+      REDIS_HOST: redis
+```
+
+Note, that you're **hosting a http server, not https**. You'll need to use a **reverse proxy** such as [traefik](https://traefik.io/traefik/) if you want to secure your API endpoint.
+
 ## Used By
 
 Below is a list of sites using Lanyard right now, check them out! A lot of them will only show an activity when they're active. Create a PR to add your site below!
 
 - [alistair.cloud](https://alistair.cloud)
 - [timcole.me](https://timcole.me)
-- [dustin.sh](https://dustin.sh)
+- [dstn.to](https://dstn.to)
 - [phineas.io](https://phineas.io)
-- [juan.engineer](https://juan.engineer)
 - [slayter.dev](https://slayter.dev)
 - [lafond.dev](https://lafond.dev)
+- [cnrad.dev](https://cnrad.dev)
 - [atzu.studio](https://atzu.studio)
 - [dont-ping.me](https://dont-ping.me)
-- [astn.me](https://astn.me)
 - [eggsy.xyz](https://eggsy.xyz)
 - [crugg.de](https://crugg.de)
 - [igalaxy.dev](https://igalaxy.dev)
@@ -219,7 +325,6 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [eri.gg](https://eri.gg)
 - [voided.dev](https://voided.dev)
 - [thicc-thighs.de](https://thicc-thighs.de)
-- [ademcancertel.tech](http://ademcancertel.tech)
 - [chezzer.dev](https://chezzer.dev)
 - [arda.codes](https://arda.codes)
 - [looskie.com](https://looskie.com)
@@ -227,31 +332,25 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [marino.codes](https://marino.codes)
 - [stealthwave.dev](https://stealthwave.dev)
 - [miraichu.co](https://miraichu.co)
-- [bobby.systems](https://bobby.systems/Core.Home)
-- [dann.systems](https://dann.systems)
-- [meric.vercel.app](https://meric.vercel.app)
-- [spotsync.me](https://spotsync.me/?utm_source=lanyardgithub&utm_medium=link&utm_campaign=lanyard)
 - [nith.codes](https://nith.codes)
-- [callumdev.xyz](https://callumdev.xyz)
-- [domm.me](https://domm.me)
-- [rafstech.link](https://rafstech.link)
 - [veny.xyz](https://veny.xyz)
 - [5elenay.github.io](https://5elenay.github.io)
-- [marcuscodes.me](https://marcuscodes.me)
 - [nickdev.org](https://nickdev.org)
 - [encrypteddev.com](https://encrypteddev.com)
 - [kevinthomas.codes](https://kevinthomas.codes)
-- [anaxes.xyz](https://anaxes.xyz)
 - [amine.im](https://amine.im)
 - [loom4k.me](https://loom4k.me)
-- [katsie.xyz](https://katsie.xyz)
 - [presence.im](https://presence.im/)
 - [maisakurajima.netlify.app](https://maisakurajima.netlify.app/)
 - [eleven.codes](https://eleven.codes)
-- [mehmetali345.xyz](https://mehmetali345.xyz)
-- [jackbailey.uk](https://jackbailey.uk)
+- [jackbailey.dev](https://jackbailey.dev)
+- [https://345dev.me](https://345dev.me)
 - [d3r1n.com](https://d3r1n.com/)
 - [lion.himbo.cat](https://lion.himbo.cat)
+- [anaxes.xyz](https://anaxes.xyz)
+- [maki.cafe](https://maki.cafe)
+- [rexulec.com](https://rexulec.com)
+
 
 ## Todo
 
