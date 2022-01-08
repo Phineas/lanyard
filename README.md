@@ -285,18 +285,21 @@ If you'd like to run Lanyard with `docker-compose`, here's an example:
 version: "3.8"
 
 services:
+  redis:
+    image: redis
+    restart: always
+    container_name: lanyard_redis
   lanyard:
     image: phineas/lanyard:latest
     restart: always
     container_name: lanyard
+    depends_on:
+      - redis
     ports:
       - 4001:4001
     environment:
       BOT_TOKEN: <token>
       REDIS_HOST: redis
-  redis:
-    image: redis
-    container_name: lanyard_redis
 ```
 
 Note, that you're **hosting a http server, not https**. You'll need to use a **reverse proxy** such as [traefik](https://traefik.io/traefik/) if you want to secure your API endpoint.
@@ -340,8 +343,8 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [presence.im](https://presence.im/)
 - [maisakurajima.netlify.app](https://maisakurajima.netlify.app/)
 - [eleven.codes](https://eleven.codes)
-- [mehmetali345.xyz](https://mehmetali345.xyz)
 - [jackbailey.dev](https://jackbailey.dev)
+- [https://345dev.me](https://345dev.me)
 - [d3r1n.com](https://d3r1n.com/)
 - [anaxes.xyz](https://anaxes.xyz)
 - [maki.cafe](https://maki.cafe)
