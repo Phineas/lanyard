@@ -10,6 +10,7 @@ You can use Lanyard's API without deploying anything yourself - but if you want 
 
 Just [join this Discord server](https://discord.gg/UrXF2cfJ7F) and your presence will start showing up when you `GET api.lanyard.rest/v1/users/:your_id`. It's that easy.  
 
+## Table of Contents
 
 - [Community Projects](#community-projects)
 - [API Docs](#api-docs)
