@@ -369,6 +369,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [jackbailey.dev](https://jackbailey.dev)
 - [https://345dev.me](https://345dev.me)
 - [d3r1n.com](https://d3r1n.com/)
+- [vops.cc](https://vops.cc)
 - [lion.himbo.cat](https://lion.himbo.cat)
 - [anaxes.xyz](https://anaxes.xyz)
 - [maki.cafe](https://maki.cafe)
