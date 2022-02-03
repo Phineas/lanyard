@@ -384,6 +384,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [eleven011.xyz](https://eleven011.xyz)
 - [krypt0n.co.uk](https://krypt0n.co.uk)
 - [oxmc.xyz](https://oxmc.xyz)
+- [voltages.me](https://voltages.me)
 
 
 ## Todo
