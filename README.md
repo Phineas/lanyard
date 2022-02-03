@@ -372,10 +372,10 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [vops.cc](https://vops.cc)
 - [lion.himbo.cat](https://lion.himbo.cat)
 - [zeromomentum.me](https://zeromomentum.me)
+- [emirkabal.com](https://emirkabal.com)
 - [anaxes.xyz](https://anaxes.xyz)
 - [maki.cafe](https://maki.cafe)
 - [rexulec.com](https://rexulec.com)
-
 
 ## Todo
 
