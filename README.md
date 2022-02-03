@@ -373,9 +373,11 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [lion.himbo.cat](https://lion.himbo.cat)
 - [zeromomentum.me](https://zeromomentum.me)
 - [emirkabal.com](https://emirkabal.com)
+- [wosleyv.dev](https://www.wosleyv.dev)
 - [anaxes.xyz](https://anaxes.xyz)
 - [maki.cafe](https://maki.cafe)
 - [rexulec.com](https://rexulec.com)
+
 
 ## Todo
 
