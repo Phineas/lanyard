@@ -380,6 +380,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [maki.cafe](https://maki.cafe)
 - [cenap.js.org](https://cenap.js.org)
 - [rexulec.com](https://rexulec.com)
+- [isaackogan.com](https://www.isaackogan.com)
 
 ## Todo
 
