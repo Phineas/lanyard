@@ -378,8 +378,8 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [anaxes.xyz](https://anaxes.xyz)
 - [avyanshralph.xyz](https://avyanshralph.xyz)
 - [maki.cafe](https://maki.cafe)
+- [cenap.js.org](https://cenap.js.org)
 - [rexulec.com](https://rexulec.com)
-
 
 ## Todo
 
