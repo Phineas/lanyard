@@ -384,6 +384,8 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [oxmc.xyz](https://oxmc.xyz)
 - [voltages.me](https://voltages.me)
 - [tysm.dev](https://tysm.dev)
+- [ggorg.tk](https://ggorg.tk)
+- [hexiaq.cf](https://hexiaq.cf)
 
 
 ## Todo
