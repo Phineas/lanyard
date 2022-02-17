@@ -49,7 +49,8 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [use-lanyard](https://github.com/LeonardSSH/use-lanyard) - Lanyard with Composition API for Vue. Supports REST and WebSocket methods \
 [use-listen-along](https://github.com/punctuations/use-listen-along) - Mock the discord 'Listen Along' feature within a react hook powered by the Lanyard API. \
 [lanyard-graphql](https://github.com/DevSnowflake/lanyard-graphql) - A GraphQL port of the Lanyard API. \
-[svelte-lanyard](https://github.com/iGalaxyYT/svelte-lanyard) - A Lanyard API wrapper for Svelte. Supports REST & WebSocket.
+[svelte-lanyard](https://github.com/iGalaxyYT/svelte-lanyard) - A Lanyard API wrapper for Svelte. Supports REST & WebSocket. \
+[denyard](https://github.com/xHyroM/denyard) - Lanyard API wrapper for Deno - Supports REST & WebSocket.
 
 ## API Docs
 
