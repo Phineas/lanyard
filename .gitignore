@@ -29,3 +29,5 @@ lanyard-*.tar
 .elixir_ls/
 
 dump.rdb
+
+.DS_Store
