@@ -389,6 +389,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [ggorg.tk](https://ggorg.tk)
 - [hexiaq.cf](https://hexiaq.cf)
 - [itsdestiny.me](https://itsdestiny.me)
+- [darkshiny.me](http://darkshiny.me)
 
 ## Todo
 
