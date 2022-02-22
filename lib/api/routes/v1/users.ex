@@ -32,7 +32,6 @@ defmodule Lanyard.Api.Routes.V1.Users do
             end
           end)
 
-          Lanyard.Connectivity.Redis.del("lanyard_kv:#{user_id}")
           Lanyard.KV.Interface.multiset(user_id, parsed)
 
           Util.respond(conn, {:ok})

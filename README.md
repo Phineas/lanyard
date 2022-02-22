@@ -182,7 +182,7 @@ Not yet implemented
 ##### HTTP
 
 `PATCH https://api.lanyard.rest/v1/users/:user_id/kv`  
-The user's KV store will be overwritten by the body of the request. The body must be keyvalue pair object with a maximum depth of 1.
+The user's KV store will be merged with the body of the request. Conflicting keys will be overwritten. The body must be keyvalue pair object with a maximum depth of 1.
 
 #### Deleting a key
 

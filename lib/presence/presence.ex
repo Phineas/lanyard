@@ -220,8 +220,11 @@ defmodule Lanyard.Presence do
 
   def sync(user_id, payload) do
     with {:ok, pid} <-
-           GenRegistry.lookup(__MODULE__, Integer.to_string(user_id)) do
+           GenRegistry.lookup(__MODULE__, normalize_user_id(user_id)) do
       GenServer.cast(pid, {:sync, payload})
     end
   end
+
+  defp normalize_user_id(user_id) when is_integer(user_id), do: Integer.to_string(user_id)
+  defp normalize_user_id(user_id), do: user_id
 end
