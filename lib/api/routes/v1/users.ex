@@ -16,6 +16,38 @@ defmodule Lanyard.Api.Routes.V1.Users do
     Util.respond(conn, Presence.get_pretty_presence(user_id))
   end
 
+  patch "/:id/kv" do
+    %Plug.Conn{params: %{"id" => user_id}} = conn
+
+    {:ok, body, _conn} = Plug.Conn.read_body(conn)
+
+    case validate_resource_access(conn) do
+      :ok ->
+        try do
+          {:ok, parsed} = Poison.decode(body)
+
+          Enum.each(parsed, fn {k, v} ->
+            with {:error, _reason} = err <- Lanyard.KV.Interface.validate_pair({k, v}) do
+              throw(err)
+            end
+          end)
+
+          Lanyard.Connectivity.Redis.del("lanyard_kv:#{user_id}")
+          Lanyard.KV.Interface.multiset(user_id, parsed)
+
+          Util.respond(conn, {:ok})
+        rescue
+          _e ->
+            Util.respond(conn, {:error, :invalid_kv_value, "body must be an object"})
+        catch
+          {:error, reason} -> Util.respond(conn, {:error, :kv_validation_failed, reason})
+        end
+
+      :no_permission ->
+        Util.no_permission(conn)
+    end
+  end
+
   put "/:id/kv/:field" do
     %Plug.Conn{params: %{"id" => user_id, "field" => field}} = conn
 
@@ -23,9 +55,13 @@ defmodule Lanyard.Api.Routes.V1.Users do
 
     case validate_resource_access(conn) do
       :ok ->
-        Lanyard.KV.Interface.set(String.to_integer(user_id), field, put_body)
+        case Lanyard.KV.Interface.set(String.to_integer(user_id), field, put_body) do
+          {:ok, _v} ->
+            Util.respond(conn, {:ok})
 
-        Util.respond(conn, {:ok})
+          {:error, reason} ->
+            Util.respond(conn, {:error, :kv_validation_failed, reason})
+        end
 
       :no_permission ->
         Util.no_permission(conn)

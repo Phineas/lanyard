@@ -24,6 +24,32 @@ defmodule Lanyard.KV.Interface do
       Map.keys(kv) |> length > 511 ->
         {:error, "request would exceed key limit (512), please delete keys first"}
 
+      true ->
+        case validate_pair({key, value}) do
+          {:error, _msg} = err ->
+            err
+
+          {:ok} ->
+            Redis.hset("lanyard_kv:#{user_id}", key, value)
+            Presence.sync(user_id, %{kv: Map.put(kv, key, value)})
+            {:ok, value}
+        end
+    end
+  end
+
+  def multiset(user_id, map) when is_map(map) do
+    Redis.hset("lanyard_kv:#{user_id}", map_to_list(map))
+  end
+
+  def del(user_id, key) do
+    Redis.hdel("lanyard_kv:#{user_id}", key)
+
+    kv = get_all(user_id)
+    Presence.sync(user_id, %{kv: Map.delete(kv, key)})
+  end
+
+  def validate_pair({key, value}) do
+    cond do
       String.length(key) > 255 ->
         {:error, "key must be 255 characters or less"}
 
@@ -34,17 +60,11 @@ defmodule Lanyard.KV.Interface do
         {:error, "value must be 30000 characters or less"}
 
       true ->
-        Redis.hset("lanyard_kv:#{user_id}", key, value)
-        Presence.sync(user_id, %{kv: Map.put(kv, key, value)})
-
-        {:ok, value}
+        {:ok}
     end
   end
 
-  def del(user_id, key) do
-    Redis.hdel("lanyard_kv:#{user_id}", key)
-
-    kv = get_all(user_id)
-    Presence.sync(user_id, %{kv: Map.delete(kv, key)})
+  defp map_to_list(map) when is_map(map) do
+    map |> Enum.reduce([], fn {k, v}, acc -> [k, v | acc] end)
   end
 end

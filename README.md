@@ -173,6 +173,17 @@ When making Lanyard KV API requests, set an `Authorization` header with the API 
 `PUT https://api.lanyard.rest/v1/users/:user_id/kv/:key`  
 The value will be set to the body of the request. The body can be any type of data, but it will be string-encoded when set in Lanyard KV.
 
+#### Setting multiple key->value pairs
+
+##### Discord
+
+Not yet implemented
+
+##### HTTP
+
+`PATCH https://api.lanyard.rest/v1/users/:user_id/kv`  
+The user's KV store will be overwritten by the body of the request. The body must be keyvalue pair object with a maximum depth of 1.
+
 #### Deleting a key
 
 ##### Discord
