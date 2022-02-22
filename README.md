@@ -1,6 +1,6 @@
 <img src="https://storage.googleapis.com/lanyard/static/lanyardtemplogo.png" alt="Lanyard Logo" width="300"/>
 
-# 🏷️  Expose your Discord presence and activities to a RESTful API and WebSocket in less than 10 seconds
+# 🏷️ Expose your Discord presence and activities to a RESTful API and WebSocket in less than 10 seconds
 
 Lanyard is a service that makes it super easy to export your live Discord presence to an API endpoint (`api.lanyard.rest/v1/users/:your_id`) and to a WebSocket (see below) for you to use wherever you want - for example, I use this to display what I'm listening to on Spotify on my personal website. It also acts as a globally-accessible KV store which you can update from the Lanyard Discord bot or from the Lanyard API.
 
@@ -8,30 +8,30 @@ You can use Lanyard's API without deploying anything yourself - but if you want 
 
 ## Get started in < 10 seconds
 
-Just [join this Discord server](https://discord.gg/UrXF2cfJ7F) and your presence will start showing up when you `GET api.lanyard.rest/v1/users/:your_id`. It's that easy.  
+Just [join this Discord server](https://discord.gg/UrXF2cfJ7F) and your presence will start showing up when you `GET api.lanyard.rest/v1/users/:your_id`. It's that easy.
 
 ## Table of Contents
 
 - [Community Projects](#community-projects)
 - [API Docs](#api-docs)
-    + [Getting a user's presence data](#getting-a-user-s-presence-data)
+  - [Getting a user's presence data](#getting-a-user-s-presence-data)
   * [KV](#kv)
-    + [Use cases](#use-cases)
-    + [Limits](#limits)
-    + [Getting an API Key](#getting-an-api-key)
-    + [Setting a key->value pair](#setting-a-key--value-pair)
-    + [Deleting a key](#deleting-a-key)
+    - [Use cases](#use-cases)
+    - [Limits](#limits)
+    - [Getting an API Key](#getting-an-api-key)
+    - [Setting a key->value pair](#setting-a-key--value-pair)
+    - [Deleting a key](#deleting-a-key)
 - [Socket Docs](#socket-docs)
-    + [Subscribing to multiple user presences](#subscribing-to-multiple-user-presences)
-    + [Subscribing to a single user presence](#subscribing-to-a-single-user-presence)
-    + [Subscribing to every user presence](#subscribing-to-every-user-presence)
+  - [Subscribing to multiple user presences](#subscribing-to-multiple-user-presences)
+  - [Subscribing to a single user presence](#subscribing-to-a-single-user-presence)
+  - [Subscribing to every user presence](#subscribing-to-every-user-presence)
   * [List of Opcodes](#list-of-opcodes)
   * [Events](#events)
   * [Error Codes](#error-codes)
+- [Quicklinks](#quicklinks)
 - [Self-host with Docker](#self-host-with-docker)
 - [Used By](#used-by)
 - [Todo](#todo)
-
 
 ## Community Projects
 
@@ -270,6 +270,15 @@ Lanyard can disconnect clients for multiple reasons, usually to do with messages
 | Name                   | Code | Data             |
 | ---------------------- | ---- | ---------------- |
 | Invalid/Unknown Opcode | 4004 | `unknown_opcode` |
+
+## Quicklinks
+
+Lanyard quicklinks allow you to easily access resources from Discord, such as profile pictures.
+
+### User Icons
+
+`https://api.lanyard.rest/<id>.<file_type>`
+Where `id` is the Discord user ID. `file_type` can be one of: `png`, `gif`, `webp`, `jpg`, or `jpeg`
 
 ## Self-host with Docker
 
