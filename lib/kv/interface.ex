@@ -39,6 +39,7 @@ defmodule Lanyard.KV.Interface do
 
   def multiset(user_id, map) when is_map(map) do
     Redis.hset("lanyard_kv:#{user_id}", map_to_list(map))
+    Presence.sync(user_id, %{kv: map})
   end
 
   def del(user_id, key) do
