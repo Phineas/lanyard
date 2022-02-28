@@ -366,6 +366,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [igalaxy.dev](https://igalaxy.dev)
 - [itspolar.dev](https://itspolar.dev)
 - [vasc.dev](https://vasc.dev)
+- [nawrasse.vercel.app](https://nawrasse.vercel.app)
 - [eri.gg](https://eri.gg)
 - [voided.dev](https://voided.dev)
 - [thicc-thighs.de](https://thicc-thighs.de)
