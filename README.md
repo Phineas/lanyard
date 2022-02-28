@@ -410,6 +410,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [hexiaq.cf](https://hexiaq.cf)
 - [itsdestiny.me](https://itsdestiny.me)
 - [darkshiny.me](http://darkshiny.me)
+- [nawrasse.vercel.app](https://nawrasse.vercel.app)
 
 ## Todo
 
