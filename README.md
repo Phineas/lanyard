@@ -411,6 +411,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [itsdestiny.me](https://itsdestiny.me)
 - [darkshiny.me](http://darkshiny.me)
 - [nawrasse.vercel.app](https://nawrasse.vercel.app)
+- [noirs.me](https://noirs.me)
 
 ## Todo
 
