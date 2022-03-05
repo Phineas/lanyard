@@ -413,6 +413,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [nawrasse.vercel.app](https://nawrasse.vercel.app)
 - [noirs.me](https://noirs.me)
 - [2m4u.netlify.app](https://2m4u.netlify.app/)
+- [eleven.js.org](https://eleven.js.org)
 
 ## Todo
 
