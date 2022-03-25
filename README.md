@@ -39,7 +39,6 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 
 [lanyard-profile-readme](https://github.com/cnrad/lanyard-profile-readme) - Utilize Lanyard to display your Discord Presence in your GitHub Profile \
 [spotsync.me](https://spotsync.me) - Stream music from your Discord presence to your friends in realtime through a slick UI \
-[lanyard-status-actions](https://github.com/CompeyDev/discord-status-action) - Updates a file to include your discord status using the Lanyard API. \
 [vue-lanyard](https://github.com/eggsy/vue-lanyard) - Lanyard API plugin for Vue. Supports REST and WebSocket methods \
 [react-use-lanyard](https://github.com/barbarbar338/react-use-lanyard) - React hook for Lanyard - supports REST & WebSocket \
 [use-lanyard](https://github.com/alii/use-lanyard) - Another React hook for Lanyard that uses SWR \
@@ -53,6 +52,7 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [svelte-lanyard](https://github.com/iGalaxyYT/svelte-lanyard) - A Lanyard API wrapper for Svelte. Supports REST & WebSocket. \
 [denyard](https://github.com/xHyroM/denyard) - Lanyard API wrapper for Deno - Supports REST & WebSocket. \
 [lanyard-ui](https://lanyard.sakurajima.cloud/) - Lanyard visualizer focused on the KV aspect
+[discord-status-actions](https://github.com/CompeyDev/discord-status-action) - Updates a file to include your discord status using the Lanyard API. \
 
 ## API Docs
 
