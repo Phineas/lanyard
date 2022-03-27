@@ -403,7 +403,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [rexulec.com](https://rexulec.com)
 - [isaackogan.com](https://www.isaackogan.com)
 - [eleven011.xyz](https://eleven011.xyz)
-- [krypt0n.co.uk](https://krypt0n.co.uk)
+- [krypton.ninja](https://krypton.ninja)
 - [oxmc.xyz](https://oxmc.xyz)
 - [voltages.me](https://voltages.me)
 - [tysm.dev](https://tysm.dev)
