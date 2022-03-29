@@ -13,7 +13,11 @@ defmodule Lanyard do
       Plug.Cowboy.child_spec(
         scheme: :http,
         plug: Lanyard.Router,
-        options: [port: 4001, dispatch: dispatch(), protocol_options: [idle_timeout: :infinity]]
+        options: [
+          port: Application.get_env(:lanyard, :http_port),
+          dispatch: dispatch(),
+          protocol_options: [idle_timeout: :infinity]
+        ]
       ),
       {Lanyard.DiscordBot, %{token: Application.get_env(:lanyard, :bot_token)}},
       {Lanyard.Connectivity.Redis, []}
