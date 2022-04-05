@@ -4,7 +4,6 @@ defmodule Lanyard.Api.Quicklinks.DiscordCdn do
   import Plug.Conn
 
   @discord_cdn "https://cdn.discordapp.com"
-  @fallback_icon "https://discord.com/assets/6f26ddd1bf59740c536d2274bb834a05.png"
 
   def proxy_image(conn) do
     [user_id, file_type] =
@@ -18,7 +17,12 @@ defmodule Lanyard.Api.Quicklinks.DiscordCdn do
     case presence do
       {:ok, p} ->
         {:ok, %HTTPoison.Response{body: b, headers: h, status_code: _status_code}} =
-          get_proxied_avatar(user_id, p.discord_user.avatar, file_type)
+          get_proxied_avatar(
+            user_id,
+            p.discord_user.avatar,
+            p.discord_user.discriminator,
+            file_type
+          )
 
         {_, content_type} =
           h
@@ -33,13 +37,14 @@ defmodule Lanyard.Api.Quicklinks.DiscordCdn do
     end
   end
 
-  defp get_proxied_avatar(id, avatar, file_type) when is_binary(avatar) do
+  defp get_proxied_avatar(id, avatar, _discriminator, file_type) when is_binary(avatar) do
     constructed_cdn_url = "#{@discord_cdn}/avatars/#{id}/#{avatar}.#{file_type}?size=1024"
 
     HTTPoison.get(constructed_cdn_url)
   end
 
-  defp get_proxied_avatar(_id, avatar, _file_type) when is_nil(avatar) do
-    HTTPoison.get(@fallback_icon)
+  defp get_proxied_avatar(_id, avatar, discriminator, _file_type) when is_nil(avatar) do
+    mod = Integer.mod(String.to_integer(discriminator), 5)
+    HTTPoison.get("#{@discord_cdn}/embed/avatars/#{mod}.png")
   end
 end
