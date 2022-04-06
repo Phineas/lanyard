@@ -16,7 +16,7 @@ defmodule Lanyard.Api.Quicklinks.DiscordCdn do
 
     case presence do
       {:ok, p} ->
-        {:ok, %HTTPoison.Response{body: b, headers: h, status_code: _status_code}} =
+        {:ok, %HTTPoison.Response{body: b, headers: h, status_code: status_code}} =
           get_proxied_avatar(
             user_id,
             p.discord_user.avatar,
@@ -24,13 +24,9 @@ defmodule Lanyard.Api.Quicklinks.DiscordCdn do
             file_type
           )
 
-        {_, content_type} =
-          h
-          |> List.keyfind("Content-Type", 0)
-
         conn
-        |> put_resp_content_type(content_type)
-        |> send_resp(200, b)
+        |> merge_resp_headers(h)
+        |> send_resp(status_code, b)
 
       error ->
         Util.respond(conn, error)
