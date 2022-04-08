@@ -22,6 +22,8 @@ defmodule Lanyard.DiscordBot do
 
     Logger.info("Discord bot running on #{inspect(pid)}")
 
+    Lanyard.Metrics.Collector.set(:gauge, :lanyard_monitored_users, 0)
+
     {:noreply, %{state | gateway_client_pid: pid}}
   end
 

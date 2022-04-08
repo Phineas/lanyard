@@ -160,6 +160,7 @@ defmodule Lanyard.Gateway.Client do
   @spec websocket_terminate(any(), any(), nil | keyword() | map()) :: :ok
   def websocket_terminate(reason, _conn_state, state) do
     Lanyard.Metrics.Collector.set(:gauge, :lanyard_monitored_users, 0)
+
     Logger.info("Websocket closed in state #{inspect(state)} with reason #{inspect(reason)}")
     Logger.info("Killing seq_num process!")
     Process.exit(state[:agent_seq_num], :kill)
