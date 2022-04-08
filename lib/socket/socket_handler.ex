@@ -49,7 +49,7 @@ defmodule Lanyard.SocketHandler do
       {:ok, json} when is_map(json) ->
         case json["op"] do
           2 ->
-            if json["d"] == nil || !is_map(json["d"]) do
+            if json["d"] == nil || !is_map(json["d"]) || map_size(json["d"]) == 0 do
               {:reply, {:close, 4005, "requires_data_object"}, state}
             else
               init_state =
@@ -93,11 +93,18 @@ defmodule Lanyard.SocketHandler do
                     Process.flag(:trap_exit, true)
 
                     Presence.subscribe_to_ids_and_build(ids)
+
+                  _ ->
+                    nil
                 end
 
-              {:reply,
-               construct_socket_msg(state.compression, %{op: 0, t: "INIT_STATE", d: init_state}),
-               state}
+              if init_state == nil do
+                {:reply, {:close, 4006, "invalid_payload"}, state}
+              else
+                {:reply,
+                 construct_socket_msg(state.compression, %{op: 0, t: "INIT_STATE", d: init_state}),
+                 state}
+              end
             end
 
           # Used for heartbeating
