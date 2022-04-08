@@ -45,80 +45,84 @@ defmodule Lanyard.SocketHandler do
   def websocket_handle({_type, json}, state) do
     Lanyard.Metrics.Collector.inc(:counter, :lanyard_messages_inbound)
 
-    with {:ok, json} <- Poison.decode(json) do
-      case json["op"] do
-        2 ->
-          if json["d"] == nil do
-            {:reply, {:close, 4005, "requires_data"}, state}
-          else
-            init_state =
-              case json["d"] do
-                %{"subscribe_to_ids" => ids} ->
-                  Logger.debug(
-                    "Sockets | Socket initialized and subscribed to list: #{inspect(ids)}"
-                  )
+    case Poison.decode(json) do
+      {:ok, json} when is_map(json) ->
+        case json["op"] do
+          2 ->
+            if json["d"] == nil || !is_map(json["d"]) do
+              {:reply, {:close, 4005, "requires_data_object"}, state}
+            else
+              init_state =
+                case json["d"] do
+                  %{"subscribe_to_ids" => ids} ->
+                    Logger.debug(
+                      "Sockets | Socket initialized and subscribed to list: #{inspect(ids)}"
+                    )
 
-                  Presence.subscribe_to_ids_and_build(ids)
+                    Presence.subscribe_to_ids_and_build(ids)
 
-                %{"subscribe_to_id" => id} ->
-                  case GenRegistry.lookup(Lanyard.Presence, id) do
-                    {:ok, pid} ->
-                      {:ok, raw_data} = Presence.get_presence(id)
-                      {_, presence} = Presence.build_pretty_presence(raw_data)
+                  %{"subscribe_to_id" => id} ->
+                    case GenRegistry.lookup(Lanyard.Presence, id) do
+                      {:ok, pid} ->
+                        {:ok, raw_data} = Presence.get_presence(id)
+                        {_, presence} = Presence.build_pretty_presence(raw_data)
 
-                      send(pid, {:add_subscriber, self()})
+                        send(pid, {:add_subscriber, self()})
 
-                      Logger.debug(
-                        "Sockets | Socket initialized and subscribed to singleton: #{id}"
-                      )
+                        Logger.debug(
+                          "Sockets | Socket initialized and subscribed to singleton: #{id}"
+                        )
 
-                      presence
+                        presence
 
-                    _ ->
-                      %{}
-                  end
+                      _ ->
+                        %{}
+                    end
 
-                %{"subscribe_to_all" => true} ->
-                  ids =
-                    GenRegistry.reduce(Lanyard.Presence, [], fn {id, _pid}, acc ->
-                      [id | acc]
-                    end)
+                  %{"subscribe_to_all" => true} ->
+                    ids =
+                      GenRegistry.reduce(Lanyard.Presence, [], fn {id, _pid}, acc ->
+                        [id | acc]
+                      end)
 
-                  :ets.insert(
-                    :global_subscribers,
-                    {"subscribers", [self() | get_global_subscriber_list()]}
-                  )
+                    :ets.insert(
+                      :global_subscribers,
+                      {"subscribers", [self() | get_global_subscriber_list()]}
+                    )
 
-                  Process.flag(:trap_exit, true)
+                    Process.flag(:trap_exit, true)
 
-                  Presence.subscribe_to_ids_and_build(ids)
-              end
+                    Presence.subscribe_to_ids_and_build(ids)
+                end
 
-            {:reply,
-             construct_socket_msg(state.compression, %{op: 0, t: "INIT_STATE", d: init_state}),
-             state}
-          end
+              {:reply,
+               construct_socket_msg(state.compression, %{op: 0, t: "INIT_STATE", d: init_state}),
+               state}
+            end
 
-        # Used for heartbeating
-        3 ->
-          {:ok, state}
+          # Used for heartbeating
+          3 ->
+            {:ok, state}
 
-        # Unsubscribe
-        4 ->
-          case json["d"] do
-            %{"unsubscribe_from_id" => id} ->
-              {:ok, pid} = GenRegistry.lookup(Lanyard.Presence, id)
+          # Unsubscribe
+          4 ->
+            case json["d"] do
+              %{"unsubscribe_from_id" => id} ->
+                {:ok, pid} = GenRegistry.lookup(Lanyard.Presence, id)
 
-              unless not Process.alive?(pid) do
-                send(pid, {:remove_subscriber, pid})
-              end
-          end
+                unless not Process.alive?(pid) do
+                  send(pid, {:remove_subscriber, pid})
+                end
+            end
 
-          {:ok, state}
+            {:ok, state}
 
-        _ ->
-          {:reply, {:close, 4004, "unknown_opcode"}, state}
-      end
+          _ ->
+            {:reply, {:close, 4004, "unknown_opcode"}, state}
+        end
+
+      _ ->
+        {:reply, {:close, 4006, "invalid_payload"}, state}
     end
   end
 

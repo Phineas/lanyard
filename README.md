@@ -279,10 +279,11 @@ Lanyard can disconnect clients for multiple reasons, usually to do with messages
 
 #### Types of Errors
 
-| Name                   | Code | Data              |
-| ---------------------- | ---- | ----------------- |
-| Invalid/Unknown Opcode | 4004 | `unknown_opcode`  |
-| Opcode Requires Data   | 4005 | `requires_data`   |
+| Name                   | Code | Data                   |
+| ---------------------- | ---- | ---------------------- |
+| Invalid/Unknown Opcode | 4004 | `unknown_opcode`       |
+| Opcode Requires Data   | 4005 | `requires_data_object` |
+| Invalid Payload        | 4006 | `invalid_payload`      |
 
 ## Quicklinks
 
