@@ -31,6 +31,8 @@ defmodule Lanyard.SocketHandler do
   end
 
   def websocket_init(state) do
+    Lanyard.Metrics.Collector.inc(:gauge, :lanyard_connected_sessions)
+
     {:reply,
      construct_socket_msg(state.compression, %{op: 1, d: %{"heartbeat_interval" => 30000}}),
      state}
@@ -41,6 +43,8 @@ defmodule Lanyard.SocketHandler do
   end
 
   def websocket_handle({_type, json}, state) do
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_messages_inbound)
+
     with {:ok, json} <- Poison.decode(json) do
       case json["op"] do
         2 ->
@@ -118,13 +122,15 @@ defmodule Lanyard.SocketHandler do
     {:reply, construct_socket_msg(state.compression, message), state}
   end
 
-  def terminate(_reason, _req, state) do
+  def terminate(_reason, _req, _state) do
     :ets.insert(
       :global_subscribers,
       {"subscribers", List.delete(get_global_subscriber_list(), self())}
     )
 
-    {:ok, state}
+    Lanyard.Metrics.Collector.dec(:gauge, :lanyard_connected_sessions)
+
+    :ok
   end
 
   def get_global_subscriber_list do
@@ -138,6 +144,8 @@ defmodule Lanyard.SocketHandler do
   end
 
   defp construct_socket_msg(compression, data) do
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_messages_outbound)
+
     case compression do
       :zlib ->
         data = data |> Poison.encode!()

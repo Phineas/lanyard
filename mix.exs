@@ -23,6 +23,8 @@ defmodule Lanyard.MixProject do
   defp deps do
     [
       {:plug_cowboy, "~> 2.0"},
+      {:prometheus_plugs, "~> 1.1"},
+      {:prometheus_ex, "~> 3.0"},
       {:websocket_client, "~> 1.2.4"},
       {:poison, "~> 4.0"},
       {:gen_registry, "~> 1.0"},

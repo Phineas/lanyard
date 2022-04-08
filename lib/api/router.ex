@@ -3,6 +3,7 @@ defmodule Lanyard.Api.Router do
 
   alias Lanyard.Api.Routes.V1
   alias Lanyard.Api.Routes.Discord
+  alias Lanyard.Api.Routes.Metrics
   alias Lanyard.Api.Util
   alias Lanyard.Api.Quicklinks
 
@@ -19,9 +20,29 @@ defmodule Lanyard.Api.Router do
 
   plug(:match)
   plug(:dispatch)
+  plug(:metrics_handle)
+
+  def metrics_handle(conn, _opts) do
+    stat =
+      cond do
+        conn.status >= 200 && conn.status < 300 ->
+          :lanyard_2xx_responses
+
+        conn.status >= 400 && conn.status < 500 ->
+          :lanyard_4xx_responses
+
+        conn.status >= 500 ->
+          :lanyard_5xx_responses
+      end
+
+    Lanyard.Metrics.Collector.inc(:counter, stat)
+
+    conn
+  end
 
   forward("/v1", to: V1)
   forward("/discord", to: Discord)
+  forward("/metrics", to: Metrics)
 
   get _ do
     quicktype = String.split(conn.request_path, ".") |> Enum.at(-1)

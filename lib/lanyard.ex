@@ -10,6 +10,7 @@ defmodule Lanyard do
 
     children = [
       {GenRegistry, worker_module: Lanyard.Presence},
+      {Lanyard.Metrics, :normal},
       Plug.Cowboy.child_spec(
         scheme: :http,
         plug: Lanyard.Router,
