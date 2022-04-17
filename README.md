@@ -419,6 +419,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [eleven.js.org](https://eleven.js.org)
 - [roxza.me](https://roxza.me)
 - [keaton.codes](https://keaton.codes)
+- [itsmebravo.dev](https://itsmebravo.dev)
 
 ## Todo
 
