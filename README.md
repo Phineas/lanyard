@@ -421,6 +421,8 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [keaton.codes](https://keaton.codes)
 - [itsmebravo.dev](https://itsmebravo.dev)
 - [cimok.co.uk](https://cimok.co.uk/)
+- [winnerose.live](https://winnerose.live/)
+- [alysum.vercel.app](https://alysum.vercel.app/)
 
 ## Todo
 
