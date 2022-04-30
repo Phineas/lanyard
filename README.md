@@ -423,6 +423,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [cimok.co.uk](https://cimok.co.uk/)
 - [winnerose.live](https://winnerose.live/)
 - [alysum.vercel.app](https://alysum.vercel.app/)
+- [alpha.is-a.dev](https://alpha.is-a.dev)
 
 ## Todo
 
