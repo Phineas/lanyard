@@ -425,6 +425,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [alysum.vercel.app](https://alysum.vercel.app/)
 - [alpha.is-a.dev](https://alpha.is-a.dev)
 - [rovi.me](https://rovi.me)
+- [snazzah.com](https://snazzah.com)
 
 ## Todo
 
