@@ -8,5 +8,5 @@ if config_env() == :prod do
     bot_presence: System.get_env("BOT_PRESENCE") || "you <3",
     bot_presence_type: String.to_integer(System.get_env("BOT_PRESENCE_TYPE") || "3"),
     bot_token: System.get_env("BOT_TOKEN"),
-    redis_host: System.get_env("REDIS_HOST")
+    redis_uri: System.get_env("REDIS_URI") || System.get_env("REDIS_URL")
 end

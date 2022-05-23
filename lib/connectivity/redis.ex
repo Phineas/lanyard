@@ -6,7 +6,12 @@ defmodule Lanyard.Connectivity.Redis do
   end
 
   def init(_) do
-    {:ok, client} = Redix.start_link(host: Application.get_env(:lanyard, :redis_host), port: 6379)
+    uri =
+      if Application.get_env(:lanyard, :redis_uri) != nil,
+        do: Application.get_env(:lanyard, :redis_uri),
+        else: "redis://#{System.get_env("REDIS_HOST")}:6379"
+
+    {:ok, client} = Redix.start_link(uri)
 
     {:ok, %{client: client}}
   end
