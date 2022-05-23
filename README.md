@@ -427,6 +427,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [rovi.me](https://rovi.me)
 - [snazzah.com](https://snazzah.com)
 - [aidak.tk](https://aidak.tk)
+- [doubleclickadvertising.com](https://doubleclickadvertising.com/team)
 
 ## Todo
 
