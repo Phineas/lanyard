@@ -428,6 +428,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [snazzah.com](https://snazzah.com)
 - [aidak.tk](https://aidak.tk)
 - [doubleclickadvertising.com](https://doubleclickadvertising.com/team)
+- [itsnp.cf](https://itsnp.cf)
 
 ## Todo
 
