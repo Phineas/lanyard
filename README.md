@@ -356,6 +356,7 @@ Note, that you're **hosting a http server, not https**. You'll need to use a **r
 Below is a list of sites using Lanyard right now, check them out! A lot of them will only show an activity when they're active. Create a PR to add your site below!
 
 - [alistair.cloud](https://alistair.cloud)
+- [muffina.github.io](https://muffinaa.github.io)
 - [timcole.me](https://timcole.me)
 - [dstn.to](https://dstn.to)
 - [phineas.io](https://phineas.io)
