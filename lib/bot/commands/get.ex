@@ -41,6 +41,9 @@ defmodule Lanyard.DiscordBot.Commands.Get do
           payload["channel_id"],
           "Invalid usage. Example `get` command usage:\n`#{Application.get_env(:lanyard, :command_prefix)}get <key>`"
         )
+
+      _ ->
+        :ok
     end
 
     :ok

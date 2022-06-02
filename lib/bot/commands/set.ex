@@ -48,6 +48,9 @@ defmodule Lanyard.DiscordBot.Commands.Set do
           payload["channel_id"],
           "Invalid usage. Example `set` command usage:\n`#{Application.get_env(:lanyard, :command_prefix)}set <key> <value>`"
         )
+
+      _ ->
+        :ok
     end
 
     :ok

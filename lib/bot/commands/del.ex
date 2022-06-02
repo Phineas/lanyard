@@ -34,6 +34,9 @@ defmodule Lanyard.DiscordBot.Commands.Del do
           payload["channel_id"],
           "Invalid usage. Example `del` command usage:\n#{Application.get_env(:lanyard, :command_prefix)}del <key>`"
         )
+
+      _ ->
+        :ok
     end
 
     :ok
