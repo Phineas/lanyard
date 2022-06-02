@@ -17,4 +17,24 @@ defmodule Lanyard.DiscordBot.DiscordApi do
       ]
     )
   end
+
+  def create_dm(recipient) do
+    {:ok, response} =
+      HTTPoison.post(
+        "#{@api_host}/users/@me/channels",
+        Poison.encode!(%{recipient_id: recipient}),
+        [
+          {"Authorization", "Bot " <> Application.get_env(:lanyard, :bot_token)},
+          {"Content-Type", "application/json"}
+        ]
+      )
+
+    case Poison.decode!(response.body) do
+      %{"id" => id} ->
+        id
+
+      _ ->
+        :ok
+    end
+  end
 end
