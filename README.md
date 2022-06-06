@@ -429,7 +429,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [aidak.tk](https://aidak.tk)
 - [doubleclickadvertising.com](https://doubleclickadvertising.com/team)
 - [itsnp.cf](https://itsnp.cf)
-- [sayanz.netlify.app](https://sayanz.netlify.app)
+- [sayanzyx.netlify.app](https://sayanzyx.netlify.app)
 
 ## Todo
 
