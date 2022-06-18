@@ -431,6 +431,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [itsnp.cf](https://itsnp.cf)
 - [sayanzyx.netlify.app](https://sayanzyx.netlify.app)
 - [lanyard-card-example.netlify.app](https://lanyard-card-example.netlify.app)
+- [niskii.denkylabs.com](https://niskii.denkylabs.com)
 
 ## Todo
 
