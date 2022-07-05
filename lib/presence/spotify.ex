@@ -4,7 +4,7 @@ defmodule Lanyard.Presence.Spotify do
       track_id: get_track_id(activity),
       artist: activity.state,
       song: activity.details,
-      album: activity.assets.large_text,
+      album: get_album_title(activity),
       album_art_url: get_album_art_url(activity),
       timestamps: activity.timestamps
     }
@@ -14,6 +14,9 @@ defmodule Lanyard.Presence.Spotify do
 
   defp get_track_id(%{sync_id: sync_id}) when is_binary(sync_id), do: sync_id
   defp get_track_id(_else), do: nil
+
+  defp get_album_title(%{assets: large_text}), do: large_text
+  defp get_album_title(_activity), do: nil
 
   defp get_album_art_url(%{assets: %{large_image: large_image}}) do
     case String.split(large_image, ":") do
