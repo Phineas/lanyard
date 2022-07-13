@@ -1,5 +1,6 @@
 defmodule Lanyard.Presence.Spotify do
   def build_pretty_spotify(activity) when is_map(activity) do
+    IO.inspect activity
     %{
       track_id: get_track_id(activity),
       artist: activity.state,
@@ -15,7 +16,8 @@ defmodule Lanyard.Presence.Spotify do
   defp get_track_id(%{sync_id: sync_id}) when is_binary(sync_id), do: sync_id
   defp get_track_id(_else), do: nil
 
-  defp get_album_title(%{assets: large_text}), do: large_text
+  defp get_album_title(%{assets: %{large_text: lt}}), do: lt
+  defp get_album_title(%{assets: large_text}) when is_binary(large_text), do: large_text
   defp get_album_title(_activity), do: nil
 
   defp get_album_art_url(%{assets: %{large_image: large_image}}) do
