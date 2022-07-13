@@ -1,6 +1,5 @@
 defmodule Lanyard.Presence.Spotify do
   def build_pretty_spotify(activity) when is_map(activity) do
-    IO.inspect activity
     %{
       track_id: get_track_id(activity),
       artist: activity.state,
