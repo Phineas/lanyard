@@ -433,7 +433,11 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [lanyard-card-example.netlify.app](https://lanyard-card-example.netlify.app)
 - [niskii.denkylabs.com](https://niskii.denkylabs.com)
 - [falsis.ga](https://falsis.ga)
+<<<<<<< main
+- [sundei.de](https://sundei.de)
+=======
 - [sanct.me](https://sanct.me)
+>>>>>>> main
 
 ## Todo
 
