@@ -435,6 +435,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [falsis.ga](https://falsis.ga)
 - [sundei.de](https://sundei.de)
 - [sanct.me](https://sanct.me)
+- [leonard.sh](https://leonard.sh/)
 
 ## Todo
 
