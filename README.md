@@ -438,7 +438,8 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [leonard.sh](https://leonard.sh/)
 - [php.codevizag.com](https://php.codevizag.com)
 - [ithundxr.dev](https://ithundxr.dev)
-
+- [callumdev.xyz](https://callumdev.xyz)
+- 
 ## Todo
 
 - [ ] Landing page?
