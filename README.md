@@ -48,7 +48,7 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [go-lanyard](https://github.com/barbarbar338/go-lanyard) - Lanyard API wrapper for GoLang - supports REST & WebSocket \
 [use-lanyard](https://github.com/LeonardSSH/use-lanyard) - Lanyard with Composition API for Vue. Supports REST and WebSocket methods \
 [use-listen-along](https://github.com/punctuations/use-listen-along) - Mock the discord 'Listen Along' feature within a react hook powered by the Lanyard API. \
-[lanyard-graphql](https://github.com/DevSnowflake/lanyard-graphql) - A GraphQL port of the Lanyard API. \
+[lanyard-graphql](https://github.com/CesiumLabs/lanyard-graphql) - A GraphQL port of the Lanyard API. \
 [svelte-lanyard](https://github.com/iGalaxyYT/svelte-lanyard) - A Lanyard API wrapper for Svelte. Supports REST & WebSocket. \
 [denyard](https://github.com/xHyroM/denyard) - Lanyard API wrapper for Deno - Supports REST & WebSocket. \
 [lanyard-ui](https://lanyard.sakurajima.cloud/) - Lanyard visualizer focused on the KV aspect \
@@ -171,7 +171,7 @@ When making Lanyard KV API requests, set an `Authorization` header with the API 
 
 ##### HTTP
 
-`PUT https://api.lanyard.rest/v1/users/:user_id/kv/:key`  
+`PUT https://api.lanyard.rest/v1/users/:user_id/kv/:key`
 The value will be set to the body of the request. The body can be any type of data, but it will be string-encoded when set in Lanyard KV.
 
 #### Setting multiple key->value pairs
@@ -182,7 +182,7 @@ Not yet implemented
 
 ##### HTTP
 
-`PATCH https://api.lanyard.rest/v1/users/:user_id/kv`  
+`PATCH https://api.lanyard.rest/v1/users/:user_id/kv`
 The user's KV store will be merged with the body of the request. Conflicting keys will be overwritten. The body must be keyvalue pair object with a maximum depth of 1.
 
 #### Deleting a key
