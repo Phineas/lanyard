@@ -48,7 +48,7 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [go-lanyard](https://github.com/barbarbar338/go-lanyard) - Lanyard API wrapper for GoLang - supports REST & WebSocket \
 [use-lanyard](https://github.com/LeonardSSH/use-lanyard) - Lanyard with Composition API for Vue. Supports REST and WebSocket methods \
 [use-listen-along](https://github.com/punctuations/use-listen-along) - Mock the discord 'Listen Along' feature within a react hook powered by the Lanyard API. \
-[lanyard-graphql](https://github.com/DevSnowflake/lanyard-graphql) - A GraphQL port of the Lanyard API. \
+[lanyard-graphql](https://github.com/CesiumLabs/lanyard-graphql) - A GraphQL port of the Lanyard API. \
 [svelte-lanyard](https://github.com/iGalaxyYT/svelte-lanyard) - A Lanyard API wrapper for Svelte. Supports REST & WebSocket. \
 [denyard](https://github.com/xHyroM/denyard) - Lanyard API wrapper for Deno - Supports REST & WebSocket. \
 [lanyard-ui](https://lanyard.sakurajima.cloud/) - Lanyard visualizer focused on the KV aspect \
@@ -171,7 +171,7 @@ When making Lanyard KV API requests, set an `Authorization` header with the API 
 
 ##### HTTP
 
-`PUT https://api.lanyard.rest/v1/users/:user_id/kv/:key`  
+`PUT https://api.lanyard.rest/v1/users/:user_id/kv/:key`
 The value will be set to the body of the request. The body can be any type of data, but it will be string-encoded when set in Lanyard KV.
 
 #### Setting multiple key->value pairs
@@ -182,7 +182,7 @@ Not yet implemented
 
 ##### HTTP
 
-`PATCH https://api.lanyard.rest/v1/users/:user_id/kv`  
+`PATCH https://api.lanyard.rest/v1/users/:user_id/kv`
 The user's KV store will be merged with the body of the request. Conflicting keys will be overwritten. The body must be keyvalue pair object with a maximum depth of 1.
 
 #### Deleting a key
@@ -359,10 +359,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [timcole.me](https://timcole.me)
 - [dstn.to](https://dstn.to)
 - [phineas.io](https://phineas.io)
-- [slayter.dev](https://slayter.dev)
-- [lafond.dev](https://lafond.dev)
 - [cnrad.dev](https://cnrad.dev)
-- [atzu.studio](https://atzu.studio)
 - [dont-ping.me](https://dont-ping.me)
 - [eggsy.xyz](https://eggsy.xyz)
 - [crugg.de](https://crugg.de)
@@ -373,47 +370,33 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [voided.dev](https://voided.dev)
 - [thicc-thighs.de](https://thicc-thighs.de)
 - [chezzer.dev](https://chezzer.dev)
-- [arda.codes](https://arda.codes)
 - [looskie.com](https://looskie.com)
-- [barbarbar338.fly.dev](https://barbarbar338.fly.dev)
+- [338.rocks](https://338.rocks)
 - [marino.codes](https://marino.codes)
-- [stealthwave.dev](https://stealthwave.dev)
 - [miraichu.co](https://miraichu.co)
-- [nith.codes](https://nith.codes)
-- [veny.xyz](https://veny.xyz)
 - [5elenay.github.io](https://5elenay.github.io)
 - [notnick.io](https://notnick.io)
-- [encrypteddev.com](https://encrypteddev.com)
-- [kevinthomas.codes](https://kevinthomas.codes)
-- [amine.im](https://amine.im)
 - [loom4k.me](https://loom4k.me)
 - [presence.im](https://presence.im/)
-- [eleven.codes](https://eleven.codes)
 - [jackbailey.dev](https://jackbailey.dev)
 - [345dev.me](https://345dev.me)
 - [d3r1n.com](https://d3r1n.com/)
 - [vops.cc](https://vops.cc)
 - [lion.himbo.cat](https://lion.himbo.cat)
-- [zeromomentum.me](https://zeromomentum.me)
 - [emirkabal.com](https://emirkabal.com)
 - [wosleyv.dev](https://www.wosleyv.dev)
 - [aidan.pw](https://aidan.pw)
 - [anaxes.codes](https://www.anaxes.codes)
-- [avyanshralph.xyz](https://avyanshralph.xyz)
 - [maki.cafe](https://maki.cafe)
 - [cenap.js.org](https://cenap.js.org)
 - [rexulec.com](https://rexulec.com)
 - [isaackogan.com](https://www.isaackogan.com)
-- [eleven011.xyz](https://eleven011.xyz)
 - [krypton.ninja](https://krypton.ninja)
-- [oxmc.xyz](https://oxmc.xyz)
 - [voltages.me](https://voltages.me)
 - [tysm.dev](https://tysm.dev)
 - [ggorg.tk](https://ggorg.tk)
 - [hexiaq.cf](https://hexiaq.cf)
-- [itsdestiny.me](https://itsdestiny.me)
 - [darkshiny.me](http://darkshiny.me)
-- [nawrasse.vercel.app](https://nawrasse.vercel.app)
 - [noirs.me](https://noirs.me)
 - [2m4u.netlify.app](https://2m4u.netlify.app/)
 - [eleven.js.org](https://eleven.js.org)
@@ -423,16 +406,12 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [cimok.co.uk](https://cimok.co.uk/)
 - [winnerose.live](https://winnerose.live/)
 - [alysum.vercel.app](https://alysum.vercel.app/)
-- [alpha.is-a.dev](https://alpha.is-a.dev)
 - [rovi.me](https://rovi.me)
 - [snazzah.com](https://snazzah.com)
-- [aidak.tk](https://aidak.tk)
-- [doubleclickadvertising.com](https://doubleclickadvertising.com/team)
 - [itsnp.cf](https://itsnp.cf)
 - [sayanzyx.netlify.app](https://sayanzyx.netlify.app)
 - [lanyard-card-example.netlify.app](https://lanyard-card-example.netlify.app)
 - [niskii.denkylabs.com](https://niskii.denkylabs.com)
-- [falsis.ga](https://falsis.ga)
 - [sundei.de](https://sundei.de)
 - [sanct.me](https://sanct.me)
 - [leonard.sh](https://leonard.sh/)
