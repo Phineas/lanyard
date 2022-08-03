@@ -440,6 +440,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [ithundxr.dev](https://ithundxr.dev)
 - [callumdev.xyz](https://callumdev.xyz)
 - [jvsh.me](https://jvsh.me)
+- [dan.onl](https://dan.onl)
 
 ## Todo
 
