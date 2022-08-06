@@ -133,7 +133,7 @@ Example response:
           "large_text": "Editing a MARKDOWN file",
           "large_image": "565945077491433494"
         },
-        "application_id": 383226320970055681
+        "application_id": "383226320970055681"
       }
     ]
   }
