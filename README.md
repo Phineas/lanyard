@@ -421,6 +421,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [jvsh.me](https://jvsh.me)
 - [dan.onl](https://dan.onl)
 - [neb.bio](https://neb.bio)
+- [mishudev.xyz](https://mishudev.xyz)
 
 ## Todo
 
