@@ -43,6 +43,7 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [react-use-lanyard](https://github.com/barbarbar338/react-use-lanyard) - React hook for Lanyard - supports REST & WebSocket \
 [use-lanyard](https://github.com/alii/use-lanyard) - Another React hook for Lanyard that uses SWR \
 [lanyard-visualizer](https://lanyard-visualizer.netlify.app/) - Beautifully display your Discord presence on a website \
+[discordstatus-website](https://github.com/LucaForever/discordstatus-website) - Display your Discord status on your own website with premade CSS, and JS \
 [hawser](https://github.com/5elenay/hawser) - Lanyard API wrapper for python. Supports both REST and WebSocket. \
 [js-lanyard](https://github.com/xaronnn/js-lanyard/) - Use Lanyard in your Web App. \
 [go-lanyard](https://github.com/barbarbar338/go-lanyard) - Lanyard API wrapper for GoLang - supports REST & WebSocket \
@@ -369,6 +370,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [vasc.dev](https://vasc.dev)
 - [eri.gg](https://eri.gg)
 - [voided.dev](https://voided.dev)
+- [lucaforever.com](https://lucaforever.com/status)
 - [thicc-thighs.de](https://thicc-thighs.de)
 - [chezzer.dev](https://chezzer.dev)
 - [looskie.com](https://looskie.com)
