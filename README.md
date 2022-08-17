@@ -53,7 +53,8 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [svelte-lanyard](https://github.com/iGalaxyYT/svelte-lanyard) - A Lanyard API wrapper for Svelte. Supports REST & WebSocket. \
 [denyard](https://github.com/xHyroM/denyard) - Lanyard API wrapper for Deno - Supports REST & WebSocket. \
 [lanyard-ui](https://lanyard.sakurajima.cloud/) - Lanyard visualizer focused on the KV aspect \
-[discord-status-actions](https://github.com/CompeyDev/discord-status-action) - Updates a file to include your discord status using the Lanyard API.
+[discord-status-actions](https://github.com/CompeyDev/discord-status-action) - Updates a file to include your discord status using the Lanyard API. \
+[discordstatus-website](https://github.com/LucaForever/discordstatus-website) - Display your Discord status on your own website with premade CSS, and JS
 
 ## API Docs
 
@@ -423,6 +424,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [dan.onl](https://dan.onl)
 - [neb.bio](https://neb.bio)
 - [mishudev.xyz](https://mishudev.xyz)
+- [lucaforever.com](https://lucaforever.com/status)
 
 ## Todo
 
