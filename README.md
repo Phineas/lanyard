@@ -55,7 +55,7 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [lanyard-ui](https://lanyard.sakurajima.cloud/) - Lanyard visualizer focused on the KV aspect \
 [discord-status-actions](https://github.com/CompeyDev/discord-status-action) - Updates a file to include your discord status using the Lanyard API. \
 [discordstatus-website](https://github.com/LucaForever/discordstatus-website) - Display your Discord status on your own website with premade CSS, and JS
-[lanyard-web](https://github.com/eggsy/lanyard-web) - Landing page and API documentation concept for Lanyard API with a sleek UI.
+[lanyard-web](https://lanyard.eggsy.xyz) - Landing page and API documentation concept for Lanyard API with a sleek UI.
 
 ## API Docs
 
