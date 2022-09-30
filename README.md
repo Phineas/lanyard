@@ -427,7 +427,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [mishudev.xyz](https://mishudev.xyz)
 - [lucaforever.com](https://lucaforever.com/status)
 - [selim1337.tk](https://selim1337.tk)
-
+- [jharajat.com.np](https://jharajat.com.np)
 ## Todo
 
 - [ ] Landing page?
