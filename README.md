@@ -429,6 +429,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [seanray.dev](https://seanray.dev/)
 - [selim1337.tk](https://selim1337.tk)
 - [jharajat.com.np](https://jharajat.com.np)
+- [fascinated.cc](https://fascinated.cc)
 - [brandons.place](https://brandons.place)
 
 ## Todo
