@@ -358,7 +358,6 @@ Note, that you're **hosting a http server, not https**. You'll need to use a **r
 
 Below is a list of sites using Lanyard right now, check them out! A lot of them will only show an activity when they're active. Create a PR to add your site below!
 
-- [fascinated.cc](https://fascinated.cc)
 - [alistair.cloud](https://alistair.cloud)
 - [timcole.me](https://timcole.me)
 - [dstn.to](https://dstn.to)
@@ -430,6 +429,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [seanray.dev](https://seanray.dev/)
 - [selim1337.tk](https://selim1337.tk)
 - [jharajat.com.np](https://jharajat.com.np)
+- [fascinated.cc](https://fascinated.cc)
 
 ## Todo
 
