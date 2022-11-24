@@ -435,6 +435,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [tunasay.in](https://tunasay.in)
 - [cairbyte71](https://cairbyte71.com)
 - [plskz.me](https://www.plskz.me/)
+- [rafaelv.live](https://rafaelv.live)
 
 ## Todo
 
