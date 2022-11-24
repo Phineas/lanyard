@@ -38,7 +38,6 @@ Just [join this Discord server](https://discord.gg/UrXF2cfJ7F) and your presence
 The Lanyard community has worked on some pretty cool projects that allows you to extend the functionality of Lanyard. PR to add a project!
 
 [lanyard-profile-readme](https://github.com/cnrad/lanyard-profile-readme) - Utilize Lanyard to display your Discord Presence in your GitHub Profile \
-[lanyard.py](https://github.com/sawshadev/lanyard-py) - An asynchronous implementation of the Lanyard websocket and HTTP for python \
 [spotsync.me](https://spotsync.me) - Stream music from your Discord presence to your friends in realtime through a slick UI \
 [vue-lanyard](https://github.com/eggsy/vue-lanyard) - Lanyard API plugin for Vue. Supports REST and WebSocket methods \
 [react-use-lanyard](https://github.com/barbarbar338/react-use-lanyard) - React hook for Lanyard - supports REST & WebSocket \
@@ -57,7 +56,8 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [discord-status-actions](https://github.com/CompeyDev/discord-status-action) - Updates a file to include your discord status using the Lanyard API. \
 [discordstatus-website](https://github.com/LucaForever/discordstatus-website) - Display your Discord status on your own website with premade CSS, and JS \
 [lanyard-web](https://lanyard.eggsy.xyz) - Landing page and API documentation concept for Lanyard API with a sleek UI. \
-[osu-nowplaying](https://github.com/Hexality/osu-nowplaying) - A small tool to scrape the info of the map you're curently playing on osu!lazer and dump into a file for obs to read.
+[osu-nowplaying](https://github.com/Hexality/osu-nowplaying) - A small tool to scrape the info of the map you're curently playing on osu!lazer and dump into a file for obs to read. \
+[lanyard.py](https://github.com/sawshadev/lanyard-py) - An asynchronous implementation of the Lanyard websocket and HTTP for python
 
 ## API Docs
 
