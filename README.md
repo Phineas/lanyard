@@ -441,6 +441,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [erdem.js.org](https://erdem.js.org)
 - [cwkhan.tech](https://cwkhan.tech)
 - [akkih.com](https://akkih.com)
+- [brokiem.is-a.dev](https://brokiem.is-a.dev/)
 
 ## Todo
 
