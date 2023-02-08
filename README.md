@@ -58,6 +58,7 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [lanyard-web](https://lanyard.eggsy.xyz) - Landing page and API documentation concept for Lanyard API with a sleek UI. \
 [osu-nowplaying](https://github.com/Hexality/osu-nowplaying) - A small tool to scrape the info of the map you're curently playing on osu!lazer and dump into a file for obs to read. \
 [lanyard.py](https://github.com/sawshadev/lanyard-py) - An asynchronous implementation of the Lanyard websocket and HTTP for python
+[LanyardJavaWrapper](https://github.com/blueysh/lanyardjavawrapper) - A simple Java wrapper for the Lanyard REST API that exposes your Discord presence within seconds
 
 ## API Docs
 
@@ -446,6 +447,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [afn.lol](https://afn.lol)
 - [ushie.dev](https://ushie.dev)
 - [lonelil.dev](https://lonelil.dev)
+- [blueysh.me](https://blueysh.me)
 
 ## Todo
 
