@@ -57,7 +57,8 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [discordstatus-website](https://github.com/LucaForever/discordstatus-website) - Display your Discord status on your own website with premade CSS, and JS \
 [lanyard-web](https://lanyard.eggsy.xyz) - Landing page and API documentation concept for Lanyard API with a sleek UI. \
 [osu-nowplaying](https://github.com/Hexality/osu-nowplaying) - A small tool to scrape the info of the map you're curently playing on osu!lazer and dump into a file for obs to read. \
-[lanyard.py](https://github.com/sawshadev/lanyard-py) - An asynchronous implementation of the Lanyard websocket and HTTP for python
+[lanyard.py](https://github.com/sawshadev/lanyard-py) - An asynchronous implementation of the Lanyard websocket and HTTP for python \
+[lanyard-wrapper](https://github.com/brokiem/lanyard-wrapper) - Fully-typed Lanyard API wrapper for JavaScript/TypeScript with support for managing Lanyard KV
 
 ## API Docs
 
