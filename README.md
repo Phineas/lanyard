@@ -433,7 +433,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [jharajat.com.np](https://jharajat.com.np)
 - [fascinated.cc](https://fascinated.cc)
 - [brandons.place](https://brandons.place)
-- [tunasay.in](https://tunasay.in)
+- [2na.xyz](https://2na.xyz)
 - [cairbyte71](https://cairbyte71.com)
 - [plskz.me](https://www.plskz.me/)
 - [rafaelv.live](https://rafaelv.live)
