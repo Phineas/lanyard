@@ -18,8 +18,10 @@ jobs:
           DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
         run: |
           echo "$DOCKER_PASSWORD" | docker login -u $DOCKER_USERNAME --password-stdin
+      - name: Update aptitude
+        run: sudo apt-get update
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install git
+        run: sudo apt-get install git
       - name: Build the Docker image
         run: docker build . --file Dockerfile --tag phineas/lanyard:latest
       - name: Docker Push
