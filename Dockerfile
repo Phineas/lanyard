@@ -1,4 +1,6 @@
-FROM elixir:1.12.3-alpine AS build
+FROM elixir:1.14-alpine AS build
+
+RUN apk add git
 
 ENV MIX_ENV=prod
 
@@ -18,7 +20,7 @@ RUN \
 	mix compile && \
 	mix release
 
-FROM elixir:1.12.3-alpine
+FROM elixir:1.14-alpine
 
 RUN apk add redis
 
