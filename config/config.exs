@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 config :lanyard,
   discord_spotify_activity_id: "spotify:1"

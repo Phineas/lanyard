@@ -10,6 +10,18 @@ defmodule Lanyard.Api.Routes.V1.Users do
   plug(:match)
   plug(:dispatch)
 
+  get "/@me" do
+    key = conn |> Plug.Conn.get_req_header("authorization")
+
+    case Redis.get("api_key:#{key}") do
+      user_id when is_binary(user_id) ->
+        Util.respond(conn, Presence.get_pretty_presence(user_id))
+
+      _ ->
+        Util.respond(conn, {:error, :invalid_api_key, "Invalid api key"})
+    end
+  end
+
   get "/:id" do
     %Plug.Conn{params: %{"id" => user_id}} = conn
 

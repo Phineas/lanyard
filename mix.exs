@@ -5,7 +5,7 @@ defmodule Lanyard.MixProject do
     [
       app: :lanyard,
       version: "0.1.0",
-      elixir: "~> 1.11",
+      elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -24,14 +24,15 @@ defmodule Lanyard.MixProject do
     [
       {:plug_cowboy, "~> 2.0"},
       {:prometheus_plugs, "~> 1.1"},
-      {:prometheus_ex, "~> 3.0"},
-      {:websocket_client, "~> 1.2.4"},
+      {:prometheus_ex,
+       git: "https://github.com/lanodan/prometheus.ex", branch: "fix/elixir-1.14", override: true},
+      {:websocket_client, "~> 1.5"},
       {:poison, "~> 4.0"},
       {:gen_registry, "~> 1.0"},
       {:corsica, "~> 1.0"},
       {:manifold, "~> 1.0"},
       {:httpoison, "~> 1.8"},
-      {:redix, "~> 1.1"}
+      {:redix, "~> 1.2"}
     ]
   end
 end
