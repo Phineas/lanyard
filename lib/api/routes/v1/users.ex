@@ -1,6 +1,4 @@
 defmodule Lanyard.Api.Routes.V1.Users do
-  import Plug.Conn
-
   alias Lanyard.Api.Util
   alias Lanyard.Presence
   alias Lanyard.Connectivity.Redis
@@ -18,7 +16,7 @@ defmodule Lanyard.Api.Routes.V1.Users do
         Util.respond(conn, Presence.get_pretty_presence(user_id))
 
       _ ->
-        Util.respond(conn, {:error, :invalid_api_key, "Invalid api key"})
+        Util.no_permission(conn)
     end
   end
 

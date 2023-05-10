@@ -1,6 +1,4 @@
 defmodule Lanyard.Api.Routes.Discord do
-  import Plug.Conn
-
   alias Lanyard.Api.Util
 
   use Plug.Router

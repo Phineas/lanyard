@@ -2,6 +2,18 @@ defmodule Lanyard.Presence.PublicFields do
   defstruct [:user_id, :discord_user, :discord_presence, :kv]
 end
 
+defmodule Lanyard.Presence.PrettyPresence do
+  defstruct discord_user: %{},
+            discord_status: "offline",
+            active_on_discord_web: false,
+            active_on_discord_desktop: false,
+            active_on_discord_mobile: false,
+            listening_to_spotify: false,
+            spotify: nil,
+            activities: [],
+            kv: %{}
+end
+
 defmodule Lanyard.Presence do
   use GenServer
 
@@ -78,17 +90,16 @@ defmodule Lanyard.Presence do
 
   def handle_cast({:sync, new_state}, state) do
     {_, pretty_presence} =
-      build_pretty_presence(
-        get_public_fields(
-          %{
-            discord_user: state.discord_user,
-            discord_presence: state.discord_presence,
-            user_id: state.user_id,
-            kv: state.kv
-          }
-          |> Map.merge(new_state)
-        )
+      get_public_fields(
+        %{
+          discord_user: state.discord_user,
+          discord_presence: state.discord_presence,
+          user_id: state.user_id,
+          kv: state.kv
+        }
+        |> Map.merge(new_state)
       )
+      |> build_pretty_presence()
 
     Manifold.send(
       state.subscriber_pids,
@@ -107,7 +118,7 @@ defmodule Lanyard.Presence do
      %{state | subscriber_pids: state.subscriber_pids |> Enum.reject(fn sub -> sub == object end)}}
   end
 
-  @spec get_public_fields(any()) :: Lanyard.Presence.PublicFields
+  @spec get_public_fields(map()) :: Lanyard.Presence.PublicFields
   defp get_public_fields(state) do
     %Lanyard.Presence.PublicFields{
       user_id: state.user_id,
@@ -121,12 +132,12 @@ defmodule Lanyard.Presence do
   # Public API
   #
 
-  @spec get_presence(binary) :: {:ok, any} | {:error, atom, binary}
+  @spec get_presence(number) :: {:ok, Lanyard.Presence.PrettyPresence} | {:error, atom, binary}
   def get_presence(user_id) when is_number(user_id) do
     get_presence(Integer.to_string(user_id))
   end
 
-  @spec get_presence(binary) :: {:ok, any} | {:error, atom, binary}
+  @spec get_presence(binary) :: {:ok, Lanyard.Presence.PrettyPresence} | {:error, atom, binary}
   def get_presence(user_id) when is_binary(user_id) do
     case GenRegistry.lookup(__MODULE__, user_id) do
       {:ok, pid} ->
@@ -171,7 +182,7 @@ defmodule Lanyard.Presence do
 
     pretty_fields =
       if has_presence? do
-        %{
+        %Lanyard.Presence.PrettyPresence{
           discord_user: Map.put(raw_data.discord_user, :id, "#{raw_data.discord_user.id}"),
           discord_status: raw_data.discord_presence.status,
           active_on_discord_web: Map.has_key?(raw_data.discord_presence.client_status, :web),
@@ -185,15 +196,8 @@ defmodule Lanyard.Presence do
           kv: raw_data.kv
         }
       else
-        %{
+        %Lanyard.Presence.PrettyPresence{
           discord_user: Map.put(raw_data.discord_user, :id, "#{raw_data.discord_user.id}"),
-          discord_status: "offline",
-          active_on_discord_web: false,
-          active_on_discord_desktop: false,
-          active_on_discord_mobile: false,
-          listening_to_spotify: false,
-          spotify: nil,
-          activities: [],
           kv: raw_data.kv
         }
       end
