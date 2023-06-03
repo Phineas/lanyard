@@ -392,6 +392,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [wosleyv.dev](https://www.wosleyv.dev)
 - [aidan.pw](https://aidan.pw)
 - [anaxes.codes](https://www.anaxes.codes)
+- [microsounds.github.io](https://microsounds.github.io)
 - [maki.cafe](https://maki.cafe)
 - [cenap.js.org](https://cenap.js.org)
 - [rexulec.com](https://rexulec.com)
