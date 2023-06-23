@@ -27,7 +27,7 @@ defmodule Lanyard.MixProject do
       {:prometheus_ex,
        git: "https://github.com/lanodan/prometheus.ex", branch: "fix/elixir-1.14", override: true},
       {:websocket_client, "~> 1.5"},
-      {:poison, "~> 4.0"},
+      {:jason, "~> 1.4"},
       {:gen_registry, "~> 1.0"},
       {:corsica, "~> 1.0"},
       {:manifold, "~> 1.0"},

@@ -45,7 +45,7 @@ defmodule Lanyard.SocketHandler do
   def websocket_handle({_type, json}, state) do
     Lanyard.Metrics.Collector.inc(:counter, :lanyard_messages_inbound)
 
-    case Poison.decode(json) do
+    case Jason.decode(json) do
       {:ok, json} when is_map(json) ->
         case json["op"] do
           2 ->
@@ -163,7 +163,7 @@ defmodule Lanyard.SocketHandler do
 
     case compression do
       :zlib ->
-        data = data |> Poison.encode!()
+        data = data |> Jason.encode!()
 
         z = :zlib.open()
         :zlib.deflateInit(z)
@@ -177,7 +177,7 @@ defmodule Lanyard.SocketHandler do
       _ ->
         data =
           data
-          |> Poison.encode!()
+          |> Jason.encode!()
 
         {:text, data}
     end

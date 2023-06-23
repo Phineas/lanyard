@@ -10,7 +10,7 @@ defmodule Lanyard.DiscordBot.DiscordApi do
 
     HTTPoison.post(
       "#{@api_host}/channels/#{channel_id}/messages",
-      Poison.encode!(%{content: sanitized_content}),
+      Jason.encode!(%{content: sanitized_content}),
       [
         {"Authorization", "Bot " <> Application.get_env(:lanyard, :bot_token)},
         {"Content-Type", "application/json"}
@@ -22,14 +22,14 @@ defmodule Lanyard.DiscordBot.DiscordApi do
     {:ok, response} =
       HTTPoison.post(
         "#{@api_host}/users/@me/channels",
-        Poison.encode!(%{recipient_id: recipient}),
+        Jason.encode!(%{recipient_id: recipient}),
         [
           {"Authorization", "Bot " <> Application.get_env(:lanyard, :bot_token)},
           {"Content-Type", "application/json"}
         ]
       )
 
-    case Poison.decode!(response.body) do
+    case Jason.decode!(response.body) do
       %{"id" => id} ->
         id
 
