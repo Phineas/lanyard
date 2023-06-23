@@ -11,6 +11,8 @@ defmodule Lanyard do
     children = [
       {GenRegistry, worker_module: Lanyard.Presence},
       {Lanyard.Metrics, :normal},
+      {Lanyard.Connectivity.Redis, []},
+      {Lanyard.DiscordBot, %{token: Application.get_env(:lanyard, :bot_token)}},
       Plug.Cowboy.child_spec(
         scheme: :http,
         plug: Lanyard.Router,
@@ -19,9 +21,7 @@ defmodule Lanyard do
           dispatch: dispatch(),
           protocol_options: [idle_timeout: :infinity]
         ]
-      ),
-      {Lanyard.DiscordBot, %{token: Application.get_env(:lanyard, :bot_token)}},
-      {Lanyard.Connectivity.Redis, []}
+      )
     ]
 
     opts = [strategy: :one_for_one, name: Lanyard.Supervisor]
