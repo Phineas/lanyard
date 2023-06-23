@@ -13,28 +13,11 @@ defmodule Lanyard do
       {Lanyard.Metrics, :normal},
       {Lanyard.Connectivity.Redis, []},
       {Lanyard.DiscordBot, %{token: Application.get_env(:lanyard, :bot_token)}},
-      Plug.Cowboy.child_spec(
-        scheme: :http,
-        plug: Lanyard.Router,
-        options: [
-          port: Application.get_env(:lanyard, :http_port),
-          dispatch: dispatch(),
-          protocol_options: [idle_timeout: :infinity]
-        ]
-      )
+      {Bandit,
+       plug: Lanyard.Api.Router, scheme: :http, port: Application.get_env(:lanyard, :http_port)}
     ]
 
     opts = [strategy: :one_for_one, name: Lanyard.Supervisor]
     Supervisor.start_link(children, opts)
-  end
-
-  defp dispatch do
-    [
-      {:_,
-       [
-         {"/socket", Lanyard.SocketHandler, []},
-         {:_, Plug.Cowboy.Handler, {Lanyard.Api.Router, []}}
-       ]}
-    ]
   end
 end

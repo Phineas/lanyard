@@ -51,6 +51,14 @@ defmodule Lanyard.Api.Router do
     Util.respond(conn, {:ok, response})
   end
 
+  get "/socket" do
+    conn = %Plug.Conn{query_params: params} = fetch_query_params(conn)
+
+    conn
+    |> WebSockAdapter.upgrade(Lanyard.SocketHandler, params, timeout: 60_000)
+    |> halt()
+  end
+
   forward("/v1", to: V1)
   forward("/discord", to: Discord)
   forward("/metrics", to: Metrics)
