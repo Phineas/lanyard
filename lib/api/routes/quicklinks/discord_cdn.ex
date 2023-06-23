@@ -2,6 +2,7 @@ defmodule Lanyard.Api.Quicklinks.DiscordCdn do
   alias Lanyard.Api.Util
 
   import Plug.Conn
+  import Bitwise
 
   @discord_cdn "https://cdn.discordapp.com"
 
@@ -39,6 +40,14 @@ defmodule Lanyard.Api.Quicklinks.DiscordCdn do
 
     :get
     |> Finch.build(constructed_cdn_url)
+    |> Finch.request(Lanyard.Finch)
+  end
+
+  defp get_proxied_avatar(id, avatar, "0", _file_type) when is_nil(avatar) do
+    mod = Integer.mod(String.to_integer(id) >>> 22, 6)
+
+    :get
+    |> Finch.build("#{@discord_cdn}/embed/avatars/#{mod}.png")
     |> Finch.request(Lanyard.Finch)
   end
 
