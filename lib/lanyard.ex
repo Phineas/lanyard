@@ -9,6 +9,7 @@ defmodule Lanyard do
     :ets.new(:analytics, [:named_table, :set, :public])
 
     children = [
+      {Finch, name: Lanyard.Finch},
       {GenRegistry, worker_module: Lanyard.Presence},
       {Lanyard.Metrics, :normal},
       {Lanyard.Connectivity.Redis, []},

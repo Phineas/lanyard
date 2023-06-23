@@ -33,7 +33,7 @@ defmodule Lanyard.MixProject do
       {:gen_registry, "~> 1.0"},
       {:corsica, "~> 1.0"},
       {:manifold, "~> 1.0"},
-      {:httpoison, "~> 1.8"},
+      {:finch, "~> 0.16.0"},
       {:redix, "~> 1.2"}
     ]
   end
