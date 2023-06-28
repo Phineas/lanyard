@@ -34,7 +34,7 @@ defmodule Lanyard.Api.Routes.V1.Users do
     case validate_resource_access(conn) do
       :ok ->
         try do
-          {:ok, parsed} = Poison.decode(body)
+          {:ok, parsed} = Jason.decode(body)
 
           Enum.each(parsed, fn {k, v} ->
             with {:error, _reason} = err <- Lanyard.KV.Interface.validate_pair({k, v}) do

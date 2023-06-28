@@ -9,32 +9,16 @@ defmodule Lanyard do
     :ets.new(:analytics, [:named_table, :set, :public])
 
     children = [
+      {Finch, name: Lanyard.Finch},
       {GenRegistry, worker_module: Lanyard.Presence},
       {Lanyard.Metrics, :normal},
-      Plug.Cowboy.child_spec(
-        scheme: :http,
-        plug: Lanyard.Router,
-        options: [
-          port: Application.get_env(:lanyard, :http_port),
-          dispatch: dispatch(),
-          protocol_options: [idle_timeout: :infinity]
-        ]
-      ),
+      {Lanyard.Connectivity.Redis, []},
       {Lanyard.DiscordBot, %{token: Application.get_env(:lanyard, :bot_token)}},
-      {Lanyard.Connectivity.Redis, []}
+      {Bandit,
+       plug: Lanyard.Api.Router, scheme: :http, port: Application.get_env(:lanyard, :http_port)}
     ]
 
     opts = [strategy: :one_for_one, name: Lanyard.Supervisor]
     Supervisor.start_link(children, opts)
-  end
-
-  defp dispatch do
-    [
-      {:_,
-       [
-         {"/socket", Lanyard.SocketHandler, []},
-         {:_, Plug.Cowboy.Handler, {Lanyard.Api.Router, []}}
-       ]}
-    ]
   end
 end

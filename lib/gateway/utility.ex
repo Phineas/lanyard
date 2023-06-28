@@ -23,7 +23,7 @@ defmodule Lanyard.Gateway.Utility do
     load
     |> _update_payload(seq_num, "s", seq_num)
     |> _update_payload(event_name, "t", seq_num)
-    |> Poison.encode!()
+    |> Jason.encode!()
   end
 
   @doc "Decode binary payload received from discord into a map"
@@ -42,7 +42,7 @@ defmodule Lanyard.Gateway.Utility do
   @doc "Decode json payload received from discord into a map"
   @spec payload_decode(list(), {:text, binary()}) :: map
   def payload_decode(codes, {:text, payload}) do
-    payload = Poison.decode!(payload)
+    payload = Jason.decode!(payload)
 
     %{
       op: opcode(codes, payload[:op] || payload["op"]),

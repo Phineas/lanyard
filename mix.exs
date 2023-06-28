@@ -22,16 +22,18 @@ defmodule Lanyard.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:plug_cowboy, "~> 2.0"},
+      {:plug, "~> 1.14"},
+      {:bandit, "~> 0.7.7"},
+      {:websock_adapter, "~> 0.5.3"},
       {:prometheus_plugs, "~> 1.1"},
       {:prometheus_ex,
        git: "https://github.com/lanodan/prometheus.ex", branch: "fix/elixir-1.14", override: true},
       {:websocket_client, "~> 1.5"},
-      {:poison, "~> 4.0"},
-      {:gen_registry, "~> 1.0"},
-      {:corsica, "~> 1.0"},
-      {:manifold, "~> 1.0"},
-      {:httpoison, "~> 1.8"},
+      {:jason, "~> 1.4"},
+      {:gen_registry, "~> 1.3"},
+      {:corsica, "~> 1.3"},
+      {:manifold, "~> 1.6"},
+      {:finch, "~> 0.16.0"},
       {:redix, "~> 1.2"}
     ]
   end

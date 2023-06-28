@@ -8,28 +8,32 @@ defmodule Lanyard.DiscordBot.DiscordApi do
       content
       |> String.replace("@", "@​\u200b")
 
-    HTTPoison.post(
+    :post
+    |> Finch.build(
       "#{@api_host}/channels/#{channel_id}/messages",
-      Poison.encode!(%{content: sanitized_content}),
       [
         {"Authorization", "Bot " <> Application.get_env(:lanyard, :bot_token)},
         {"Content-Type", "application/json"}
-      ]
+      ],
+      Jason.encode!(%{content: sanitized_content})
     )
+    |> Finch.request(Lanyard.Finch)
   end
 
   def create_dm(recipient) do
     {:ok, response} =
-      HTTPoison.post(
+      :post
+      |> Finch.build(
         "#{@api_host}/users/@me/channels",
-        Poison.encode!(%{recipient_id: recipient}),
         [
           {"Authorization", "Bot " <> Application.get_env(:lanyard, :bot_token)},
           {"Content-Type", "application/json"}
-        ]
+        ],
+        Jason.encode!(%{recipient_id: recipient})
       )
+      |> Finch.request(Lanyard.Finch)
 
-    case Poison.decode!(response.body) do
+    case Jason.decode!(response.body) do
       %{"id" => id} ->
         id
 

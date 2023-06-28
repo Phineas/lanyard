@@ -13,12 +13,9 @@ defmodule Lanyard.SocketHandler do
             encoding: nil,
             compression: nil
 
-  @behaviour :cowboy_websocket
-
-  def init(request, _state) do
+  def init(params) do
     compression =
-      request
-      |> :cowboy_req.parse_qs()
+      params
       |> Enum.find(fn {name, _value} -> name == "compression" end)
       |> case do
         {_name, "zlib_json"} -> :zlib
@@ -27,30 +24,26 @@ defmodule Lanyard.SocketHandler do
 
     state = %__MODULE__{awaiting_init: true, encoding: "json", compression: compression}
 
-    {:cowboy_websocket, request, state}
-  end
-
-  def websocket_init(state) do
     Lanyard.Metrics.Collector.inc(:gauge, :lanyard_connected_sessions)
 
-    {:reply,
+    {:reply, :ok,
      construct_socket_msg(state.compression, %{op: 1, d: %{"heartbeat_interval" => 30000}}),
      state}
   end
 
-  def websocket_handle({:ping, _binary}, state) do
+  def handle_control({_message, [opcode: :ping]}, state) do
     {:ok, state}
   end
 
-  def websocket_handle({_type, json}, state) do
+  def handle_in({json, _type}, state) do
     Lanyard.Metrics.Collector.inc(:counter, :lanyard_messages_inbound)
 
-    case Poison.decode(json) do
+    case Jason.decode(json) do
       {:ok, json} when is_map(json) ->
         case json["op"] do
           2 ->
             if json["d"] == nil || !is_map(json["d"]) || map_size(json["d"]) == 0 do
-              {:reply, {:close, 4005, "requires_data_object"}, state}
+              {:stop, :normal, {4005, "requires_data_object"}, state}
             else
               init_state =
                 case json["d"] do
@@ -99,9 +92,9 @@ defmodule Lanyard.SocketHandler do
                 end
 
               if init_state == nil do
-                {:reply, {:close, 4006, "invalid_payload"}, state}
+                {:stop, :normal, {4006, "invalid_payload"}, state}
               else
-                {:reply,
+                {:reply, :ok,
                  construct_socket_msg(state.compression, %{op: 0, t: "INIT_STATE", d: init_state}),
                  state}
               end
@@ -125,19 +118,19 @@ defmodule Lanyard.SocketHandler do
             {:ok, state}
 
           _ ->
-            {:reply, {:close, 4004, "unknown_opcode"}, state}
+            {:stop, :normal, {4004, "unknown_opcode"}, state}
         end
 
       _ ->
-        {:reply, {:close, 4006, "invalid_payload"}, state}
+        {:stop, :normal, {4006, "invalid_payload"}, state}
     end
   end
 
-  def websocket_info({:remote_send, message}, state) do
-    {:reply, construct_socket_msg(state.compression, message), state}
+  def handle_info({:remote_send, message}, state) do
+    {:reply, :ok, construct_socket_msg(state.compression, message), state}
   end
 
-  def terminate(_reason, _req, _state) do
+  def terminate(_reason, _state) do
     :ets.insert(
       :global_subscribers,
       {"subscribers", List.delete(get_global_subscriber_list(), self())}
@@ -163,7 +156,7 @@ defmodule Lanyard.SocketHandler do
 
     case compression do
       :zlib ->
-        data = data |> Poison.encode!()
+        data = data |> Jason.encode!()
 
         z = :zlib.open()
         :zlib.deflateInit(z)
@@ -177,7 +170,7 @@ defmodule Lanyard.SocketHandler do
       _ ->
         data =
           data
-          |> Poison.encode!()
+          |> Jason.encode!()
 
         {:text, data}
     end

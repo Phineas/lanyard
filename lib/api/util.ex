@@ -18,7 +18,7 @@ defmodule Lanyard.Api.Util do
   def respond(conn, {:ok, data}) do
     conn
     |> put_resp_content_type("application/json")
-    |> send_resp(200, Poison.encode!(%{success: true, data: data}))
+    |> send_resp(200, Jason.encode!(%{success: true, data: data}))
   end
 
   @spec respond(Plug.Conn.t(), {:error, atom, binary}) :: Plug.Conn.t()
@@ -32,7 +32,7 @@ defmodule Lanyard.Api.Util do
     |> put_resp_content_type("application/json")
     |> send_resp(
       http_code,
-      Poison.encode!(%{
+      Jason.encode!(%{
         success: false,
         error: %{
           code: Atom.to_string(code),

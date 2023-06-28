@@ -1,8 +1,10 @@
 defmodule Lanyard.Presence.PublicFields do
+  @derive Jason.Encoder
   defstruct [:user_id, :discord_user, :discord_presence, :kv]
 end
 
 defmodule Lanyard.Presence.PrettyPresence do
+  @derive Jason.Encoder
   defstruct discord_user: %{},
             discord_status: "offline",
             active_on_discord_web: false,
@@ -20,6 +22,7 @@ defmodule Lanyard.Presence do
   alias Lanyard.Presence.Spotify
   alias Lanyard.Presence.Activity
 
+  @derive Jason.Encoder
   defstruct user_id: nil,
             discord_user: nil,
             discord_presence: nil,
