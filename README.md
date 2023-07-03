@@ -367,6 +367,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [cnrad.dev](https://cnrad.dev)
 - [dont-ping.me](https://dont-ping.me)
 - [eggsy.xyz](https://eggsy.xyz)
+- [therealzzy.xyz](https://therealzzy.xyz)
 - [crugg.de](https://crugg.de)
 - [igalaxy.dev](https://igalaxy.dev)
 - [itspolar.dev](https://itspolar.dev)
