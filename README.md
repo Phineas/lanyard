@@ -446,6 +446,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [afn.lol](https://afn.lol)
 - [ushie.dev](https://ushie.dev)
 - [lonelil.dev](https://lonelil.dev)
+- [thereallo.dev](https://thereallo.dev)
 
 ## Todo
 
