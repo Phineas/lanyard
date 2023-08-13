@@ -369,6 +369,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [eggsy.xyz](https://eggsy.xyz)
 - [crugg.de](https://crugg.de)
 - [igalaxy.dev](https://igalaxy.dev)
+- [adambot.vercel.app](https://adambot.vercel.app)
 - [itspolar.dev](https://itspolar.dev)
 - [vasc.dev](https://vasc.dev)
 - [eri.gg](https://eri.gg)
