@@ -442,7 +442,6 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [cwkhan.tech](https://cwkhan.tech)
 - [akkih.com](https://akkih.com)
 - [brokiem.is-a.dev](https://brokiem.is-a.dev/)
-- [astrid.exposed](https://astrid.exposed/root)
 - [afn.lol](https://afn.lol)
 - [ushie.dev](https://ushie.dev)
 - [lonelil.dev](https://lonelil.dev)
