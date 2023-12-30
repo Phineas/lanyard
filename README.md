@@ -372,6 +372,7 @@ Below is a list of sites using Lanyard right now, check them out! A lot of them 
 - [itspolar.dev](https://itspolar.dev)
 - [vasc.dev](https://vasc.dev)
 - [eri.gg](https://eri.gg)
+- [satr14.is-a.dev](https://satr14.is-a.dev/)
 - [voided.dev](https://voided.dev)
 - [thicc-thighs.de](https://thicc-thighs.de)
 - [chezzer.dev](https://chezzer.dev)
