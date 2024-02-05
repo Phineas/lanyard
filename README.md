@@ -2,7 +2,7 @@
 
 # 🏷️ Expose your Discord presence and activities to a RESTful API and WebSocket in less than 10 seconds
 
-Lanyard is a service that makes it super easy to export your live Discord presence to an API endpoint (`api.lanyard.rest/v1/users/:your_id`) and to a WebSocket (see below) for you to use wherever you want - for example, I use this to display what I'm listening to on Spotify on my personal website. It also acts as a globally-accessible KV store which you can update from the Lanyard Discord bot or from the Lanyard API.
+Lanyard is a service that makes it super easy to export your live Discord presence to an API endpoint (`api.lanyard.rest/v1/users/:your_id`) and to a WebSocket (see below) for you to use wherever you want - for example, I use this to display what I'm listening to on Spotify on my personal website. It also acts as a globally-accessible realtime KV store which you can update from the Lanyard Discord bot or from the Lanyard API.
 
 You can use Lanyard's API without deploying anything yourself - but if you want to self host it, you have the option to, though it'll require a tiny bit of configuration.
 
@@ -37,8 +37,8 @@ Just [join this Discord server](https://discord.gg/UrXF2cfJ7F) and your presence
 
 The Lanyard community has worked on some pretty cool projects that allows you to extend the functionality of Lanyard. PR to add a project!
 
+[lanyard-web](https://lanyard.eggsy.xyz) - Landing page and API documentation concept for Lanyard API with a sleek UI. \
 [lanyard-profile-readme](https://github.com/cnrad/lanyard-profile-readme) - Utilize Lanyard to display your Discord Presence in your GitHub Profile \
-[spotsync.me](https://spotsync.me) - Stream music from your Discord presence to your friends in realtime through a slick UI \
 [vue-lanyard](https://github.com/eggsy/vue-lanyard) - Lanyard API plugin for Vue. Supports REST and WebSocket methods \
 [react-use-lanyard](https://github.com/barbarbar338/react-use-lanyard) - React hook for Lanyard - supports REST & WebSocket \
 [use-lanyard](https://github.com/alii/use-lanyard) - Another React hook for Lanyard that uses SWR \
@@ -55,7 +55,6 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [lanyard-ui](https://lanyard.sakurajima.cloud/) - Lanyard visualizer focused on the KV aspect \
 [discord-status-actions](https://github.com/CompeyDev/discord-status-action) - Updates a file to include your discord status using the Lanyard API. \
 [discordstatus-website](https://github.com/LucaForever/discordstatus-website) - Display your Discord status on your own website with premade CSS, and JS \
-[lanyard-web](https://lanyard.eggsy.xyz) - Landing page and API documentation concept for Lanyard API with a sleek UI. \
 [osu-nowplaying](https://github.com/Hexality/osu-nowplaying) - A small tool to scrape the info of the map you're curently playing on osu!lazer and dump into a file for obs to read. \
 [lanyard.py](https://github.com/sawshadev/lanyard-py) - An asynchronous implementation of the Lanyard websocket and HTTP for python
 
@@ -147,7 +146,7 @@ Example response:
 
 ### KV
 
-Lanyard KV is a a dynamic, real-time key->value store which is added to the Lanyard user API response. When a KV pair is updated, a PRESENCE_UPDATE for the user will also be emitted through the Lanyard socket.
+Lanyard KV is a a dynamic, real-time key->value store which is added to the Lanyard user API response. When a KV pair is updated, a `PRESENCE_UPDATE` for the user will also be emitted through the Lanyard socket.
 
 #### Use cases
 
@@ -356,97 +355,27 @@ services:
 
 Note, that you're **hosting a http server, not https**. You'll need to use a **reverse proxy** such as [traefik](https://traefik.io/traefik/) if you want to secure your API endpoint.
 
-## Used By
+## Showcase
 
-Below is a list of sites using Lanyard right now, check them out! A lot of them will only show an activity when they're active. Create a PR to add your site below!
+Below is a curated selection of websites using Lanyard right now, check them out! Some of them will only show an activity when they're active.
 
-- [alistair.cloud](https://alistair.cloud)
-- [timcole.me](https://timcole.me)
-- [dstn.to](https://dstn.to)
-- [phineas.io](https://phineas.io)
-- [cnrad.dev](https://cnrad.dev)
-- [dont-ping.me](https://dont-ping.me)
+- [alistair.sh](https://alistair.sh)
 - [eggsy.xyz](https://eggsy.xyz)
-- [crugg.de](https://crugg.de)
 - [igalaxy.dev](https://igalaxy.dev)
+- [makidoll.io](https://makidoll.io/)
+- [chezzer.dev](https://chezzer.dev)
+- [dan.onl](https://dan.onl/)
+- [cnrad.dev](https://cnrad.dev)
+- [venqoi.lol](https://venqoi.lol/)
+- [phineas.io](https://phineas.io)
+- [timcole.me](https://timcole.me)
 - [itspolar.dev](https://itspolar.dev)
 - [vasc.dev](https://vasc.dev)
-- [eri.gg](https://eri.gg)
+- [dstn.to](https://dstn.to)
 - [voided.dev](https://voided.dev)
-- [thicc-thighs.de](https://thicc-thighs.de)
-- [chezzer.dev](https://chezzer.dev)
-- [looskie.com](https://looskie.com)
-- [338.rocks](https://338.rocks)
-- [marino.codes](https://marino.codes)
-- [miraichu.co](https://miraichu.co)
-- [5elenay.github.io](https://5elenay.github.io)
-- [notnick.io](https://notnick.io)
-- [loom4k.me](https://loom4k.me)
-- [presence.im](https://presence.im/)
-- [jackbailey.dev](https://jackbailey.dev)
-- [345dev.me](https://345dev.me)
-- [d3r1n.com](https://d3r1n.com/)
-- [vops.cc](https://vops.cc)
-- [lion.himbo.cat](https://lion.himbo.cat)
-- [emirkabal.com](https://emirkabal.com)
-- [wosleyv.dev](https://www.wosleyv.dev)
-- [aidan.pw](https://aidan.pw)
-- [anaxes.codes](https://www.anaxes.codes)
-- [maki.cafe](https://maki.cafe)
-- [cenap.js.org](https://cenap.js.org)
-- [rexulec.com](https://rexulec.com)
-- [isaackogan.com](https://www.isaackogan.com)
-- [krypton.ninja](https://krypton.ninja)
-- [voltages.me](https://voltages.me)
-- [tysm.dev](https://tysm.dev)
-- [ggorg.tk](https://ggorg.tk)
-- [hexiaq.cf](https://hexiaq.cf)
-- [darkshiny.me](http://darkshiny.me)
-- [noirs.me](https://noirs.me)
-- [2m4u.netlify.app](https://2m4u.netlify.app/)
-- [eleven.js.org](https://eleven.js.org)
-- [roxza.me](https://roxza.me)
-- [keaton.codes](https://keaton.codes)
-- [itsmebravo.dev](https://itsmebravo.dev)
-- [cimok.co.uk](https://cimok.co.uk/)
-- [winnerose.live](https://winnerose.live/)
-- [alysum.vercel.app](https://alysum.vercel.app/)
-- [rovi.me](https://rovi.me)
-- [snazzah.com](https://snazzah.com)
-- [itsnp.cf](https://itsnp.cf)
-- [sayanzyx.netlify.app](https://sayanzyx.netlify.app)
-- [lanyard-card-example.netlify.app](https://lanyard-card-example.netlify.app)
-- [niskii.denkylabs.com](https://niskii.denkylabs.com)
-- [sundei.de](https://sundei.de)
-- [sanct.me](https://sanct.me)
-- [leonard.sh](https://leonard.sh/)
-- [php.codevizag.com](https://php.codevizag.com)
-- [ithundxr.dev](https://ithundxr.dev)
-- [callumdev.xyz](https://callumdev.xyz)
-- [jvsh.me](https://jvsh.me)
-- [dan.onl](https://dan.onl)
 - [neb.bio](https://neb.bio)
-- [mishudev.xyz](https://mishudev.xyz)
-- [lucaforever.com](https://lucaforever.com/status)
-- [seanray.dev](https://seanray.dev/)
-- [selim1337.tk](https://selim1337.tk)
-- [jharajat.com.np](https://jharajat.com.np)
-- [fascinated.cc](https://fascinated.cc)
-- [brandons.place](https://brandons.place)
-- [tunasay.in](https://tunasay.in)
-- [cairbyte71](https://cairbyte71.com)
-- [plskz.me](https://www.plskz.me/)
-- [rafaelv.live](https://rafaelv.live)
-- [vaul.xyz](https://vaul.xyz)
-- [erdem.js.org](https://erdem.js.org)
-- [cwkhan.tech](https://cwkhan.tech)
-- [akkih.com](https://akkih.com)
-- [brokiem.is-a.dev](https://brokiem.is-a.dev/)
-- [astrid.exposed](https://astrid.exposed/root)
-- [afn.lol](https://afn.lol)
-- [ushie.dev](https://ushie.dev)
-- [lonelil.dev](https://lonelil.dev)
-
-## Todo
-
-- [ ] Landing page?
+- [looskie.com](https://looskie.com)
+- [krypton.ninja](https://krypton.ninja)
+- [eosis.space](https://eosis.space/)
+- [dromzeh.dev](https://dromzeh.dev)
+- [littleprinceonu.com](https://littlepriceonu.com/)
