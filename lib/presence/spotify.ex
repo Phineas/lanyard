@@ -1,14 +1,8 @@
 defmodule Lanyard.Presence.Spotify do
   def build_pretty_spotify(activity) when is_map(activity) do
-    artist =
-      case Map.fetch(activity, :state) do
-        {:ok, state} -> state
-        :error -> nil
-      end
-
     %{
       track_id: get_track_id(activity),
-      artist: artist,
+      artist: Map.get(activity, :state),
       song: activity.details,
       album: get_album_title(activity),
       album_art_url: get_album_art_url(activity),
