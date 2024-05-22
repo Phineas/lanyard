@@ -56,8 +56,8 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [discord-status-actions](https://github.com/CompeyDev/discord-status-action) - Updates a file to include your discord status using the Lanyard API. \
 [discordstatus-website](https://github.com/LucaForever/discordstatus-website) - Display your Discord status on your own website with premade CSS, and JS \
 [osu-nowplaying](https://github.com/Hexality/osu-nowplaying) - A small tool to scrape the info of the map you're curently playing on osu!lazer and dump into a file for obs to read. \
-[lanyard.py](https://github.com/sawshadev/lanyard-py) - An asynchronous implementation of the Lanyard websocket and HTTP for python
-
+[lanyard.py](https://github.com/sawshadev/lanyard-py) - An asynchronous implementation of the Lanyard websocket and HTTP for python  \
+[StalkCord](https://github.com/N1tchVar/StalkCord) - Stalk anyones Discord from Lanyard's Server using Lanyard API
 ## API Docs
 
 #### Getting a user's presence data
