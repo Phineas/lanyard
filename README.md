@@ -381,3 +381,4 @@ Below is a curated selection of websites using Lanyard right now, check them out
 - [eosis.space](https://eosis.space/)
 - [dromzeh.dev](https://dromzeh.dev)
 - [littleprinceonu.com](https://littlepriceonu.com/)
+- [sotasan.com](https://sotasan.com)
