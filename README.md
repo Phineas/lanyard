@@ -362,6 +362,7 @@ Below is a curated selection of websites using Lanyard right now, check them out
 
 - [alistair.sh](https://alistair.sh)
 - [eggsy.xyz](https://eggsy.xyz)
+- [saahild.com](https://saahild.com/?ref=lanyard)
 - [igalaxy.dev](https://igalaxy.dev)
 - [anahoward.me](https://www.anahoward.me/)
 - [chezzer.dev](https://chezzer.dev)
