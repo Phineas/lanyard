@@ -183,10 +183,28 @@ defmodule Lanyard.Presence do
 
     has_presence? = raw_data.discord_presence !== nil
 
+    discord_user =
+      if raw_data.discord_user.clan != nil do
+        user_clan =
+          Map.put(
+            raw_data.discord_user.clan,
+            :identity_guild_id,
+            "#{raw_data.discord_user.clan.identity_guild_id}"
+          )
+
+        Map.put(
+          raw_data.discord_user,
+          :clan,
+          user_clan
+        )
+      else
+        raw_data.discord_user
+      end
+
     pretty_fields =
       if has_presence? do
         %Lanyard.Presence.PrettyPresence{
-          discord_user: Map.put(raw_data.discord_user, :id, "#{raw_data.discord_user.id}"),
+          discord_user: Map.put(discord_user, :id, "#{raw_data.discord_user.id}"),
           discord_status: raw_data.discord_presence.status,
           active_on_discord_web: Map.has_key?(raw_data.discord_presence.client_status, :web),
           active_on_discord_desktop:
@@ -200,7 +218,7 @@ defmodule Lanyard.Presence do
         }
       else
         %Lanyard.Presence.PrettyPresence{
-          discord_user: Map.put(raw_data.discord_user, :id, "#{raw_data.discord_user.id}"),
+          discord_user: Map.put(discord_user, :id, "#{raw_data.discord_user.id}"),
           kv: raw_data.kv
         }
       end
