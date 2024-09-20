@@ -36,6 +36,13 @@ defmodule Lanyard.Api.Quicklinks.DiscordCdn do
   end
 
   defp get_proxied_avatar(id, avatar, _discriminator, file_type) when is_binary(avatar) do
+    file_type =
+      if !String.starts_with?(avatar, "a_") && file_type == "gif" do
+        "jpg"
+      else
+        file_type
+      end
+
     constructed_cdn_url = "#{@discord_cdn}/avatars/#{id}/#{avatar}.#{file_type}?size=1024"
 
     :get
