@@ -6,7 +6,6 @@ defmodule Lanyard do
 
     :ets.new(:cached_presences, [:named_table, :set, :public])
     :ets.new(:global_subscribers, [:named_table, :set, :public])
-    :ets.new(:analytics, [:named_table, :set, :public])
 
     children = [
       {Finch, name: Lanyard.Finch},
