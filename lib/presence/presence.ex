@@ -109,10 +109,6 @@ defmodule Lanyard.Presence do
       {:remote_send, %{op: 0, t: "PRESENCE_UPDATE", d: pretty_presence}}
     )
 
-    Task.start(fn ->
-      Lanyard.Analytics.presence_tick(state.user_id, pretty_presence)
-    end)
-
     {:noreply, Map.merge(state, new_state)}
   end
 
