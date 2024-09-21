@@ -180,12 +180,15 @@ defmodule Lanyard.Presence do
     has_presence? = raw_data.discord_presence !== nil
 
     discord_user =
-      with %{clan: %{identity_guild_id: guild_id} = clan} <- raw_data.discord_user do
-        updated_clan = Map.put(clan, :identity_guild_id, "#{guild_id}")
-        Map.put(raw_data.discord_user, :clan, updated_clan)
-      else
-        _ -> raw_data.discord_user
-      end
+      raw_data.discord_user
+      |> Map.update(:clan, nil, fn
+        nil -> nil
+        clan -> Map.update(clan, :identity_guild_id, nil, fn guild_id -> "#{guild_id}" end)
+      end)
+      |> Map.update(:avatar_decoration_data, nil, fn
+        nil -> nil
+        avatar_data -> Map.update(avatar_data, :sku_id, nil, fn sku_id -> "#{sku_id}" end)
+      end)
 
     pretty_fields =
       if has_presence? do
