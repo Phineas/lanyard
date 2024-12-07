@@ -30,7 +30,7 @@ Just [join this Discord server](https://discord.gg/UrXF2cfJ7F) and your presence
   * [Error Codes](#error-codes)
 - [Quicklinks](#quicklinks)
 - [Self-host with Docker](#self-host-with-docker)
-- [Used By](#used-by)
+- [Showcase](#showcase)
 - [Todo](#todo)
 
 ## Community Projects
@@ -368,7 +368,7 @@ Below is a curated selection of websites using Lanyard right now, check them out
 - [makidoll.io](https://makidoll.io/)
 - [dan.onl](https://dan.onl/)
 - [cnrad.dev](https://cnrad.dev)
-- [venqoi.lol](https://venqoi.lol/)
+- [loefey.world](https://loefey.world/)
 - [phineas.io](https://phineas.io)
 - [timcole.me](https://timcole.me)
 - [itspolar.dev](https://itspolar.dev)
