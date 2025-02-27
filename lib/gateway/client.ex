@@ -178,9 +178,11 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def handle_event({:message_create, payload}, state) do
-    Task.start(fn ->
-      Lanyard.DiscordBot.CommandHandler.handle_message(payload)
-    end)
+    if Application.get_env(:lanyard, :is_idempotent) do
+      Task.start(fn ->
+        Lanyard.DiscordBot.CommandHandler.handle_message(payload)
+      end)
+    end
 
     {:ok, state}
   end

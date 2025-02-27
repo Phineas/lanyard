@@ -1,4 +1,5 @@
 defmodule Lanyard do
+  require Logger
   use Application
 
   def start(_type, _args) do
@@ -19,5 +20,24 @@ defmodule Lanyard do
 
     opts = [strategy: :one_for_one, name: Lanyard.Supervisor]
     Supervisor.start_link(children, opts)
+  end
+
+  def is_idempotent?() do
+    case System.get_env("BOT_IDEMPOTENCY_ENV_KEY") do
+      nil ->
+        true
+
+      "" ->
+        true
+
+      key ->
+        case String.split(key, "=", parts: 2, trim: true) do
+          [env_key, expected_value] ->
+            System.get_env(env_key) == expected_value
+
+          _ ->
+            false
+        end
+    end
   end
 end
