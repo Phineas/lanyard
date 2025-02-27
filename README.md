@@ -380,4 +380,4 @@ Below is a curated selection of websites using Lanyard right now, check them out
 - [krypton.ninja](https://krypton.ninja)
 - [eosis.space](https://eosis.space/)
 - [dromzeh.dev](https://dromzeh.dev)
-- [littleprinceonu.com](https://littlepriceonu.com/)
+- [littlepriceonu.com](https://littlepriceonu.com/)
