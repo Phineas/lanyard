@@ -19,6 +19,7 @@ end
 defmodule Lanyard.Presence do
   use GenServer
 
+  alias Lanyard.Connectivity.Redis
   alias Lanyard.Presence.Spotify
   alias Lanyard.Presence.Activity
 
@@ -232,10 +233,24 @@ defmodule Lanyard.Presence do
     end)
   end
 
-  def sync(user_id, payload) do
+  def sync(user_id, payload), do: sync(user_id, payload, false)
+
+  def sync(user_id, payload, from_global_sync) do
     with {:ok, pid} <-
            GenRegistry.lookup(__MODULE__, normalize_user_id(user_id)) do
       GenServer.cast(pid, {:sync, payload})
+
+      unless from_global_sync do
+        Task.start(fn ->
+          global_sync_payload =
+            Map.new()
+            |> Map.put(:node, :erlang.phash2(node()))
+            |> Map.put(:user_id, normalize_user_id(user_id))
+            |> Map.put(:diff, payload)
+
+          Redis.publish("lanyard:global_sync", Jason.encode!(global_sync_payload))
+        end)
+      end
     end
   end
 

@@ -1,4 +1,5 @@
 defmodule Lanyard.Connectivity.Redis do
+  alias Lanyard.Presence
   use GenServer
 
   def start_link(_) do
@@ -12,8 +13,34 @@ defmodule Lanyard.Connectivity.Redis do
         else: "redis://#{System.get_env("REDIS_HOST")}:6379"
 
     {:ok, client} = Redix.start_link(uri)
+    {:ok, conn} = Redix.PubSub.start_link(uri)
+
+    Redix.PubSub.subscribe(conn, "lanyard:global_sync", self())
 
     {:ok, %{client: client}}
+  end
+
+  def handle_info({:redix_pubsub, _pubsub, _pid, :subscribed, %{channel: channel}}, state) do
+    IO.puts("Redis: subscribed to #{channel}")
+    {:noreply, state}
+  end
+
+  def handle_info(
+        {:redix_pubsub, _pubsub, _pid, :message,
+         %{channel: "lanyard:global_sync", payload: payload}},
+        state
+      ) do
+    node_id = :erlang.phash2(node())
+
+    case Jason.decode!(payload) do
+      %{node_id: ^node_id} ->
+        # Ignore messages from the same node
+        {:noreply, state}
+
+      %{user_id: uid, diff: diff} ->
+        Presence.sync(uid, diff, true)
+        {:noreply, state}
+    end
   end
 
   def handle_call({:hgetall, key}, _from, state) do
@@ -64,6 +91,12 @@ defmodule Lanyard.Connectivity.Redis do
     {:noreply, state}
   end
 
+  def handle_cast({:publish, channel, message}, state) do
+    Redix.command(state.client, ["PUBLISH", channel, message])
+
+    {:noreply, state}
+  end
+
   def set(key, value) do
     GenServer.cast(:local_redis_client, {:set, key, value})
   end
@@ -106,6 +139,10 @@ defmodule Lanyard.Connectivity.Redis do
     {:ok, response} = GenServer.call(:local_redis_client, {:get, key})
 
     response
+  end
+
+  def publish(channel, message) do
+    GenServer.cast(:local_redis_client, {:publish, channel, message})
   end
 
   defp normalize_kv(l) do
