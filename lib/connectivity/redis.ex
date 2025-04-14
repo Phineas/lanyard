@@ -1,6 +1,7 @@
 defmodule Lanyard.Connectivity.Redis do
   alias Lanyard.Presence
   use GenServer
+  require Logger
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, [], name: :local_redis_client)
@@ -21,7 +22,7 @@ defmodule Lanyard.Connectivity.Redis do
   end
 
   def handle_info({:redix_pubsub, _pubsub, _pid, :subscribed, %{channel: channel}}, state) do
-    IO.puts("Redis: subscribed to #{channel}")
+    Logger.info("Redis: subscribed to #{channel}")
     {:noreply, state}
   end
 
@@ -33,12 +34,16 @@ defmodule Lanyard.Connectivity.Redis do
     node_id = :erlang.phash2(node())
 
     case Jason.decode!(payload) do
-      %{node_id: ^node_id} ->
+      %{"node_id" => ^node_id} ->
         # Ignore messages from the same node
         {:noreply, state}
 
-      %{user_id: uid, diff: diff} ->
+      %{"user_id" => uid, "diff" => diff} ->
         Presence.sync(uid, diff, true)
+        {:noreply, state}
+
+      _ ->
+        Logger.error("Redis: Unknown payload format: #{inspect(payload)}")
         {:noreply, state}
     end
   end

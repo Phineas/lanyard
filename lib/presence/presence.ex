@@ -93,6 +93,20 @@ defmodule Lanyard.Presence do
   end
 
   def handle_cast({:sync, new_state}, state) do
+    original_keys = Map.keys(state) |> MapSet.new()
+
+    normalized_new_state =
+      for {k, v} <- new_state, into: %{} do
+        key =
+          cond do
+            is_atom(k) -> k
+            is_binary(k) and MapSet.member?(original_keys, String.to_atom(k)) -> String.to_atom(k)
+            true -> k
+          end
+
+        {key, v}
+      end
+
     {_, pretty_presence} =
       get_public_fields(
         %{
@@ -101,7 +115,7 @@ defmodule Lanyard.Presence do
           user_id: state.user_id,
           kv: state.kv
         }
-        |> Map.merge(new_state)
+        |> Map.merge(normalized_new_state)
       )
       |> build_pretty_presence()
 
@@ -118,7 +132,7 @@ defmodule Lanyard.Presence do
      %{state | subscriber_pids: state.subscriber_pids |> Enum.reject(fn sub -> sub == object end)}}
   end
 
-  @spec get_public_fields(map()) :: Lanyard.Presence.PublicFields
+  @spec get_public_fields(map()) :: %Lanyard.Presence.PublicFields{}
   defp get_public_fields(state) do
     %Lanyard.Presence.PublicFields{
       user_id: state.user_id,
@@ -236,16 +250,19 @@ defmodule Lanyard.Presence do
   def sync(user_id, payload), do: sync(user_id, payload, false)
 
   def sync(user_id, payload, from_global_sync) do
+    user_id = normalize_user_id(user_id)
+
     with {:ok, pid} <-
-           GenRegistry.lookup(__MODULE__, normalize_user_id(user_id)) do
+           GenRegistry.lookup(__MODULE__, user_id) do
       GenServer.cast(pid, {:sync, payload})
+      IO.inspect("Syncing presence for user #{user_id}")
 
       unless from_global_sync do
         Task.start(fn ->
           global_sync_payload =
             Map.new()
-            |> Map.put(:node, :erlang.phash2(node()))
-            |> Map.put(:user_id, normalize_user_id(user_id))
+            |> Map.put(:node_id, :erlang.phash2(node()))
+            |> Map.put(:user_id, user_id)
             |> Map.put(:diff, payload)
 
           Redis.publish("lanyard:global_sync", Jason.encode!(global_sync_payload))
