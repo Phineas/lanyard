@@ -16,7 +16,7 @@ on:
       - "**.lock"
       - "Dockerfile"
       - ".dockerignore"
-      - ".github/workflows/docker-build.yml"
+      - ".github/workflows/docker.yml"
       - "docker-bake.hcl"
 
 env:
