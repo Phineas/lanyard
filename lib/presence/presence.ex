@@ -10,6 +10,7 @@ defmodule Lanyard.Presence.PrettyPresence do
             active_on_discord_web: false,
             active_on_discord_desktop: false,
             active_on_discord_mobile: false,
+            active_on_discord_embedded: false,
             listening_to_spotify: false,
             spotify: nil,
             activities: [],
@@ -215,6 +216,8 @@ defmodule Lanyard.Presence do
             Map.has_key?(raw_data.discord_presence.client_status, :desktop),
           active_on_discord_mobile:
             Map.has_key?(raw_data.discord_presence.client_status, :mobile),
+          active_on_discord_embedded:
+            Map.has_key?(raw_data.discord_presence.client_status, :embedded),
           listening_to_spotify: spotify_activity !== nil,
           spotify: Spotify.build_pretty_spotify(spotify_activity),
           activities: Activity.build_pretty_activities(raw_data.discord_presence.activities),
