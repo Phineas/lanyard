@@ -201,9 +201,28 @@ defmodule Lanyard.Presence do
         nil -> nil
         clan -> Map.update(clan, :identity_guild_id, nil, fn guild_id -> "#{guild_id}" end)
       end)
+      |> Map.update(:primary_guild, nil, fn
+        nil ->
+          nil
+
+        primary_guild ->
+          Map.update(primary_guild, :identity_guild_id, nil, fn guild_id -> "#{guild_id}" end)
+      end)
       |> Map.update(:avatar_decoration_data, nil, fn
         nil -> nil
         avatar_data -> Map.update(avatar_data, :sku_id, nil, fn sku_id -> "#{sku_id}" end)
+      end)
+
+    discord_user =
+      Map.update(discord_user, :collectibles, nil, fn
+        nil ->
+          nil
+
+        collectibles ->
+          Map.update(collectibles, :nameplate, nil, fn
+            nil -> nil
+            nameplate -> Map.update(nameplate, :sku_id, nil, &to_string/1)
+          end)
       end)
 
     pretty_fields =
