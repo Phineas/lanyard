@@ -368,7 +368,7 @@ Below is a curated selection of websites using Lanyard right now, check them out
 - [makidoll.io](https://makidoll.io/)
 - [dan.onl](https://dan.onl/)
 - [cnrad.dev](https://cnrad.dev)
-- [loefey.world](https://loefey.world/)
+- [venqoi.love](https://venqoi.love/)
 - [phineas.io](https://phineas.io)
 - [timcole.me](https://timcole.me)
 - [itspolar.dev](https://itspolar.dev)
