@@ -40,10 +40,12 @@ defmodule Lanyard.Presence do
 
   def init(state) do
     kv = Lanyard.Connectivity.Redis.hgetall("lanyard_kv:#{state.user_id}")
+    last_seen = Lanyard.Connectivity.Redis.get("lanyard_last_seen:#{state.user_id}")
 
     {:ok, pretty_presence} =
       state
       |> Map.put(:kv, kv)
+      |> Map.put(:last_seen, last_seen)
       |> get_public_fields()
       |> build_pretty_presence()
 
@@ -61,7 +63,8 @@ defmodule Lanyard.Presence do
        discord_user: state.discord_user,
        kv: kv,
        subscriber_pids: subscriber_pids,
-       refmap: %{}
+       refmap: %{},
+       last_seen: last_seen
      }}
   end
 
@@ -110,13 +113,26 @@ defmodule Lanyard.Presence do
         {key, v}
       end
 
+    last_seen =
+      cond do
+        normalized_new_state.discord_presence != nil and
+            normalized_new_state.discord_presence.status != "offline" ->
+          seen_on = System.system_time(:millisecond)
+          Lanyard.Connectivity.Redis.set("lanyard_last_seen:#{state.user_id}", seen_on)
+          seen_on
+
+        true ->
+          normalized_new_state.last_seen
+      end
+
     {_, pretty_presence} =
       get_public_fields(
         %{
           discord_user: state.discord_user,
           discord_presence: state.discord_presence,
           user_id: state.user_id,
-          kv: state.kv
+          kv: state.kv,
+          last_seen: last_seen
         }
         |> Map.merge(normalized_new_state)
       )
@@ -142,7 +158,7 @@ defmodule Lanyard.Presence do
       discord_user: state.discord_user,
       discord_presence: state.discord_presence,
       kv: state.kv,
-      last_seen: Map.get(state, :last_seen)
+      last_seen: state.last_seen
     }
   end
 
@@ -198,14 +214,6 @@ defmodule Lanyard.Presence do
 
     has_presence? = raw_data.discord_presence !== nil
 
-    last_seen =
-      cond do
-        raw_data.discord_presence != nil and raw_data.discord_presence.status != "offline" ->
-          System.system_time(:millisecond)
-        true ->
-          raw_data.last_seen
-      end
-
     discord_user =
       raw_data.discord_user
       |> Map.update(:clan, nil, fn
@@ -252,13 +260,13 @@ defmodule Lanyard.Presence do
           spotify: Spotify.build_pretty_spotify(spotify_activity),
           activities: Activity.build_pretty_activities(raw_data.discord_presence.activities),
           kv: raw_data.kv,
-          last_seen: last_seen
+          last_seen: raw_data.last_seen
         }
       else
         %Lanyard.Presence.PrettyPresence{
           discord_user: Map.put(discord_user, :id, "#{raw_data.discord_user.id}"),
           kv: raw_data.kv,
-          last_seen: last_seen
+          last_seen: raw_data.last_seen
         }
       end
 
