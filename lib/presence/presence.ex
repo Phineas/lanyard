@@ -40,7 +40,15 @@ defmodule Lanyard.Presence do
 
   def init(state) do
     kv = Lanyard.Connectivity.Redis.hgetall("lanyard_kv:#{state.user_id}")
-    last_seen = Lanyard.Connectivity.Redis.get("lanyard_last_seen:#{state.user_id}")
+
+    last_seen =
+      case Lanyard.Connectivity.Redis.get("lanyard_last_seen:#{state.user_id}") do
+        seen_on when is_binary(seen_on) ->
+          String.to_integer(seen_on)
+
+        nil ->
+          get_last_seen(state, state)
+      end
 
     {:ok, pretty_presence} =
       state
@@ -113,18 +121,7 @@ defmodule Lanyard.Presence do
         {key, v}
       end
 
-    last_seen =
-      cond do
-        normalized_new_state.discord_presence != nil and
-            normalized_new_state.discord_presence.status != "offline" ->
-          seen_on = System.system_time(:millisecond)
-          Lanyard.Connectivity.Redis.set("lanyard_last_seen:#{state.user_id}", seen_on)
-          seen_on
-
-        true ->
-          # assume new state doesnt have the user status
-          state.last_seen
-      end
+    last_seen = get_last_seen(state, normalized_new_state)
 
     {_, pretty_presence} =
       get_public_fields(
@@ -161,6 +158,20 @@ defmodule Lanyard.Presence do
       kv: state.kv,
       last_seen: state.last_seen
     }
+  end
+
+  defp get_last_seen(state, new_state) do
+    cond do
+      new_state.discord_presence != nil and
+          new_state.discord_presence.status != "offline" ->
+        seen_on = System.system_time(:millisecond)
+        Lanyard.Connectivity.Redis.set("lanyard_last_seen:#{state.user_id}", seen_on)
+        seen_on
+
+      true ->
+        # the init call of lanyard doesnt have the last_seen field
+        Map.get(state, :last_seen)
+    end
   end
 
   #
