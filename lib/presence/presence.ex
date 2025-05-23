@@ -122,7 +122,8 @@ defmodule Lanyard.Presence do
           seen_on
 
         true ->
-          normalized_new_state.last_seen
+          # assume new state doesnt have the user status
+          state.last_seen
       end
 
     {_, pretty_presence} =
