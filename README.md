@@ -55,7 +55,8 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [discord-status-actions](https://github.com/CompeyDev/discord-status-action) - Updates a file to include your discord status using the Lanyard API. \
 [discordstatus-website](https://github.com/lucaledd/discordstatus-website) - Display your Discord status on your own website with premade CSS, and JS \
 [osu-nowplaying](https://github.com/Hexality/osu-nowplaying) - A small tool to scrape the info of the map you're curently playing on osu!lazer and dump into a file for obs to read. \
-[landart](https://pub.dev/packages/landart) - A featureful API wrapper for Lanyard & Lanyard KV written in Dart.
+[landart](https://pub.dev/packages/landart) - A featureful API wrapper for Lanyard & Lanyard KV written in Dart. \
+[lanyard.py](https://github.com/nerma-now/lanyard.py) - Modern and fully asynchronous wrapper for Lanyard API written in Python 3.12+. 
 
 ## API Docs
 
