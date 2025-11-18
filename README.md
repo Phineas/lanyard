@@ -98,6 +98,7 @@ Example response:
       "avatar": "a_7484f82375f47a487f41650f36d30318"
     },
     "discord_status": "online",
+    "last_seen": 1615529820677,
     // activities contains the plain Discord activities array that gets sent down with presences
     "activities": [
       {
@@ -144,6 +145,8 @@ Example response:
   }
 }
 ```
+
+The `last_seen` field is the Unix timestamp (in milliseconds) of when the user was last active (i.e., had a non-offline status), or `null` if the user has not been active yet.
 
 ### KV
 
@@ -334,7 +337,7 @@ Create a bot here: https://discord.com/developers/applications
 If you'd like to run Lanyard with `docker-compose`, here's an example:
 
 ```yml
-version: "3.8"
+version: '3.8'
 
 services:
   redis:
