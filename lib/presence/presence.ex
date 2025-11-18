@@ -1,6 +1,6 @@
 defmodule Lanyard.Presence.PublicFields do
   @derive Jason.Encoder
-  defstruct [:user_id, :discord_user, :discord_presence, :kv]
+  defstruct [:user_id, :discord_user, :discord_presence, :kv, :last_seen]
 end
 
 defmodule Lanyard.Presence.PrettyPresence do
@@ -14,7 +14,8 @@ defmodule Lanyard.Presence.PrettyPresence do
             listening_to_spotify: false,
             spotify: nil,
             activities: [],
-            kv: %{}
+            kv: %{},
+            last_seen: nil
 end
 
 defmodule Lanyard.Presence do
@@ -30,7 +31,8 @@ defmodule Lanyard.Presence do
             discord_presence: nil,
             kv: nil,
             subscriber_pids: nil,
-            refmap: nil
+            refmap: nil,
+            last_seen: nil
 
   def start_link(state) do
     GenServer.start_link(__MODULE__, state, name: :"presence:#{state.user_id}")
@@ -139,7 +141,8 @@ defmodule Lanyard.Presence do
       user_id: state.user_id,
       discord_user: state.discord_user,
       discord_presence: state.discord_presence,
-      kv: state.kv
+      kv: state.kv,
+      last_seen: Map.get(state, :last_seen)
     }
   end
 
@@ -195,6 +198,14 @@ defmodule Lanyard.Presence do
 
     has_presence? = raw_data.discord_presence !== nil
 
+    last_seen =
+      cond do
+        raw_data.discord_presence != nil and raw_data.discord_presence.status != "offline" ->
+          System.system_time(:millisecond)
+        true ->
+          raw_data.last_seen
+      end
+
     discord_user =
       raw_data.discord_user
       |> Map.update(:clan, nil, fn
@@ -240,12 +251,14 @@ defmodule Lanyard.Presence do
           listening_to_spotify: spotify_activity !== nil,
           spotify: Spotify.build_pretty_spotify(spotify_activity),
           activities: Activity.build_pretty_activities(raw_data.discord_presence.activities),
-          kv: raw_data.kv
+          kv: raw_data.kv,
+          last_seen: last_seen
         }
       else
         %Lanyard.Presence.PrettyPresence{
           discord_user: Map.put(discord_user, :id, "#{raw_data.discord_user.id}"),
-          kv: raw_data.kv
+          kv: raw_data.kv,
+          last_seen: last_seen
         }
       end
 
