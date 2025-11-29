@@ -34,7 +34,8 @@ defmodule Lanyard.MixProject do
       {:corsica, "~> 1.3"},
       {:manifold, "~> 1.6"},
       {:finch, "~> 0.16.0"},
-      {:redix, "~> 1.2"}
+      {:redix, "~> 1.2"},
+      {:open_api_spex, "~> 3.18"}
     ]
   end
 end
