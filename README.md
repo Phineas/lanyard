@@ -86,6 +86,7 @@ When making Lanyard KV API requests, set an `Authorization` header with the API 
 
 #### Discord
 You can control KV using the Discord bot (Lanyard#5766):
+* `.get <key>` - get Discord user's KV value
 * `.set <key> <value>` - set Discord user's KV value
 * `.del <key>` - delete Discord user's KV value
 
