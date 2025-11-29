@@ -18,6 +18,8 @@ defmodule Lanyard.Api.Router do
     allow_headers: :all
   )
 
+  plug OpenApiSpex.Plug.PutApiSpec, module: Lanyard.ApiSpec
+
   plug(:match)
   plug(:dispatch)
   plug(:metrics_handle)
@@ -58,6 +60,13 @@ defmodule Lanyard.Api.Router do
     |> WebSockAdapter.upgrade(Lanyard.SocketHandler, params, timeout: 60_000)
     |> halt()
   end
+
+  forward("/api/openapi", to: OpenApiSpex.Plug.RenderSpec, init_opts: [spec: Lanyard.ApiSpec])
+
+  forward("/docs", to: OpenApiSpex.Plug.SwaggerUI, init_opts: [
+    path: "/api/openapi",
+    default_model_expand_depth: 3,
+  ])
 
   forward("/v1", to: V1)
   forward("/discord", to: Discord)
