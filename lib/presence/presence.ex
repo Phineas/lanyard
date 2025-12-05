@@ -209,8 +209,14 @@ defmodule Lanyard.Presence do
           Map.update(primary_guild, :identity_guild_id, nil, fn guild_id -> "#{guild_id}" end)
       end)
       |> Map.update(:avatar_decoration_data, nil, fn
-        nil -> nil
-        avatar_data -> Map.update(avatar_data, :sku_id, nil, fn sku_id -> "#{sku_id}" end)
+        nil ->
+          nil
+
+        avatar_data ->
+          avatar_data
+          |> Map.update(:sku_id, nil, fn sku_id -> "#{sku_id}" end)
+          |> Map.update(:asset, nil, fn asset -> asset end)
+          |> Map.update(:animated, nil, fn animated -> animated end)
       end)
 
     discord_user =
