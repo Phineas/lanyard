@@ -6,7 +6,7 @@ defmodule Lanyard.Presence.Spotify do
       song: activity.details,
       album: get_album_title(activity),
       album_art_url: get_album_art_url(activity),
-      timestamps: activity.timestamps
+      timestamps: Map.get(activity, :timestamps)
     }
   end
 
