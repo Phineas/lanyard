@@ -20,8 +20,8 @@ defmodule Lanyard.Api.Quicklinks.DiscordCdn do
         {:ok, %Finch.Response{body: b, headers: h, status: status_code}} =
           get_proxied_avatar(
             user_id,
-            p.discord_user.avatar,
-            p.discord_user.discriminator,
+            p.discord_user["avatar"],
+            p.discord_user["discriminator"],
             file_type
           )
 
