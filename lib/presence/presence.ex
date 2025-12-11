@@ -1,6 +1,6 @@
 defmodule Lanyard.Presence.PublicFields do
   @derive Jason.Encoder
-  defstruct [:user_id, :discord_user, :discord_presence, :kv]
+  defstruct [:user_id, :discord_user, :discord_presence, :kv, :last_seen]
 end
 
 defmodule Lanyard.Presence.PrettyPresence do
@@ -14,7 +14,8 @@ defmodule Lanyard.Presence.PrettyPresence do
             listening_to_spotify: false,
             spotify: nil,
             activities: [],
-            kv: %{}
+            kv: %{},
+            last_seen: nil
 end
 
 defmodule Lanyard.Presence do
@@ -30,7 +31,8 @@ defmodule Lanyard.Presence do
             discord_presence: nil,
             kv: nil,
             subscriber_pids: nil,
-            refmap: nil
+            refmap: nil,
+            last_seen: nil
 
   def start_link(state) do
     GenServer.start_link(__MODULE__, state, name: :"presence:#{state.user_id}")
@@ -39,9 +41,19 @@ defmodule Lanyard.Presence do
   def init(state) do
     kv = Lanyard.Connectivity.Redis.hgetall("lanyard_kv:#{state.user_id}")
 
+    last_seen =
+      case Lanyard.Connectivity.Redis.get("lanyard_last_seen:#{state.user_id}") do
+        seen_on when is_binary(seen_on) ->
+          String.to_integer(seen_on)
+
+        nil ->
+          get_last_seen(state, state)
+      end
+
     {:ok, pretty_presence} =
       state
       |> Map.put(:kv, kv)
+      |> Map.put(:last_seen, last_seen)
       |> get_public_fields()
       |> build_pretty_presence()
 
@@ -59,7 +71,8 @@ defmodule Lanyard.Presence do
        discord_user: state.discord_user,
        kv: kv,
        subscriber_pids: subscriber_pids,
-       refmap: %{}
+       refmap: %{},
+       last_seen: last_seen
      }}
   end
 
@@ -108,13 +121,16 @@ defmodule Lanyard.Presence do
         {key, v}
       end
 
+    last_seen = get_last_seen(state, normalized_new_state)
+
     {_, pretty_presence} =
       get_public_fields(
         %{
           discord_user: state.discord_user,
           discord_presence: state.discord_presence,
           user_id: state.user_id,
-          kv: state.kv
+          kv: state.kv,
+          last_seen: last_seen
         }
         |> Map.merge(normalized_new_state)
       )
@@ -139,8 +155,23 @@ defmodule Lanyard.Presence do
       user_id: state.user_id,
       discord_user: state.discord_user,
       discord_presence: state.discord_presence,
-      kv: state.kv
+      kv: state.kv,
+      last_seen: state.last_seen
     }
+  end
+
+  defp get_last_seen(state, new_state) do
+    cond do
+      new_state.discord_presence != nil and
+          new_state.discord_presence.status != "offline" ->
+        seen_on = System.system_time(:millisecond)
+        Lanyard.Connectivity.Redis.set("lanyard_last_seen:#{state.user_id}", seen_on)
+        seen_on
+
+      true ->
+        # the init call of lanyard doesnt have the last_seen field
+        Map.get(state, :last_seen)
+    end
   end
 
   #
@@ -240,12 +271,14 @@ defmodule Lanyard.Presence do
           listening_to_spotify: spotify_activity !== nil,
           spotify: Spotify.build_pretty_spotify(spotify_activity),
           activities: Activity.build_pretty_activities(raw_data.discord_presence.activities),
-          kv: raw_data.kv
+          kv: raw_data.kv,
+          last_seen: raw_data.last_seen
         }
       else
         %Lanyard.Presence.PrettyPresence{
           discord_user: Map.put(discord_user, :id, "#{raw_data.discord_user.id}"),
-          kv: raw_data.kv
+          kv: raw_data.kv,
+          last_seen: raw_data.last_seen
         }
       end
 
