@@ -1,4 +1,4 @@
-FROM elixir:1.14-alpine AS build
+FROM elixir:1.19-alpine AS build
 
 RUN apk add git
 
@@ -20,7 +20,7 @@ RUN \
 	mix compile && \
 	mix release
 
-FROM elixir:1.14-alpine
+FROM elixir:1.19-alpine
 
 RUN apk add redis
 

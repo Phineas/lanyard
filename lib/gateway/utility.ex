@@ -11,7 +11,7 @@ defmodule Lanyard.Gateway.Utility do
 
     load
     |> _update_payload(seq_num, "s", seq_num)
-    |> _update_payload(event_name, "t", seq_num)
+    |> _update_payload(event_name, "t", event_name)
     |> :erlang.term_to_binary()
   end
 
@@ -22,7 +22,7 @@ defmodule Lanyard.Gateway.Utility do
 
     load
     |> _update_payload(seq_num, "s", seq_num)
-    |> _update_payload(event_name, "t", seq_num)
+    |> _update_payload(event_name, "t", event_name)
     |> Jason.encode!()
   end
 
@@ -45,10 +45,10 @@ defmodule Lanyard.Gateway.Utility do
     payload = Jason.decode!(payload)
 
     %{
-      op: opcode(codes, payload[:op] || payload["op"]),
-      data: payload[:d] || payload["d"],
-      seq_num: payload[:s] || payload["s"],
-      event_name: payload[:t] || payload["t"]
+      op: opcode(codes, payload["op"]),
+      data: payload["d"],
+      seq_num: payload["s"],
+      event_name: payload["t"]
     }
   end
 

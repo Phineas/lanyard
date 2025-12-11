@@ -67,6 +67,11 @@ defmodule Lanyard.Presence do
     {:reply, get_public_fields(state), state}
   end
 
+  def handle_info({:DOWN, _ref, :process, object, _reason}, state) do
+    {:noreply,
+     %{state | subscriber_pids: state.subscriber_pids |> Enum.reject(fn sub -> sub == object end)}}
+  end
+
   def handle_info({:add_subscriber, pid}, state) do
     ref = Process.monitor(pid)
 
@@ -128,11 +133,6 @@ defmodule Lanyard.Presence do
     {:noreply, Map.merge(state, new_state)}
   end
 
-  def handle_info({:DOWN, _ref, :process, object, _reason}, state) do
-    {:noreply,
-     %{state | subscriber_pids: state.subscriber_pids |> Enum.reject(fn sub -> sub == object end)}}
-  end
-
   @spec get_public_fields(map()) :: %Lanyard.Presence.PublicFields{}
   defp get_public_fields(state) do
     %Lanyard.Presence.PublicFields{
@@ -147,12 +147,14 @@ defmodule Lanyard.Presence do
   # Public API
   #
 
-  @spec get_presence(number) :: {:ok, Lanyard.Presence.PrettyPresence} | {:error, atom, binary}
+  @spec get_presence(number) ::
+          {:ok, Lanyard.Presence.PrettyPresence} | {:error, atom, binary}
   def get_presence(user_id) when is_number(user_id) do
     get_presence(Integer.to_string(user_id))
   end
 
-  @spec get_presence(binary) :: {:ok, Lanyard.Presence.PrettyPresence} | {:error, atom, binary}
+  @spec get_presence(binary) ::
+          {:ok, Lanyard.Presence.PrettyPresence} | {:error, atom, binary}
   def get_presence(user_id) when is_binary(user_id) do
     case GenRegistry.lookup(__MODULE__, user_id) do
       {:ok, pid} ->
@@ -185,71 +187,41 @@ defmodule Lanyard.Presence do
   end
 
   def build_pretty_presence(raw_data) do
-    activities = raw_data.discord_presence[:activities] || []
+    activities = raw_data.discord_presence["activities"] || []
 
     spotify_activity =
       activities
       |> Enum.find(fn activity ->
-        activity.id == Application.get_env(:lanyard, :discord_spotify_activity_id)
+        activity["id"] == Application.get_env(:lanyard, :discord_spotify_activity_id)
       end)
 
     has_presence? = raw_data.discord_presence !== nil
 
-    discord_user =
-      raw_data.discord_user
-      |> Map.update(:clan, nil, fn
-        nil -> nil
-        clan -> Map.update(clan, :identity_guild_id, nil, fn guild_id -> "#{guild_id}" end)
-      end)
-      |> Map.update(:primary_guild, nil, fn
-        nil ->
-          nil
-
-        primary_guild ->
-          Map.update(primary_guild, :identity_guild_id, nil, fn guild_id -> "#{guild_id}" end)
-      end)
-      |> Map.update(:avatar_decoration_data, nil, fn
-        nil -> nil
-        avatar_data -> Map.update(avatar_data, :sku_id, nil, fn sku_id -> "#{sku_id}" end)
-      end)
-
-    discord_user =
-      Map.update(discord_user, :collectibles, nil, fn
-        nil ->
-          nil
-
-        collectibles ->
-          Map.update(collectibles, :nameplate, nil, fn
-            nil -> nil
-            nameplate -> Map.update(nameplate, :sku_id, nil, &to_string/1)
-          end)
-      end)
-
     pretty_fields =
       if has_presence? do
         %Lanyard.Presence.PrettyPresence{
-          discord_user: Map.put(discord_user, :id, "#{raw_data.discord_user.id}"),
-          discord_status: raw_data.discord_presence.status,
-          active_on_discord_web: Map.has_key?(raw_data.discord_presence.client_status, :web),
+          discord_user: raw_data.discord_user,
+          discord_status: raw_data.discord_presence["status"],
+          active_on_discord_web: Map.has_key?(raw_data.discord_presence["client_status"], "web"),
           active_on_discord_desktop:
-            Map.has_key?(raw_data.discord_presence.client_status, :desktop),
+            Map.has_key?(raw_data.discord_presence["client_status"], "desktop"),
           active_on_discord_mobile:
-            Map.has_key?(raw_data.discord_presence.client_status, :mobile),
+            Map.has_key?(raw_data.discord_presence["client_status"], "mobile"),
           active_on_discord_embedded:
-            Map.has_key?(raw_data.discord_presence.client_status, :embedded),
+            Map.has_key?(raw_data.discord_presence["client_status"], "embedded"),
           listening_to_spotify: spotify_activity !== nil,
           spotify: Spotify.build_pretty_spotify(spotify_activity),
-          activities: Activity.build_pretty_activities(raw_data.discord_presence.activities),
+          activities: Activity.build_pretty_activities(raw_data.discord_presence["activities"]),
           kv: raw_data.kv
         }
       else
         %Lanyard.Presence.PrettyPresence{
-          discord_user: Map.put(discord_user, :id, "#{raw_data.discord_user.id}"),
+          discord_user: raw_data.discord_user,
           kv: raw_data.kv
         }
       end
 
-    :ets.insert(:cached_presences, {"#{raw_data.discord_user.id}", pretty_fields})
+    :ets.insert(:cached_presences, {"#{raw_data.discord_user["id"]}", pretty_fields})
 
     {:ok, pretty_fields}
   end

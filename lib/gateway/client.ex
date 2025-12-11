@@ -4,9 +4,21 @@ defmodule Lanyard.Gateway.Client do
 
   alias Lanyard.Gateway.Heartbeat
 
+  import Bitwise
   import Lanyard.Gateway.Utility
 
   @behaviour :websocket_client
+
+  @intents %{
+    guilds: 1 <<< 0,
+    guild_members: 1 <<< 1,
+    guild_presences: 1 <<< 8,
+    guild_messages: 1 <<< 9,
+    direct_messages: 1 <<< 12,
+    message_content: 1 <<< 15
+  }
+
+  @intents_mask Enum.reduce(@intents, 0, fn {_k, bit}, acc -> acc ||| bit end)
 
   def opcodes do
     %{
@@ -30,10 +42,11 @@ defmodule Lanyard.Gateway.Client do
     # |> Map.put(:guilds, [])
     # |> Map.put(:token, state.token)
 
-    :crypto.start()
     :ssl.start()
 
-    :websocket_client.start_link("wss://gateway.discord.gg/?v=9&encoding=etf", __MODULE__, [state])
+    :websocket_client.start_link("wss://gateway.discord.gg/?v=10&encoding=json", __MODULE__, [
+      state
+    ])
   end
 
   def init([state]) do
@@ -62,6 +75,16 @@ defmodule Lanyard.Gateway.Client do
     {:close, {:remote, :closed}, state}
   end
 
+  def websocket_handle({:text, payload}, _socket, state) do
+    data = payload_decode(opcodes(), {:text, payload})
+
+    # Keeps the sequence tracker process updated
+    _update_agent_sequence(data, state)
+
+    # Handle data based on opcode sent by Discord
+    _handle_data(data, state)
+  end
+
   def websocket_handle({:binary, payload}, _socket, state) do
     data = payload_decode(opcodes(), {:binary, payload})
 
@@ -80,7 +103,7 @@ defmodule Lanyard.Gateway.Client do
     {:ok, heartbeat_pid} =
       Heartbeat.start_link(
         state[:agent_seq_num],
-        data.data.heartbeat_interval,
+        data.data["heartbeat_interval"],
         self()
       )
 
@@ -96,6 +119,8 @@ defmodule Lanyard.Gateway.Client do
   end
 
   defp _handle_data(%{op: :dispatch, event_name: event_name} = data, state) do
+    event_name = String.to_atom(event_name)
+
     # Dispatch op carries actual content like channel messages
     if event_name == :READY do
       # Client is ready
@@ -108,7 +133,7 @@ defmodule Lanyard.Gateway.Client do
   end
 
   defp _handle_data(%{op: :reconnect} = _data, state) do
-    Logger.warn("Discord enforced Reconnect")
+    Logger.warning("Discord enforced Reconnect")
     # Discord enforces reconnection. Websocket should be
     # reconnected and resume opcode sent to playback missed messages.
     # For now just kill the connection so that a supervisor can restart us.
@@ -116,7 +141,7 @@ defmodule Lanyard.Gateway.Client do
   end
 
   defp _handle_data(%{op: :invalid_session} = _data, state) do
-    Logger.warn("Discord: Invalid session")
+    Logger.warning("Discord: Invalid session")
     # On resume Discord will send invalid_session if our session id is too old
     # to be resumed.
     # For now just kill the connection so that a supervisor can restart us.
@@ -145,7 +170,7 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def websocket_info({:update_status, new_status}, _connection, state) do
-    payload = payload_build(opcode(opcodes(), :status_update), new_status)
+    payload = payload_build_json(opcode(opcodes(), :status_update), new_status)
     :websocket_client.cast(self(), {:binary, payload})
     {:ok, state}
   end
@@ -172,7 +197,7 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def handle_event({:ready, payload}, state) do
-    new_state = Map.put(state, :session_id, payload.data[:session_id])
+    new_state = Map.put(state, :session_id, payload.data["session_id"])
 
     {:ok, new_state}
   end
@@ -192,8 +217,8 @@ defmodule Lanyard.Gateway.Client do
 
     # The Lanyard guild is above the large_threshold, so we need to use Opcode 8: Request Guild Members
     request_payload =
-      payload_build(opcode(opcodes(), :request_guild_members), %{
-        "guild_id" => payload.data.id,
+      payload_build_json(opcode(opcodes(), :request_guild_members), %{
+        "guild_id" => payload.data["id"],
         "limit" => 0,
         "query" => "",
         "presences" => true
@@ -208,7 +233,7 @@ defmodule Lanyard.Gateway.Client do
     Lanyard.Metrics.Collector.inc(:counter, :lanyard_presence_updates)
 
     with {:ok, pid} <-
-           GenRegistry.lookup(Lanyard.Presence, Integer.to_string(payload.data.user.id)) do
+           GenRegistry.lookup(Lanyard.Presence, payload.data["user"]["id"]) do
       GenServer.cast(pid, {:sync, %{discord_presence: payload.data}})
     end
 
@@ -221,7 +246,7 @@ defmodule Lanyard.Gateway.Client do
     Lanyard.Metrics.Collector.inc(:gauge, :lanyard_monitored_users)
 
     request_payload =
-      payload_build(opcode(opcodes(), :request_guild_members), %{
+      payload_build_json(opcode(opcodes(), :request_guild_members), %{
         "guild_id" => payload.data["guild_id"],
         "user_ids" => [payload.data["user"]["id"]],
         "limit" => 1,
@@ -234,11 +259,11 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def handle_event({:guild_member_update, payload}, state) do
-    Logger.debug("User object for #{payload.data.user.id} was updated")
+    Logger.debug("User object for #{payload.data["user"]["id"]} was updated")
 
     with {:ok, pid} <-
-           GenRegistry.lookup(Lanyard.Presence, Integer.to_string(payload.data.user.id)) do
-      GenServer.cast(pid, {:sync, %{discord_user: payload.data.user}})
+           GenRegistry.lookup(Lanyard.Presence, payload.data["user"]["id"]) do
+      GenServer.cast(pid, {:sync, %{discord_user: payload.data["user"]}})
     end
 
     {:ok, state}
@@ -249,7 +274,7 @@ defmodule Lanyard.Gateway.Client do
 
     Lanyard.Metrics.Collector.dec(:gauge, :lanyard_monitored_users)
 
-    str_id = Integer.to_string(payload.data["user"]["id"])
+    str_id = payload.data["user"]["id"]
 
     GenRegistry.stop(Lanyard.Presence, str_id)
     :ets.delete(:cached_presences, str_id)
@@ -258,7 +283,11 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def handle_event({:guild_members_chunk, payload}, state) do
-    Lanyard.Metrics.Collector.inc(:gauge, :lanyard_monitored_users, length(payload.data.members))
+    Lanyard.Metrics.Collector.inc(
+      :gauge,
+      :lanyard_monitored_users,
+      length(payload.data["members"])
+    )
 
     create_member_presences(payload)
 
@@ -289,10 +318,10 @@ defmodule Lanyard.Gateway.Client do
       },
       "compress" => false,
       "large_threshold" => 250,
-      "intents" => 4867
+      "intents" => @intents_mask
     }
 
-    payload = payload_build(opcode(opcodes(), :identify), data)
+    payload = payload_build_json(opcode(opcodes(), :identify), data)
     :websocket_client.cast(self(), {:binary, payload})
   end
 
@@ -304,15 +333,15 @@ defmodule Lanyard.Gateway.Client do
 
   defp create_member_presences(payload) do
     Task.start(fn ->
-      Enum.each(payload.data.members, fn member ->
+      Enum.each(payload.data["members"], fn member ->
         presence =
-          payload.data.presences
-          |> Enum.find(fn presence -> presence.user.id === member.user.id end)
+          payload.data["presences"]
+          |> Enum.find(fn presence -> presence["user"]["id"] === member["user"]["id"] end)
 
         gen_init = %{
-          user_id: Integer.to_string(member.user.id),
+          user_id: member["user"]["id"],
           discord_presence: presence,
-          discord_user: member.user
+          discord_user: member["user"]
         }
 
         {:ok, pid} = GenRegistry.lookup_or_start(Lanyard.Presence, gen_init.user_id, [gen_init])

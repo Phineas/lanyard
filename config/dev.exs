@@ -8,4 +8,5 @@ config :lanyard,
   bot_presence_type: String.to_integer(System.get_env("BOT_PRESENCE_TYPE") || "3"),
   bot_token: System.get_env("BOT_TOKEN"),
   redis_uri:
-    System.get_env("REDIS_DSN") || System.get_env("REDIS_URI") || System.get_env("REDIS_URL")
+    System.get_env("REDIS_DSN") || System.get_env("REDIS_URI") || System.get_env("REDIS_URL"),
+  is_idempotent: System.get_env("IS_IDEMPOTENT") == "true" || false
