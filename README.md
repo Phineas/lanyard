@@ -360,6 +360,7 @@ Note, that you're **hosting a http server, not https**. You'll need to use a **r
 
 Below is a curated selection of websites using Lanyard right now, check them out! Some of them will only show an activity when they're active.
 
+- [kaloudasdev.xyz](https://www.kaloudasdev.xyz)
 - [alistair.sh](https://alistair.sh)
 - [eggsy.xyz](https://eggsy.xyz)
 - [igalaxy.dev](https://igalaxy.dev)
