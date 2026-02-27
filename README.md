@@ -57,7 +57,7 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [osu-nowplaying](https://github.com/Hexality/osu-nowplaying) - A small tool to scrape the info of the map you're curently playing on osu!lazer and dump into a file for obs to read. \
 [landart](https://pub.dev/packages/landart) - A featureful API wrapper for Lanyard & Lanyard KV written in Dart. \
 [lanyard.py](https://github.com/nerma-now/lanyard.py) - Modern and fully asynchronous wrapper for Lanyard API written in Python 3.12+. \
-[lanyard-mcp-server](https://github.com/NNTin/lanyard-mcp-server) - Exposing Lanyard API in MCP - with Docker support
+[lanyard-mcp-server](https://github.com/NNTin/lanyard-mcp-server) - Exposing Lanyard API in MCP - with Docker support. \
 [dark-mesh-bio](https://github.com/aeroaviorxt/dark-mesh-bio.git) - Modular, premium digital profile system. Real-time integrations, automated weather, and a state-of-the-art admin panel for complete identity control.
 
 ## API Docs
