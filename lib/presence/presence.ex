@@ -11,6 +11,7 @@ defmodule Lanyard.Presence.PrettyPresence do
             active_on_discord_desktop: false,
             active_on_discord_mobile: false,
             active_on_discord_embedded: false,
+            active_on_discord_vr: false,
             listening_to_spotify: false,
             spotify: nil,
             activities: [],
