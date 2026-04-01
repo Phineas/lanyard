@@ -99,39 +99,42 @@ defmodule Lanyard.Presence do
      }}
   end
 
-  def handle_cast({:sync, new_state}, state) do
-    original_keys = Map.keys(state) |> MapSet.new()
+  def handle_cast({:sync_user_update, new_user}, state) do
+    merged_user = merge_user(state.discord_user, new_user)
 
-    normalized_new_state =
-      for {k, v} <- new_state, into: %{} do
-        key =
-          cond do
-            is_atom(k) -> k
-            is_binary(k) and MapSet.member?(original_keys, String.to_atom(k)) -> String.to_atom(k)
-            true -> k
-          end
+    {:noreply, %{state | discord_user: merged_user}}
+  end
 
-        {key, v}
+  def handle_cast({:sync, payload}, state) do
+    new_user =
+      if Map.has_key?(payload, :discord_user) do
+        merge_user(state.discord_user, payload.discord_user)
+      else
+        state.discord_user
       end
 
-    {_, pretty_presence} =
-      get_public_fields(
-        %{
-          discord_user: state.discord_user,
-          discord_presence: state.discord_presence,
-          user_id: state.user_id,
-          kv: state.kv
-        }
-        |> Map.merge(normalized_new_state)
-      )
-      |> build_pretty_presence()
+    new_presence =
+      if Map.has_key?(payload, :discord_presence) do
+        payload.discord_presence
+      else
+        state.discord_presence
+      end
 
-    Manifold.send(
-      state.subscriber_pids,
-      {:remote_send, %{op: 0, t: "PRESENCE_UPDATE", d: pretty_presence}}
-    )
+    new_kv =
+      if Map.has_key?(payload, :kv) do
+        payload.kv
+      else
+        state.kv
+      end
 
-    {:noreply, Map.merge(state, new_state)}
+    new_state = %{
+      state
+      | discord_user: new_user,
+        discord_presence: new_presence,
+        kv: new_kv
+    }
+
+    {:noreply, new_state}
   end
 
   @spec get_public_fields(map()) :: %Lanyard.Presence.PublicFields{}
@@ -269,4 +272,13 @@ defmodule Lanyard.Presence do
 
   defp normalize_user_id(user_id) when is_integer(user_id), do: Integer.to_string(user_id)
   defp normalize_user_id(user_id), do: user_id
+
+  defp merge_user(old, new) do
+    old = old || %{}
+    new = new || %{}
+
+    Map.merge(old, new)
+    |> Map.put("banner", Map.get(new, "banner") || Map.get(old, "banner"))
+    |> Map.put("banner_color", Map.get(new, "banner_color") || Map.get(old, "banner_color"))
+  end
 end

@@ -136,7 +136,8 @@ defmodule Lanyard.Gateway.Client do
     Logger.warning("Discord enforced Reconnect")
     # Discord enforces reconnection. Websocket should be
     # reconnected and resume opcode sent to playback missed messages.
-    # For now just kill the connection so that a supervisor can restart us.
+ 
+   # For now just kill the connection so that a supervisor can restart us.
     {:close, "Discord enforced reconnect", state}
   end
 
@@ -158,12 +159,10 @@ defmodule Lanyard.Gateway.Client do
     {:ok, state}
   end
 
-  @doc "Ability to update websocket client state"
   def websocket_info({:update_state, update_values}, _connection, state) do
     {:ok, Map.merge(state, update_values)}
   end
 
-  @doc "Remove key from state"
   def websocket_info({:clear_from_state, keys}, _connection, state) do
     new_state = Map.drop(state, keys)
     {:ok, new_state}
@@ -263,7 +262,7 @@ defmodule Lanyard.Gateway.Client do
 
     with {:ok, pid} <-
            GenRegistry.lookup(Lanyard.Presence, payload.data["user"]["id"]) do
-      GenServer.cast(pid, {:sync, %{discord_user: payload.data["user"]}})
+      GenServer.cast(pid, {:sync_user_update, payload.data["user"]})
     end
 
     {:ok, state}
@@ -341,12 +340,25 @@ defmodule Lanyard.Gateway.Client do
         gen_init = %{
           user_id: member["user"]["id"],
           discord_presence: presence,
-          discord_user: member["user"]
+          discord_user: fetch_user_with_banner(member["user"])
         }
 
         {:ok, pid} = GenRegistry.lookup_or_start(Lanyard.Presence, gen_init.user_id, [gen_init])
         GenServer.cast(pid, {:sync, gen_init})
       end)
     end)
+  end
+
+  defp fetch_user_with_banner(user) do
+    case Finch.build(:get, "https://discord.com/api/v9/users/#{user["id"]}", [
+      {"Authorization", "Bot " <> Application.get_env(:lanyard, :bot_token)}
+    ])
+    |> Finch.request(Lanyard.Finch) do
+      {:ok, %Finch.Response{body: body, status: 200}} ->
+        fetched = Jason.decode!(body)
+        Map.merge(user, %{"banner" => fetched["banner"], "banner_color" => fetched["banner_color"]})
+      _ ->
+        user
+    end
   end
 end
