@@ -9,16 +9,28 @@ defmodule Lanyard.Connectivity.Redis do
 
   def init(_) do
     uri =
-      if Application.get_env(:lanyard, :redis_uri) != nil,
-        do: Application.get_env(:lanyard, :redis_uri),
-        else: "redis://#{System.get_env("REDIS_HOST")}:6379"
+      cond do
+        Application.get_env(:lanyard, :redis_uri) != nil ->
+          Application.get_env(:lanyard, :redis_uri)
 
-    {:ok, client} = Redix.start_link(uri)
-    {:ok, conn} = Redix.PubSub.start_link(uri)
+        System.get_env("REDIS_HOST") != nil ->
+          "redis://#{System.get_env("REDIS_HOST")}:6379"
 
-    Redix.PubSub.subscribe(conn, "lanyard:global_sync", self())
+        true ->
+          nil
+      end
 
-    {:ok, %{client: client}}
+    if uri do
+      {:ok, client} = Redix.start_link(uri)
+      {:ok, conn} = Redix.PubSub.start_link(uri)
+
+      Redix.PubSub.subscribe(conn, "lanyard:global_sync", self())
+
+      {:ok, %{client: client}}
+    else
+      Logger.warning("Redis URI/Host not set, Redis functionality will be disabled.")
+      {:ok, %{client: nil}}
+    end
   end
 
   def handle_info({:redix_pubsub, _pubsub, _pid, :subscribed, %{channel: channel}}, state) do
@@ -49,56 +61,68 @@ defmodule Lanyard.Connectivity.Redis do
   end
 
   def handle_call({:hgetall, key}, _from, state) do
-    value = Redix.command(state[:client], ["HGETALL", key])
-
-    {:reply, value, state}
+    if state.client do
+      value = Redix.command(state[:client], ["HGETALL", key])
+      {:reply, value, state}
+    else
+      {:reply, {:error, :no_redis}, state}
+    end
   end
 
   def handle_call({:hget, key, field}, _from, state) do
-    value = Redix.command(state[:client], ["HGET", key, field])
+    if state.client do
+      value = Redix.command(state[:client], ["HGET", key, field])
+      {:reply, value, state}
+    else
+      {:reply, {:error, :no_redis}, state}
+    end
+  end
 
-    {:reply, value, state}
+  def handle_call({:command, args}, _from, state) do
+    if state.client do
+      value = Redix.command(state[:client], args)
+      {:reply, value, state}
+    else
+      {:reply, {:error, :no_redis}, state}
+    end
   end
 
   def handle_call({:get, key}, _from, state) do
-    value = Redix.command(state[:client], ["GET", key])
-
-    {:reply, value, state}
+    if state.client do
+      value = Redix.command(state[:client], ["GET", key])
+      {:reply, value, state}
+    else
+      {:reply, {:error, :no_redis}, state}
+    end
   end
 
   def handle_cast({:set, key, value}, state) do
-    Redix.command(state.client, ["SET", key, value])
-
+    if state.client, do: Redix.command(state.client, ["SET", key, value])
     {:noreply, state}
   end
 
   def handle_cast({:del, key}, state) do
-    Redix.command(state.client, ["DEL", key])
-
+    if state.client, do: Redix.command(state.client, ["DEL", key])
     {:noreply, state}
   end
 
   def handle_cast({:hset, key, valuepairs}, state) do
-    Redix.command(state.client, Enum.concat(["HSET", key], valuepairs))
-
+    if state.client, do: Redix.command(state.client, Enum.concat(["HSET", key], valuepairs))
     {:noreply, state}
   end
 
   def handle_cast({:hincrby, key, field, amount}, state) do
-    Redix.command(state.client, ["HINCRBY", key, field, amount])
-
+    if state.client, do: Redix.command(state.client, ["HINCRBY", key, field, amount])
     {:noreply, state}
   end
 
   def handle_cast({:hdel, key, field}, state) do
-    Redix.command(state.client, ["HDEL", key, field])
-
+    if state.client, do: Redix.command(state.client, ["HDEL", key, field])
     {:noreply, state}
   end
 
   def handle_cast({:publish, channel, message}, state) do
-    Redix.command(state.client, ["PUBLISH", channel, message])
-
+    if state.client, do: Redix.command(state.client, ["PUBLISH", channel, message])
     {:noreply, state}
   end
 
@@ -148,6 +172,10 @@ defmodule Lanyard.Connectivity.Redis do
 
   def publish(channel, message) do
     GenServer.cast(:local_redis_client, {:publish, channel, message})
+  end
+
+  def command(args) do
+    GenServer.call(:local_redis_client, {:command, args})
   end
 
   defp normalize_kv(l) do

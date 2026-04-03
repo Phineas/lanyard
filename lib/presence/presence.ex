@@ -1,6 +1,6 @@
 defmodule Lanyard.Presence.PublicFields do
   @derive Jason.Encoder
-  defstruct [:user_id, :discord_user, :discord_presence, :kv]
+  defstruct [:user_id, :discord_user, :discord_presence, :kv, :last_seen, :monitoring_since]
 end
 
 defmodule Lanyard.Presence.PrettyPresence do
@@ -15,13 +15,18 @@ defmodule Lanyard.Presence.PrettyPresence do
             listening_to_spotify: false,
             spotify: nil,
             activities: [],
-            kv: %{}
+            kv: %{},
+            last_seen: %{},
+            last_seen_readable: nil,
+            monitoring_since: nil,
+            monitoring_since_readable: nil
 end
 
 defmodule Lanyard.Presence do
   use GenServer
 
   alias Lanyard.Connectivity.Redis
+  alias Lanyard.Connectivity.Persistence
   alias Lanyard.Presence.Spotify
   alias Lanyard.Presence.Activity
 
@@ -30,6 +35,8 @@ defmodule Lanyard.Presence do
             discord_user: nil,
             discord_presence: nil,
             kv: nil,
+            last_seen: nil,
+            monitoring_since: nil,
             subscriber_pids: nil,
             refmap: nil
 
@@ -38,11 +45,25 @@ defmodule Lanyard.Presence do
   end
 
   def init(state) do
-    kv = Lanyard.Connectivity.Redis.hgetall("lanyard_kv:#{state.user_id}")
+    kv = Persistence.get_all_kv(state.user_id)
+    last_seen = Persistence.get_last_seen(state.user_id)
+
+    monitoring_since =
+      case Persistence.get_monitoring_since(state.user_id) do
+        nil ->
+          now = System.os_time(:second)
+          Persistence.set_monitoring_since(state.user_id, now)
+          now
+
+        val ->
+          val
+      end
 
     {:ok, pretty_presence} =
       state
       |> Map.put(:kv, kv)
+      |> Map.put(:last_seen, last_seen)
+      |> Map.put(:monitoring_since, monitoring_since)
       |> get_public_fields()
       |> build_pretty_presence()
 
@@ -59,6 +80,8 @@ defmodule Lanyard.Presence do
        discord_presence: state.discord_presence,
        discord_user: state.discord_user,
        kv: kv,
+       last_seen: last_seen,
+       monitoring_since: monitoring_since,
        subscriber_pids: subscriber_pids,
        refmap: %{}
      }}
@@ -114,13 +137,28 @@ defmodule Lanyard.Presence do
         {key, v}
       end
 
+    # Detect offline transition: save last_seen timestamp to Redis
+    prev_status = state.discord_presence && state.discord_presence["status"]
+    new_status = normalized_new_state[:discord_presence] && normalized_new_state[:discord_presence]["status"]
+
+    last_seen =
+      if prev_status != "offline" and prev_status != nil and new_status == "offline" do
+        timestamp = System.os_time(:millisecond)
+        Persistence.upsert_last_seen(state.user_id, timestamp)
+        timestamp
+      else
+        state.last_seen
+      end
+
     {_, pretty_presence} =
       get_public_fields(
         %{
           discord_user: state.discord_user,
           discord_presence: state.discord_presence,
           user_id: state.user_id,
-          kv: state.kv
+          kv: state.kv,
+          last_seen: last_seen,
+          monitoring_since: state.monitoring_since
         }
         |> Map.merge(normalized_new_state)
       )
@@ -131,7 +169,7 @@ defmodule Lanyard.Presence do
       {:remote_send, %{op: 0, t: "PRESENCE_UPDATE", d: pretty_presence}}
     )
 
-    {:noreply, Map.merge(state, new_state)}
+    {:noreply, state |> Map.merge(new_state) |> Map.put(:last_seen, last_seen)}
   end
 
   @spec get_public_fields(map()) :: %Lanyard.Presence.PublicFields{}
@@ -140,7 +178,9 @@ defmodule Lanyard.Presence do
       user_id: state.user_id,
       discord_user: state.discord_user,
       discord_presence: state.discord_presence,
-      kv: state.kv
+      kv: state.kv,
+      last_seen: state.last_seen,
+      monitoring_since: state.monitoring_since
     }
   end
 
@@ -198,6 +238,52 @@ defmodule Lanyard.Presence do
 
     has_presence? = raw_data.discord_presence !== nil
 
+    last_seen_val =
+      case raw_data.last_seen do
+        nil ->
+          nil
+
+        ms ->
+          %{
+            "unix" => ms,
+            "raw" => DateTime.from_unix!(ms, :millisecond) |> DateTime.to_iso8601()
+          }
+      end
+
+    last_seen_readable =
+      case raw_data.last_seen do
+        nil ->
+          nil
+
+        ms ->
+          ms
+          |> DateTime.from_unix!(:millisecond)
+          |> Calendar.strftime("%B %d, %Y %I:%M:%S %p")
+      end
+
+    monitoring_since_obj =
+      case raw_data.monitoring_since do
+        nil ->
+          nil
+
+        unix ->
+          %{
+            "unix" => unix,
+            "raw" => DateTime.from_unix!(unix) |> DateTime.to_iso8601()
+          }
+      end
+
+    monitoring_since_readable =
+      case raw_data.monitoring_since do
+        nil ->
+          nil
+
+        unix ->
+          unix
+          |> DateTime.from_unix!()
+          |> Calendar.strftime("%B %d, %Y %I:%M:%S %p")
+      end
+
     pretty_fields =
       if has_presence? do
         %Lanyard.Presence.PrettyPresence{
@@ -214,12 +300,20 @@ defmodule Lanyard.Presence do
           listening_to_spotify: spotify_activity !== nil,
           spotify: Spotify.build_pretty_spotify(spotify_activity),
           activities: Activity.build_pretty_activities(raw_data.discord_presence["activities"]),
-          kv: raw_data.kv
+          kv: raw_data.kv,
+          last_seen: last_seen_val,
+          last_seen_readable: last_seen_readable,
+          monitoring_since: monitoring_since_obj,
+          monitoring_since_readable: monitoring_since_readable
         }
       else
         %Lanyard.Presence.PrettyPresence{
           discord_user: raw_data.discord_user,
-          kv: raw_data.kv
+          kv: raw_data.kv,
+          last_seen: last_seen_val,
+          last_seen_readable: last_seen_readable,
+          monitoring_since: monitoring_since_obj,
+          monitoring_since_readable: monitoring_since_readable
         }
       end
 

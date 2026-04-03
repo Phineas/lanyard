@@ -98,6 +98,17 @@ Example response:
       "avatar": "a_7484f82375f47a487f41650f36d30318"
     },
     "discord_status": "online",
+    // Standardized rich timestamps (Durable)
+    "last_seen": {
+      "unix": 1775185650417,
+      "raw": "2026-04-03T03:07:30.417Z"
+    },
+    "last_seen_readable": "April 03, 2026 03:07:30 AM",
+    "monitoring_since": {
+      "unix": 1664641326,
+      "raw": "2022-10-01T16:22:06Z"
+    },
+    "monitoring_since_readable": "October 01, 2022 04:22:06 PM",
     // activities contains the plain Discord activities array that gets sent down with presences
     "activities": [
       {
@@ -308,19 +319,42 @@ Build the Docker image by cloning this repo and running:
 docker build -t phineas/lanyard:latest .
 ```
 
-If you don't already have a redis server you'll need to run one, here's the docker command to run one:
+If you don't already have MongoDB or Redis servers, you'll need to run them. Here's a `docker-compose` example that includes everything for a production-ready, durable deployment:
 
-```bash
-docker run -d --name lanyard-redis -v docker_mount_location_on_host:/data redis
-```
+```yml
+version: "3.8"
 
-And run Lanyard API server using:
+services:
+  redis:
+    image: redis
+    restart: always
+    container_name: lanyard_redis
 
-```bash
-docker run --rm -it -p 4001:4001 -e REDIS_HOST=redis -e BOT_TOKEN=<token> --link lanyard-redis:redis phineas/lanyard:latest
+  mongodb:
+    image: mongo
+    restart: always
+    container_name: lanyard_mongo
+
+  lanyard:
+    image: phineas/lanyard:latest
+    restart: always
+    container_name: lanyard
+    depends_on:
+      - redis
+      - mongodb
+    ports:
+      - 4001:4001
+    environment:
+      BOT_TOKEN: <token>
+      REDIS_HOST: redis
+      MONGODB_URI: "mongodb://mongodb:27017"
+      MONGODB_DATABASE: "lanyard"
 ```
 
 You'll be able to access the API using **port 4001**.
+### Enhanced Persistence
+- **MongoDB**: Used for infinite durability of KV data, Metrics, and Last Seen timestamps.
+- **Redis**: Used for high-speed real-time presence synchronization between bot nodes.
 
 You also need to create a Discord bot and use its token above.
 

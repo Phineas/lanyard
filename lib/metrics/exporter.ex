@@ -35,6 +35,6 @@ defmodule Lanyard.Metrics.Exporter do
         ]
       )
 
-    {format.content_type, format.format(unquote(registry))}
+    {format.content_type(), format.format(unquote(registry))}
   end
 end

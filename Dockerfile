@@ -17,12 +17,13 @@ RUN \
 # then make a release build
 ADD . /app/
 RUN \
+	mix deps.get && \
 	mix compile && \
 	mix release
 
 FROM elixir:1.19-alpine
 
-RUN apk add redis
+RUN apk add redis ca-certificates
 
 COPY --from=build /app/_build/prod/rel/lanyard /opt/lanyard
 

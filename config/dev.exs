@@ -9,4 +9,6 @@ config :lanyard,
   bot_token: System.get_env("BOT_TOKEN"),
   redis_uri:
     System.get_env("REDIS_DSN") || System.get_env("REDIS_URI") || System.get_env("REDIS_URL"),
+  mongodb_uri: System.get_env("MONGODB_URI"),
+  mongodb_database: System.get_env("MONGODB_DATABASE") || "lanyard",
   is_idempotent: System.get_env("IS_IDEMPOTENT") == "true" || false

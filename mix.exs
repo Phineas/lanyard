@@ -26,15 +26,17 @@ defmodule Lanyard.MixProject do
       {:bandit, "~> 1.8"},
       {:websock_adapter, "~> 0.5.9"},
       {:prometheus_plugs, "~> 1.1"},
-      {:prometheus_ex,
-       git: "https://github.com/lanodan/prometheus.ex", branch: "fix/elixir-1.14", override: true},
+      {:prometheus, "~> 6.1", override: true},
+      {:prometheus_ex, "~> 5.1", override: true},
       {:websocket_client, "~> 1.6"},
       {:jason, "~> 1.4"},
-      {:gen_registry, "~> 1.3"},
+      {:gen_registry, git: "https://github.com/MeguminSama/gen_registry.git", branch: "fix/elixir-1.18"},
       {:corsica, "~> 2.1"},
       {:manifold, "~> 1.6"},
       {:finch, "~> 0.20.0"},
-      {:redix, "~> 1.5"}
+      {:redix, "~> 1.5"},
+      {:mongodb_driver, "~> 1.4"},
+      {:castore, "~> 1.0"}
     ]
   end
 end

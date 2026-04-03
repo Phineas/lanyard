@@ -11,8 +11,9 @@ defmodule Lanyard do
     children = [
       {Finch, name: Lanyard.Finch},
       {GenRegistry, worker_module: Lanyard.Presence},
-      {Lanyard.Metrics, :normal},
       {Lanyard.Connectivity.Redis, []},
+      {Lanyard.Connectivity.MongoDB, []},
+      {Lanyard.Metrics, :normal},
       {Lanyard.DiscordBot, %{token: Application.get_env(:lanyard, :bot_token)}},
       {Bandit,
        plug: Lanyard.Api.Router, scheme: :http, port: Application.get_env(:lanyard, :http_port)}

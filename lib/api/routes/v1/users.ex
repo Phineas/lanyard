@@ -1,7 +1,7 @@
 defmodule Lanyard.Api.Routes.V1.Users do
   alias Lanyard.Api.Util
   alias Lanyard.Presence
-  alias Lanyard.Connectivity.Redis
+  alias Lanyard.Connectivity.MongoDB
 
   use Plug.Router
 
@@ -11,7 +11,7 @@ defmodule Lanyard.Api.Routes.V1.Users do
   get "/@me" do
     key = conn |> Plug.Conn.get_req_header("authorization")
 
-    case Redis.get("api_key:#{key}") do
+    case MongoDB.get_user_id_by_api_key(key) do
       user_id when is_binary(user_id) ->
         Util.respond(conn, Presence.get_pretty_presence(user_id))
 
@@ -64,7 +64,7 @@ defmodule Lanyard.Api.Routes.V1.Users do
 
     case validate_resource_access(conn) do
       :ok ->
-        case Lanyard.KV.Interface.set(String.to_integer(user_id), field, put_body) do
+        case Lanyard.KV.Interface.set(user_id, field, put_body) do
           {:ok, _v} ->
             Util.respond(conn, {:ok})
 
@@ -82,7 +82,7 @@ defmodule Lanyard.Api.Routes.V1.Users do
 
     case validate_resource_access(conn) do
       :ok ->
-        Lanyard.KV.Interface.del(String.to_integer(user_id), field)
+        Lanyard.KV.Interface.del(user_id, field)
         Util.respond(conn, {:ok})
 
       :no_permission ->
@@ -98,7 +98,7 @@ defmodule Lanyard.Api.Routes.V1.Users do
     %Plug.Conn{params: %{"id" => user_id}} = conn
     key = conn |> Plug.Conn.get_req_header("authorization")
 
-    case Redis.get("api_key:#{key}") do
+    case MongoDB.get_user_id_by_api_key(key) do
       ^user_id ->
         :ok
 

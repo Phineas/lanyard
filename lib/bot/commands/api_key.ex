@@ -1,5 +1,5 @@
 defmodule Lanyard.DiscordBot.Commands.ApiKey do
-  alias Lanyard.Connectivity.Redis
+  alias Lanyard.Connectivity.MongoDB
   alias Lanyard.DiscordBot.DiscordApi
 
   def handle(_, %{"channel_id" => channel_id, "guild_id" => _guild_id} = _p) do
@@ -8,15 +8,9 @@ defmodule Lanyard.DiscordBot.Commands.ApiKey do
 
   def handle(_, payload) do
     key = generate_api_key()
+    user_id = payload["author"]["id"]
 
-    existing_key? = Redis.get("user_api_key:#{payload["author"]["id"]}")
-
-    if existing_key? do
-      Redis.del("api_key:#{existing_key?}")
-    end
-
-    Redis.set("api_key:#{key}", payload["author"]["id"])
-    Redis.set("user_api_key:#{payload["author"]["id"]}", key)
+    MongoDB.set_api_key(user_id, key)
 
     DiscordApi.send_message(
       payload["channel_id"],
@@ -25,7 +19,7 @@ defmodule Lanyard.DiscordBot.Commands.ApiKey do
   end
 
   def validate_api_key(user_id, key) when is_binary(key) do
-    case Redis.get("user_api_key:#{user_id}") do
+    case MongoDB.get_api_key_by_user_id(user_id) do
       ^key ->
         {true}
 
@@ -36,7 +30,7 @@ defmodule Lanyard.DiscordBot.Commands.ApiKey do
 
   def validate_api_key(user_id, key) when is_list(key) do
     Enum.map(key, fn apikey ->
-      case Redis.get("user_api_key:#{user_id}") do
+      case MongoDB.get_api_key_by_user_id(user_id) do
         ^apikey ->
           {true}
 
@@ -48,14 +42,8 @@ defmodule Lanyard.DiscordBot.Commands.ApiKey do
 
   def generate_and_send_new(user_id) do
     key = generate_api_key()
-    existing_key? = Redis.get("user_api_key:#{user_id}")
 
-    if existing_key? do
-      Redis.del("api_key:#{existing_key?}")
-    end
-
-    Redis.set("api_key:#{key}", user_id)
-    Redis.set("user_api_key:#{user_id}", key)
+    MongoDB.set_api_key(user_id, key)
 
     dm_channel = DiscordApi.create_dm(user_id)
 

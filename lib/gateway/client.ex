@@ -158,12 +158,12 @@ defmodule Lanyard.Gateway.Client do
     {:ok, state}
   end
 
-  @doc "Ability to update websocket client state"
+  # Ability to update websocket client state
   def websocket_info({:update_state, update_values}, _connection, state) do
     {:ok, Map.merge(state, update_values)}
   end
 
-  @doc "Remove key from state"
+  # Remove key from state
   def websocket_info({:clear_from_state, keys}, _connection, state) do
     new_state = Map.drop(state, keys)
     {:ok, new_state}
@@ -333,19 +333,35 @@ defmodule Lanyard.Gateway.Client do
 
   defp create_member_presences(payload) do
     Task.start(fn ->
+      # Index presences by user_id for O(1) lookup
+      presences_map =
+        (payload.data["presences"] || [])
+        |> Map.new(fn p -> {p["user"]["id"], p} end)
+
       Enum.each(payload.data["members"], fn member ->
-        presence =
-          payload.data["presences"]
-          |> Enum.find(fn presence -> presence["user"]["id"] === member["user"]["id"] end)
+        user_id = member["user"]["id"]
+        presence = Map.get(presences_map, user_id)
+
+        joined_at_unix =
+          case member["joined_at"] do
+            nil -> nil
+            iso ->
+              case DateTime.from_iso8601(iso) do
+                {:ok, dt, _} -> DateTime.to_unix(dt)
+                _ -> nil
+              end
+          end
 
         gen_init = %{
-          user_id: member["user"]["id"],
+          user_id: user_id,
           discord_presence: presence,
-          discord_user: member["user"]
+          discord_user: member["user"],
+          monitoring_since: joined_at_unix
         }
 
-        {:ok, pid} = GenRegistry.lookup_or_start(Lanyard.Presence, gen_init.user_id, [gen_init])
-        GenServer.cast(pid, {:sync, gen_init})
+        with {:ok, pid} <- GenRegistry.lookup_or_start(Lanyard.Presence, user_id, [gen_init]) do
+          GenServer.cast(pid, {:sync, gen_init})
+        end
       end)
     end)
   end

@@ -39,7 +39,7 @@ defmodule Lanyard.Gateway.Utility do
     }
   end
 
-  @doc "Decode json payload received from discord into a map"
+  # Decode json payload received from discord into a map
   @spec payload_decode(list(), {:text, binary()}) :: map
   def payload_decode(codes, {:text, payload}) do
     payload = Jason.decode!(payload)
@@ -58,7 +58,7 @@ defmodule Lanyard.Gateway.Utility do
     codes[value]
   end
 
-  @doc "Get the atom value of and opcode using an integer value"
+  # Get the atom value of and opcode using an integer value
   @spec opcode(map, integer) :: atom
   def opcode(codes, value) when is_integer(value) do
     {k, _value} = Enum.find(codes, fn {_key, v} -> v == value end)
