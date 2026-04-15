@@ -38,15 +38,15 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def start_link(state) do
-    # state = state
-    # |> Map.put(:guilds, [])
-    # |> Map.put(:token, state.token)
-
     :ssl.start()
 
-    :websocket_client.start_link("wss://gateway.discord.gg/?v=10&encoding=json", __MODULE__, [
-      state
-    ])
+    url =
+      case state[:resume_gateway_url] do
+        nil -> "wss://gateway.discord.gg/?v=10&encoding=json"
+        resume_url -> "#{resume_url}?v=10&encoding=json"
+      end
+
+    :websocket_client.start_link(url, __MODULE__, [state])
   end
 
   def init([state]) do
@@ -65,13 +65,33 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def onconnect(_WSReq, state) do
-    # Send identifier to discord gateway
-    identify(state)
+    if state[:session_id] && state[:resume_gateway_url] && state[:seq_num] do
+      Logger.info("Discord: Resuming session #{state[:session_id]}")
+      resume(state)
+    else
+      identify(state)
+    end
+
     {:ok, state}
   end
 
   def ondisconnect({:remote, :closed}, state) do
-    # Reconnection with resume opcode should be attempted here
+    Logger.warning("Discord: Remote closed connection, will attempt resume")
+
+    if state[:session_id] && state[:resume_gateway_url] do
+      seq_num = agent_value(state[:agent_seq_num])
+
+      send(
+        :discord_bot,
+        {:prepare_resume,
+         %{
+           session_id: state[:session_id],
+           resume_gateway_url: state[:resume_gateway_url],
+           seq_num: seq_num
+         }}
+      )
+    end
+
     {:close, {:remote, :closed}, state}
   end
 
@@ -133,19 +153,27 @@ defmodule Lanyard.Gateway.Client do
   end
 
   defp _handle_data(%{op: :reconnect} = _data, state) do
-    Logger.warning("Discord enforced Reconnect")
-    # Discord enforces reconnection. Websocket should be
-    # reconnected and resume opcode sent to playback missed messages.
-    # For now just kill the connection so that a supervisor can restart us.
-    {:close, "Discord enforced reconnect", state}
+    Logger.warning("Discord enforced Reconnect, will resume session")
+
+    seq_num = agent_value(state[:agent_seq_num])
+
+    send(
+      :discord_bot,
+      {:prepare_resume,
+       %{
+         session_id: state[:session_id],
+         resume_gateway_url: state[:resume_gateway_url],
+         seq_num: seq_num
+       }}
+    )
+
+    {:close, "Reconnecting for resume", state}
   end
 
   defp _handle_data(%{op: :invalid_session} = _data, state) do
-    Logger.warning("Discord: Invalid session")
-    # On resume Discord will send invalid_session if our session id is too old
-    # to be resumed.
-    # For now just kill the connection so that a supervisor can restart us.
-    {:close, "Invalid session", state}
+    Logger.warning("Discord: Invalid session, starting new session")
+    send(:discord_bot, :clear_resume)
+    {:close, "Invalid session, starting new session", state}
   end
 
   def websocket_info(:start, _connection, state) do
@@ -176,9 +204,20 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def websocket_info(:heartbeat_stale, _connection, state) do
-    # Heartbeat process reports stale connection. Websocket should be
-    # reconnected and resume opcode sent to playback missed messages.
-    # For now just kill the connection so that a supervisor can restart us.
+    Logger.warning("Discord: Heartbeat stale, will resume session")
+
+    seq_num = agent_value(state[:agent_seq_num])
+
+    send(
+      :discord_bot,
+      {:prepare_resume,
+       %{
+         session_id: state[:session_id],
+         resume_gateway_url: state[:resume_gateway_url],
+         seq_num: seq_num
+       }}
+    )
+
     {:close, "Heartbeat stale", state}
   end
 
@@ -197,7 +236,12 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def handle_event({:ready, payload}, state) do
-    new_state = Map.put(state, :session_id, payload.data["session_id"])
+    new_state =
+      state
+      |> Map.put(:session_id, payload.data["session_id"])
+      |> Map.put(:resume_gateway_url, payload.data["resume_gateway_url"])
+
+    Logger.info("Discord: Ready")
 
     {:ok, new_state}
   end
@@ -296,6 +340,17 @@ defmodule Lanyard.Gateway.Client do
 
   def handle_event({_event, _payload}, state) do
     {:ok, state}
+  end
+
+  def resume(state) do
+    data = %{
+      "token" => state.token,
+      "session_id" => state[:session_id],
+      "seq" => state[:seq_num]
+    }
+
+    payload = payload_build_json(opcode(opcodes(), :resume), data)
+    :websocket_client.cast(self(), {:binary, payload})
   end
 
   def identify(state) do
