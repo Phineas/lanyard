@@ -20,6 +20,7 @@ end
 
 defmodule Lanyard.Presence do
   use GenServer
+  require Logger
 
   alias Lanyard.Connectivity.Redis
   alias Lanyard.Presence.Spotify
@@ -114,16 +115,18 @@ defmodule Lanyard.Presence do
         {key, v}
       end
 
+    merged_state =
+      %{
+        discord_user: state.discord_user,
+        discord_presence: state.discord_presence,
+        user_id: state.user_id,
+        kv: state.kv
+      }
+      |> Map.merge(normalized_new_state)
+
     {_, pretty_presence} =
-      get_public_fields(
-        %{
-          discord_user: state.discord_user,
-          discord_presence: state.discord_presence,
-          user_id: state.user_id,
-          kv: state.kv
-        }
-        |> Map.merge(normalized_new_state)
-      )
+      merged_state
+      |> get_public_fields()
       |> build_pretty_presence()
 
     Manifold.send(
@@ -131,7 +134,7 @@ defmodule Lanyard.Presence do
       {:remote_send, %{op: 0, t: "PRESENCE_UPDATE", d: pretty_presence}}
     )
 
-    {:noreply, Map.merge(state, new_state)}
+    {:noreply, Map.merge(state, normalized_new_state)}
   end
 
   @spec get_public_fields(map()) :: %Lanyard.Presence.PublicFields{}
@@ -251,7 +254,7 @@ defmodule Lanyard.Presence do
     with {:ok, pid} <-
            GenRegistry.lookup(__MODULE__, user_id) do
       GenServer.cast(pid, {:sync, payload})
-      IO.inspect("Syncing presence for user #{user_id}")
+      Logger.debug("Syncing presence for user #{user_id}")
 
       unless from_global_sync do
         Task.start(fn ->
