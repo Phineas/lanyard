@@ -75,8 +75,10 @@ defmodule Lanyard.Gateway.Client do
     {:ok, state}
   end
 
-  def ondisconnect({:remote, :closed}, state) do
-    Logger.warning("Discord: Remote closed connection, will attempt resume")
+  def ondisconnect(reason, state) do
+    Logger.warning(
+      "Discord: WebSocket disconnected with reason #{inspect(reason)}, will attempt resume"
+    )
 
     if state[:session_id] && state[:resume_gateway_url] do
       seq_num = agent_value(state[:agent_seq_num])
@@ -92,7 +94,7 @@ defmodule Lanyard.Gateway.Client do
       )
     end
 
-    {:close, {:remote, :closed}, state}
+    {:close, reason, state}
   end
 
   def websocket_handle({:text, payload}, _socket, state) do
@@ -227,13 +229,17 @@ defmodule Lanyard.Gateway.Client do
 
     Logger.info("Websocket closed in state #{inspect(state)} with reason #{inspect(reason)}")
     Logger.info("Killing seq_num process!")
-    Process.exit(state[:agent_seq_num], :kill)
+    kill_process(state[:agent_seq_num])
     Logger.info("Killing rest_client process!")
-    Process.exit(state[:rest_client], :kill)
+    kill_process(state[:rest_client])
     Logger.info("Killing heartbeat process!")
-    Process.exit(state[:heartbeat_pid], :kill)
+    kill_process(state[:heartbeat_pid])
     :ok
   end
+
+  # we can term before any of the sub processes are started: gateway fails to connect etc
+  defp kill_process(pid) when is_pid(pid), do: Process.exit(pid, :kill)
+  defp kill_process(_pid), do: :ok
 
   def handle_event({:ready, payload}, state) do
     new_state =
