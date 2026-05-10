@@ -77,7 +77,7 @@ defmodule Lanyard.Gateway.Client do
 
   def ondisconnect(reason, state) do
     Logger.warning(
-      "Discord: WebSocket disconnected with reason #{inspect(reason)}, will attempt resume"
+      "Discord: Websocket disconnected with reason #{inspect(reason)}, will attempt resume"
     )
 
     if state[:session_id] && state[:resume_gateway_url] do
@@ -227,19 +227,10 @@ defmodule Lanyard.Gateway.Client do
   def websocket_terminate(reason, _conn_state, state) do
     Lanyard.Metrics.Collector.set(:gauge, :lanyard_monitored_users, 0)
 
-    Logger.info("Websocket closed in state #{inspect(state)} with reason #{inspect(reason)}")
-    Logger.info("Killing seq_num process!")
-    kill_process(state[:agent_seq_num])
-    Logger.info("Killing rest_client process!")
-    kill_process(state[:rest_client])
-    Logger.info("Killing heartbeat process!")
-    kill_process(state[:heartbeat_pid])
+    Logger.info("Discord: Websocket closed in state #{inspect(state)} with reason #{inspect(reason)}")
+
     :ok
   end
-
-  # we can term before any of the sub processes are started: gateway fails to connect etc
-  defp kill_process(pid) when is_pid(pid), do: Process.exit(pid, :kill)
-  defp kill_process(_pid), do: :ok
 
   def handle_event({:ready, payload}, state) do
     new_state =
