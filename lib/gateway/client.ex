@@ -75,8 +75,10 @@ defmodule Lanyard.Gateway.Client do
     {:ok, state}
   end
 
-  def ondisconnect({:remote, :closed}, state) do
-    Logger.warning("Discord: Remote closed connection, will attempt resume")
+  def ondisconnect(reason, state) do
+    Logger.warning(
+      "Discord: Websocket disconnected with reason #{inspect(reason)}, will attempt resume"
+    )
 
     if state[:session_id] && state[:resume_gateway_url] do
       seq_num = agent_value(state[:agent_seq_num])
@@ -92,7 +94,7 @@ defmodule Lanyard.Gateway.Client do
       )
     end
 
-    {:close, {:remote, :closed}, state}
+    {:close, reason, state}
   end
 
   def websocket_handle({:text, payload}, _socket, state) do
@@ -225,13 +227,8 @@ defmodule Lanyard.Gateway.Client do
   def websocket_terminate(reason, _conn_state, state) do
     Lanyard.Metrics.Collector.set(:gauge, :lanyard_monitored_users, 0)
 
-    Logger.info("Websocket closed in state #{inspect(state)} with reason #{inspect(reason)}")
-    Logger.info("Killing seq_num process!")
-    Process.exit(state[:agent_seq_num], :kill)
-    Logger.info("Killing rest_client process!")
-    Process.exit(state[:rest_client], :kill)
-    Logger.info("Killing heartbeat process!")
-    Process.exit(state[:heartbeat_pid], :kill)
+    Logger.info("Discord: Websocket closed in state #{inspect(state)} with reason #{inspect(reason)}")
+
     :ok
   end
 
