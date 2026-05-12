@@ -381,3 +381,4 @@ Below is a curated selection of websites using Lanyard right now, check them out
 - [eosis.space](https://eosis.space/)
 - [dromzeh.dev](https://dromzeh.dev)
 - [littlepriceonu.com](https://littlepriceonu.com/)
+- [eu.dumitrw.ro](https://eu.dumitrw.ro) - Personal site showing Discord status using Lanyard.
