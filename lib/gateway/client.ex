@@ -225,8 +225,6 @@ defmodule Lanyard.Gateway.Client do
 
   @spec websocket_terminate(any(), any(), nil | keyword() | map()) :: :ok
   def websocket_terminate(reason, _conn_state, state) do
-    Lanyard.Metrics.Collector.set(:gauge, :lanyard_monitored_users, 0)
-
     Logger.info("Discord: Websocket closed in state #{inspect(state)} with reason #{inspect(reason)}")
 
     :ok
@@ -284,8 +282,6 @@ defmodule Lanyard.Gateway.Client do
   def handle_event({:guild_member_add, payload}, state) do
     Logger.debug("User #{payload.data["user"]["id"]} joined guild")
 
-    Lanyard.Metrics.Collector.inc(:gauge, :lanyard_monitored_users)
-
     request_payload =
       payload_build_json(opcode(opcodes(), :request_guild_members), %{
         "guild_id" => payload.data["guild_id"],
@@ -313,8 +309,6 @@ defmodule Lanyard.Gateway.Client do
   def handle_event({:guild_member_remove, payload}, state) do
     Logger.debug("User #{payload.data["user"]["id"]} left guild")
 
-    Lanyard.Metrics.Collector.dec(:gauge, :lanyard_monitored_users)
-
     str_id = payload.data["user"]["id"]
 
     GenRegistry.stop(Lanyard.Presence, str_id)
@@ -324,12 +318,6 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def handle_event({:guild_members_chunk, payload}, state) do
-    Lanyard.Metrics.Collector.inc(
-      :gauge,
-      :lanyard_monitored_users,
-      length(payload.data["members"])
-    )
-
     create_member_presences(payload)
 
     {:ok, state}
