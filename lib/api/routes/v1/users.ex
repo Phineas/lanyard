@@ -29,7 +29,7 @@ defmodule Lanyard.Api.Routes.V1.Users do
   patch "/:id/kv" do
     %Plug.Conn{params: %{"id" => user_id}} = conn
 
-    {:ok, body, _conn} = Plug.Conn.read_body(conn)
+    {:ok, body, conn} = Plug.Conn.read_body(conn)
 
     case validate_resource_access(conn) do
       :ok ->
@@ -60,7 +60,7 @@ defmodule Lanyard.Api.Routes.V1.Users do
   put "/:id/kv/:field" do
     %Plug.Conn{params: %{"id" => user_id, "field" => field}} = conn
 
-    {:ok, put_body, _conn} = Plug.Conn.read_body(conn)
+    {:ok, put_body, conn} = Plug.Conn.read_body(conn)
 
     case validate_resource_access(conn) do
       :ok ->
