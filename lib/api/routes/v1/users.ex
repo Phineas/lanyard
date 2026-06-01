@@ -9,7 +9,7 @@ defmodule Lanyard.Api.Routes.V1.Users do
   plug(:dispatch)
 
   get "/@me" do
-    key = conn |> Plug.Conn.get_req_header("authorization")
+    key = Util.authorization_header(conn)
 
     case Redis.get("api_key:#{key}") do
       user_id when is_binary(user_id) ->
@@ -96,7 +96,7 @@ defmodule Lanyard.Api.Routes.V1.Users do
 
   defp validate_resource_access(conn) do
     %Plug.Conn{params: %{"id" => user_id}} = conn
-    key = conn |> Plug.Conn.get_req_header("authorization")
+    key = Util.authorization_header(conn)
 
     case Redis.get("api_key:#{key}") do
       ^user_id ->
