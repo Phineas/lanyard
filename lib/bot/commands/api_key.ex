@@ -22,7 +22,7 @@ defmodule Lanyard.DiscordBot.Commands.ApiKey do
     Lanyard.DiscordBot.DiscordApi.send_message(payload["channel_id"], %{
       title: "Lanyard API Key",
       description:
-        "**Absolutely do not share or post this key anywhere, it is a secret key that will allow anyone to manage your Lanyard K/V**\n\n**This key is not to be used in a front-end application/website**\n\nIf you are looking for the public endpoint for your data, you would use your discord user ID like so\nhttps://api.lanyard.rest/v1/users/#{user_id}",
+        "**Absolutely do not share or post this key anywhere, it is a secret key that will allow anyone to manage your Lanyard K/V**\n\n**This key is not to be used in a front-end application/website**\n\nIf you are looking for the public endpoint for your data, you would use your discord user ID like so\n#{Application.get_env(:lanyard, :external_url)}/v1/users/#{user_id}",
       color: 0x5865F2,
       footer: %{text: "Run this command again if you need to re-generate your key"},
       fields: [

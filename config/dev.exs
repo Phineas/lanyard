@@ -9,4 +9,5 @@ config :lanyard,
   bot_token: System.get_env("BOT_TOKEN"),
   redis_uri:
     System.get_env("REDIS_DSN") || System.get_env("REDIS_URI") || System.get_env("REDIS_URL"),
-  is_idempotent: System.get_env("IS_IDEMPOTENT") == "true" || false
+  is_idempotent: System.get_env("IS_IDEMPOTENT") == "true" || false,
+  external_url: System.get_env("EXTERNAL_URL") || "http://127.0.0.1:4001"

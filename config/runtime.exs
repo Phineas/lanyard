@@ -10,5 +10,6 @@ if config_env() == :prod do
     bot_token: System.get_env("BOT_TOKEN"),
     redis_uri:
       System.get_env("REDIS_DSN") || System.get_env("REDIS_URI") || System.get_env("REDIS_URL"),
-    is_idempotent: Lanyard.is_idempotent?()
+    is_idempotent: Lanyard.is_idempotent?(),
+    external_url: System.get_env("EXTERNAL_URL") || "https://api.lanyard.rest"
 end
