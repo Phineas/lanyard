@@ -9,19 +9,26 @@ defmodule Lanyard.DiscordBot.Commands.ApiKey do
   def handle(_, payload) do
     key = generate_api_key()
 
-    existing_key? = Redis.get("user_api_key:#{payload["author"]["id"]}")
+    user_id = payload["author"]["id"]
+    existing_key? = Redis.get("user_api_key:#{user_id}")
 
     if existing_key? do
       Redis.del("api_key:#{existing_key?}")
     end
 
-    Redis.set("api_key:#{key}", payload["author"]["id"])
-    Redis.set("user_api_key:#{payload["author"]["id"]}", key)
+    Redis.set("api_key:#{key}", user_id)
+    Redis.set("user_api_key:#{user_id}", key)
 
-    DiscordApi.send_message(
-      payload["channel_id"],
-      ":white_check_mark: Your new Lanyard API key is `#{key}`\n\n**ABSOLUTELY DO NOT SHARE OR POST THIS KEY ANYWHERE IT WILL ALLOW ANYONE TO MANAGE YOUR LANYARD K/V**\n*Run this command again if you need to re-generate your key*"
-    )
+    Lanyard.DiscordBot.DiscordApi.send_message(payload["channel_id"], %{
+      title: "Lanyard API Key",
+      description:
+        "**Absolutely do not share or post this key anywhere, it is a secret key that will allow anyone to manage your Lanyard K/V**\n\n**This key is not to be used in a front-end application/website**\n\nIf you are looking for the public endpoint for your data, you would use your discord user ID like so\nhttps://api.lanyard.rest/v1/users/#{user_id}",
+      color: 0x5865F2,
+      footer: %{text: "Run this command again if you need to re-generate your key"},
+      fields: [
+        %{name: "Key", value: "||`#{key}`||", inline: false}
+      ]
+    })
   end
 
   def validate_api_key(user_id, key) when is_binary(key) do
