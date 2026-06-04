@@ -24,6 +24,7 @@ defmodule Lanyard.Presence do
   alias Lanyard.Connectivity.Redis
   alias Lanyard.Presence.Spotify
   alias Lanyard.Presence.Activity
+  require Logger
 
   @derive Jason.Encoder
   defstruct user_id: nil,
@@ -131,7 +132,7 @@ defmodule Lanyard.Presence do
       {:remote_send, %{op: 0, t: "PRESENCE_UPDATE", d: pretty_presence}}
     )
 
-    {:noreply, Map.merge(state, new_state)}
+    {:noreply, Map.merge(state, normalized_new_state)}
   end
 
   @spec get_public_fields(map()) :: %Lanyard.Presence.PublicFields{}
@@ -251,7 +252,7 @@ defmodule Lanyard.Presence do
     with {:ok, pid} <-
            GenRegistry.lookup(__MODULE__, user_id) do
       GenServer.cast(pid, {:sync, payload})
-      IO.inspect("Syncing presence for user #{user_id}")
+      Logger.debug("Syncing presence for user #{user_id}")
 
       unless from_global_sync do
         Task.start(fn ->

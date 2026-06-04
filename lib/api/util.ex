@@ -8,6 +8,13 @@ defmodule Lanyard.Api.Util do
     |> send_resp(:found, url)
   end
 
+  @spec authorization_header(Plug.Conn.t()) :: binary | nil
+  def authorization_header(conn) do
+    conn
+    |> get_req_header("authorization")
+    |> List.first()
+  end
+
   @spec respond(Plug.Conn.t(), {:ok}) :: Plug.Conn.t()
   def respond(conn, {:ok}) do
     conn
