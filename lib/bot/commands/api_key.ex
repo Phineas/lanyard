@@ -26,7 +26,7 @@ defmodule Lanyard.DiscordBot.Commands.ApiKey do
       color: 0x5865F2,
       footer: %{text: "Run this command again if you need to re-generate your key"},
       fields: [
-        %{name: "Key", value: "||`#{key}`||", inline: false}
+        %{name: "Key", value: "||`#{key}`||\n-# *click above to reveal*", inline: false}
       ]
     })
   end
