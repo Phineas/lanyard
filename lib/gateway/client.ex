@@ -13,9 +13,7 @@ defmodule Lanyard.Gateway.Client do
     guilds: 1 <<< 0,
     guild_members: 1 <<< 1,
     guild_presences: 1 <<< 8,
-    guild_messages: 1 <<< 9,
-    direct_messages: 1 <<< 12,
-    message_content: 1 <<< 15
+    direct_messages: 1 <<< 12
   }
 
   @intents_mask Enum.reduce(@intents, 0, fn {_k, bit}, acc -> acc ||| bit end)
@@ -255,6 +253,16 @@ defmodule Lanyard.Gateway.Client do
 
     Logger.info("Discord: Ready")
 
+    if Application.get_env(:lanyard, :is_idempotent) do
+      application_id = get_in(payload.data, ["application", "id"])
+
+      if application_id do
+        Task.start(fn ->
+          Lanyard.DiscordBot.CommandRegistration.register(application_id)
+        end)
+      end
+    end
+
     {:ok, new_state}
   end
 
@@ -262,6 +270,16 @@ defmodule Lanyard.Gateway.Client do
     if Application.get_env(:lanyard, :is_idempotent) do
       Task.start(fn ->
         Lanyard.DiscordBot.CommandHandler.handle_message(payload)
+      end)
+    end
+
+    {:ok, state}
+  end
+
+  def handle_event({:interaction_create, payload}, state) do
+    if Application.get_env(:lanyard, :is_idempotent) do
+      Task.start(fn ->
+        Lanyard.DiscordBot.InteractionHandler.handle_interaction(payload.data)
       end)
     end
 
