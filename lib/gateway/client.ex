@@ -13,6 +13,7 @@ defmodule Lanyard.Gateway.Client do
     guilds: 1 <<< 0,
     guild_members: 1 <<< 1,
     guild_presences: 1 <<< 8,
+    guild_messages: 1 <<< 9,
     direct_messages: 1 <<< 12
   }
 
@@ -237,6 +238,13 @@ defmodule Lanyard.Gateway.Client do
       |> Map.put(:resume_gateway_url, payload.data["resume_gateway_url"])
 
     Logger.info("Discord: Ready")
+
+    bot_user_id =
+      get_in(payload.data, ["user", "id"]) || get_in(payload.data, ["application", "id"])
+
+    if bot_user_id do
+      Application.put_env(:lanyard, :bot_user_id, bot_user_id)
+    end
 
     if Application.get_env(:lanyard, :is_idempotent) do
       application_id = get_in(payload.data, ["application", "id"])
