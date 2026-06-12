@@ -7,6 +7,7 @@ defmodule Lanyard do
 
     :ets.new(:cached_presences, [:named_table, :set, :public])
     :ets.new(:global_subscribers, [:named_table, :set, :public])
+    Lanyard.DiscordBot.CommandCache.init()
 
     children = [
       {Finch, name: Lanyard.Finch},

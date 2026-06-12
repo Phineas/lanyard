@@ -35,6 +35,43 @@ defmodule Lanyard.DiscordBot.DiscordApi do
     |> Finch.request(Lanyard.Finch)
   end
 
+  def respond_to_interaction(interaction_id, interaction_token, content, opts \\ [])
+
+  def respond_to_interaction(interaction_id, interaction_token, content, opts)
+      when is_binary(content) do
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_discord_messages_sent)
+
+    sanitized_content =
+      content
+      |> String.replace("@", "@​​")
+
+    data = %{content: sanitized_content}
+    data = if opts[:ephemeral], do: Map.put(data, :flags, 64), else: data
+
+    :post
+    |> Finch.build(
+      "#{@api_host}/interactions/#{interaction_id}/#{interaction_token}/callback",
+      [{"Content-Type", "application/json"}],
+      Jason.encode!(%{type: 4, data: data})
+    )
+    |> Finch.request(Lanyard.Finch)
+  end
+
+  def respond_to_interaction(interaction_id, interaction_token, %{} = embed, opts) do
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_discord_messages_sent)
+
+    data = %{embeds: [embed]}
+    data = if opts[:ephemeral], do: Map.put(data, :flags, 64), else: data
+
+    :post
+    |> Finch.build(
+      "#{@api_host}/interactions/#{interaction_id}/#{interaction_token}/callback",
+      [{"Content-Type", "application/json"}],
+      Jason.encode!(%{type: 4, data: data})
+    )
+    |> Finch.request(Lanyard.Finch)
+  end
+
   def create_dm(recipient) do
     {:ok, response} =
       :post

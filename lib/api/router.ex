@@ -3,6 +3,7 @@ defmodule Lanyard.Api.Router do
 
   alias Lanyard.Api.Routes.V1
   alias Lanyard.Api.Routes.Discord
+  alias Lanyard.Api.Routes.Legal
   alias Lanyard.Api.Routes.Metrics
   alias Lanyard.Api.Util
   alias Lanyard.Api.Quicklinks
@@ -68,6 +69,14 @@ defmodule Lanyard.Api.Router do
       other ->
         reraise other, __STACKTRACE__
     end
+  end
+
+  get "/privacy" do
+    Legal.privacy(conn)
+  end
+
+  get "/terms" do
+    Legal.terms(conn)
   end
 
   forward("/v1", to: V1)
