@@ -365,7 +365,6 @@ Below is a curated selection of websites using Lanyard right now, check them out
 - [igalaxy.dev](https://igalaxy.dev)
 - [anahoward.me](https://www.anahoward.me/)
 - [chezzer.dev](https://chezzer.dev)
-- [makidoll.io](https://makidoll.io/)
 - [dan.onl](https://dan.onl/)
 - [cnrad.dev](https://cnrad.dev)
 - [venqoi.lol](https://venqoi.lol/)
