@@ -111,7 +111,7 @@ defmodule Lanyard.SocketHandler do
                 {:ok, pid} = GenRegistry.lookup(Lanyard.Presence, id)
 
                 unless not Process.alive?(pid) do
-                  send(pid, {:remove_subscriber, pid})
+                  send(pid, {:remove_subscriber, self()})
                 end
             end
 
