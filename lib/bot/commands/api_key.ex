@@ -73,6 +73,6 @@ defmodule Lanyard.DiscordBot.Commands.ApiKey do
   end
 
   def generate_api_key() do
-    :crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)
+    "lnyd_" <> (:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower))
   end
 end
