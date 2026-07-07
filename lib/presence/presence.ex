@@ -5,7 +5,8 @@ end
 
 defmodule Lanyard.Presence.PrettyPresence do
   @derive Jason.Encoder
-  defstruct discord_user: %{},
+  defstruct user_id: nil,
+            discord_user: %{},
             discord_status: "offline",
             active_on_discord_web: false,
             active_on_discord_desktop: false,
@@ -202,6 +203,7 @@ defmodule Lanyard.Presence do
     pretty_fields =
       if has_presence? do
         %Lanyard.Presence.PrettyPresence{
+          user_id: raw_data.user_id,
           discord_user: raw_data.discord_user,
           discord_status: raw_data.discord_presence["status"],
           active_on_discord_web: Map.has_key?(raw_data.discord_presence["client_status"], "web"),
@@ -219,6 +221,7 @@ defmodule Lanyard.Presence do
         }
       else
         %Lanyard.Presence.PrettyPresence{
+          user_id: raw_data.user_id,
           discord_user: raw_data.discord_user,
           kv: raw_data.kv
         }
