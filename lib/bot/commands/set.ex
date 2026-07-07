@@ -25,7 +25,7 @@ defmodule Lanyard.DiscordBot.Commands.Set do
           _ ->
             DiscordApi.send_message(
               payload["channel_id"],
-              ":white_check_mark: `#{key}` was set. View it with `#{Application.get_env(:lanyard, :command_prefix)}get #{key}` or go to https://api.lanyard.rest/v1/users/#{payload["author"]["id"]}"
+              ":white_check_mark: `#{key}` was set. View it with `#{Application.get_env(:lanyard, :command_prefix)}get #{key}` or go to #{Application.get_env(:lanyard, :external_url)}/v1/users/#{payload["author"]["id"]}"
             )
         end
     end

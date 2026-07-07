@@ -25,6 +25,7 @@ Just [join this Discord server](https://discord.gg/UrXF2cfJ7F) and your presence
   - [Subscribing to multiple user presences](#subscribing-to-multiple-user-presences)
   - [Subscribing to a single user presence](#subscribing-to-a-single-user-presence)
   - [Subscribing to every user presence](#subscribing-to-every-user-presence)
+  - [Unsubscribing from a user presence](#unsubscribing-from-a-user-presence)
   * [List of Opcodes](#list-of-opcodes)
   * [Events](#events)
   * [Error Codes](#error-codes)
@@ -216,7 +217,7 @@ Example of `Opcode 2: Initialize`:
   d: {
     // subscribe_to_ids should be an array of user IDs you want to subscribe to presences from
     // if Lanyard doesn't monitor an ID specified, it won't be included in INIT_STATE
-    subscribe_to_ids: ["94490510688792576"]
+    subscribe_to_ids: ["94490510688792576", "156114103033790464"]
   }
 }
 ```
@@ -235,14 +236,57 @@ If you want to subscribe to every presence being monitored by Lanyard, you can s
 
 Once Op 2 is sent, you should immediately receive an `INIT_STATE` event payload if connected successfully. If not, you will be disconnected with an error (see below).
 
+#### Unsubscribing from a user presence
+
+If you no longer want to receive `PRESENCE_UPDATE`s for a user you've subscribed to, send `Opcode 4: Unsubscribe` with `unsubscribe_from_id` set to the string user ID you want to stop receiving updates for. Unlike Op 2, this does not send anything back - you'll simply stop receiving that user's presence updates.
+
+Example of `Opcode 4: Unsubscribe`:
+
+```js
+{
+  op: 4,
+  d: {
+    // unsubscribe_from_id should be a single user ID (string) you no longer want to receive updates for
+    unsubscribe_from_id: "94490510688792576"
+  }
+}
+```
+
+To unsubscribe from multiple users at once, send `unsubscribe_from_ids` with a `string[]` list of user IDs to stop receiving updates for. Any IDs you aren't subscribed to (or that aren't monitored) are simply ignored.
+
+Example of `Opcode 4: Unsubscribe` from multiple:
+
+```js
+{
+  op: 4,
+  d: {
+    unsubscribe_from_ids: ["94490510688792576", "156114103033790464"]
+  }
+}
+```
+
+If you subscribed to every presence with `subscribe_to_all`, you can unsubscribe from all of them at once by sending `Opcode 4: Unsubscribe` with `unsubscribe_from_all` set to (bool) `true`. This removes you from the global subscriber list (so you won't receive updates for newly monitored users either) and stops updates for every user you're currently subscribed to.
+
+Example of `Opcode 4: Unsubscribe` from all:
+
+```js
+{
+  op: 4,
+  d: {
+    unsubscribe_from_all: true
+  }
+}
+```
+
 ### List of Opcodes
 
 | Opcode | Name       | Description                                                                                                                 | Client Send/Recv |
 | ------ | ---------- | --------------------------------------------------------------------------------------------------------------------------- | ---------------- |
 | 0      | Event      | This is the default opcode when receiving core events from Lanyard, like `INIT_STATE`                                       | Receive          |
 | 1      | Hello      | Lanyard sends this when clients initially connect, and it includes the heartbeat interval                                   | Receive Only     |
-| 2      | Initialize | This is what the client sends when receiving Opcode 1 from Lanyard - it should contain an array of user IDs to subscribe to | Send only        |
+| 2      | Initialize | Sent by the client after Opcode 1 to subscribe to presences - its data should contain `subscribe_to_ids` (array of IDs), `subscribe_to_id` (single ID), or `subscribe_to_all` (bool) | Send only        |
 | 3      | Heartbeat  | Clients should send Opcode 3 every 30 seconds (or whatever the Hello Opcode says to heartbeat at)                           | Send only        |
+| 4      | Unsubscribe | Sent by the client to unsubscribe from presences - its data should contain `unsubscribe_from_ids` (array of IDs), `unsubscribe_from_id` (single ID), or `unsubscribe_from_all` (bool) | Send only        |
 
 ### Events
 
@@ -365,7 +409,6 @@ Below is a curated selection of websites using Lanyard right now, check them out
 - [igalaxy.dev](https://igalaxy.dev)
 - [anahoward.me](https://www.anahoward.me/)
 - [chezzer.dev](https://chezzer.dev)
-- [makidoll.io](https://makidoll.io/)
 - [dan.onl](https://dan.onl/)
 - [cnrad.dev](https://cnrad.dev)
 - [venqoi.lol](https://venqoi.lol/)
