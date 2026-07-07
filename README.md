@@ -4,7 +4,7 @@
 
 Lanyard is a service that makes it super easy to export your live Discord presence to an API endpoint (`api.lanyard.rest/v1/users/:your_id`) and to a WebSocket (see below) for you to use wherever you want - for example, I use this to display what I'm listening to on Spotify on my personal website. It also acts as a globally-accessible realtime KV store which you can update from the Lanyard Discord bot or from the Lanyard API.
 
-You can use Lanyard's API without deploying anything yourself - but if you want to self host it, you have the option to, though it'll require a tiny bit of configuration.
+You can use Lanyard's API without deploying anything yourself - but if you want to self-host it, you have the option to, though it'll require a tiny bit of configuration.
 
 ## Get started in < 10 seconds
 
@@ -36,7 +36,7 @@ Just [join this Discord server](https://discord.gg/UrXF2cfJ7F) and your presence
 
 ## Community Projects
 
-The Lanyard community has worked on some pretty cool projects that allows you to extend the functionality of Lanyard. PR to add a project!
+The Lanyard community has worked on some pretty cool projects that allow you to extend the functionality of Lanyard. PR to add a project!
 
 [lanyard-web](https://lanyard.eggsy.xyz) - Landing page and API documentation concept for Lanyard API with a sleek UI. \
 [lanyard-profile-readme](https://github.com/cnrad/lanyard-profile-readme) - Utilize Lanyard to display your Discord Presence in your GitHub Profile \
@@ -45,17 +45,17 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [use-lanyard](https://github.com/alii/use-lanyard) - Another React hook for Lanyard that uses SWR \
 [lanyard-visualizer](https://lanyard-visualizer.netlify.app/) - Beautifully display your Discord presence on a website \
 [js-lanyard](https://github.com/xaronnn/js-lanyard/) - Use Lanyard in your Web App. \
-[go-lanyard](https://github.com/barbarbar338/go-lanyard) - Lanyard API wrapper for GoLang - supports REST & WebSocket \
+[go-lanyard](https://github.com/barbarbar338/go-lanyard) - Lanyard API wrapper for Golang - supports REST & WebSocket \
 [use-lanyard](https://github.com/LeonardSSH/use-lanyard) - Lanyard with Composition API for Vue. Supports REST and WebSocket methods \
-[use-listen-along](https://github.com/punctuations/use-listen-along) - Mock the discord 'Listen Along' feature within a react hook powered by the Lanyard API. \
+[use-listen-along](https://github.com/punctuations/use-listen-along) - Mock the Discord 'Listen Along' feature within a React hook powered by the Lanyard API. \
 [lanyard-graphql](https://github.com/CesiumLabs/lanyard-graphql) - A GraphQL port of the Lanyard API. \
 [sk-lanyard](https://github.com/nebulatgs/sk-lanyard) - SvelteKit integration with Lanyard, supports REST & WebSocket. \
 [svelte-lanyard](https://github.com/iGalaxyYT/svelte-lanyard) - A Lanyard API wrapper for Svelte. Supports REST & WebSocket. \
 [denyard](https://github.com/xHyroM/denyard) - Lanyard API wrapper for Deno - Supports REST & WebSocket. \
-[lanyard-ui](https://lanyard.sakurajima.cloud/) - Lanyard visualizer focused on the KV aspect \
-[discord-status-actions](https://github.com/CompeyDev/discord-status-action) - Updates a file to include your discord status using the Lanyard API. \
-[discordstatus-website](https://github.com/lucaledd/discordstatus-website) - Display your Discord status on your own website with premade CSS, and JS \
-[osu-nowplaying](https://github.com/Hexality/osu-nowplaying) - A small tool to scrape the info of the map you're curently playing on osu!lazer and dump into a file for obs to read. \
+[lanyard-ui](https://lanyard.sakurajima.cloud/) - Lanyard visualizer focused on the KV aspect. \
+[discord-status-actions](https://github.com/CompeyDev/discord-status-action) - Updates a file to include your Discord status using the Lanyard API. \
+[discordstatus-website](https://github.com/lucaledd/discordstatus-website) - Display your Discord status on your own website with premade CSS and JS \
+[osu-nowplaying](https://github.com/Hexality/osu-nowplaying) - A small tool to scrape the info of the map you're currently playing on osu!lazer and dump into a file for OBS to read. \
 [landart](https://pub.dev/packages/landart) - A featureful API wrapper for Lanyard & Lanyard KV written in Dart. \
 [lanyard.py](https://github.com/nerma-now/lanyard.py) - Modern and fully asynchronous wrapper for Lanyard API written in Python 3.12+. \
 [lanyard-mcp-server](https://github.com/NNTin/lanyard-mcp-server) - Exposing Lanyard API in MCP - with Docker support
