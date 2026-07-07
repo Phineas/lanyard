@@ -317,7 +317,7 @@ Events are received on `Opcode 0: Event` - the event type will be part of the ro
   seq: 2,
   t: "PRESENCE_UPDATE",
   d: {
-    // Full Lanyard presence and an extra "user_id" field
+    // Full Lanyard presence
   }
 }
 ```
