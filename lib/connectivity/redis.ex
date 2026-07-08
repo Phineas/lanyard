@@ -13,8 +13,15 @@ defmodule Lanyard.Connectivity.Redis do
         do: Application.get_env(:lanyard, :redis_uri),
         else: "redis://#{System.get_env("REDIS_HOST")}:6379"
 
-    {:ok, client} = Redix.start_link(uri)
-    {:ok, conn} = Redix.PubSub.start_link(uri)
+    # Redix connects over IPv4 by default and won't detect IPv6 from a hostname
+    # URI, so force the socket family when REDIS_IPV6 is enabled.
+    opts =
+      if Application.get_env(:lanyard, :redis_inet6),
+        do: [socket_opts: [:inet6]],
+        else: []
+
+    {:ok, client} = Redix.start_link(uri, opts)
+    {:ok, conn} = Redix.PubSub.start_link(uri, opts)
 
     Redix.PubSub.subscribe(conn, "lanyard:global_sync", self())
 
