@@ -31,12 +31,10 @@ defmodule Lanyard.Api.Routes.V1.Users do
   end
 
   patch "/:id/kv" do
-    %Plug.Conn{params: %{"id" => user_id}} = conn
-
     {:ok, body, conn} = Plug.Conn.read_body(conn)
 
     case validate_resource_access(conn) do
-      :ok ->
+      {:ok, user_id} ->
         try do
           {:ok, parsed} = Jason.decode(body)
 
@@ -62,12 +60,12 @@ defmodule Lanyard.Api.Routes.V1.Users do
   end
 
   put "/:id/kv/:field" do
-    %Plug.Conn{params: %{"id" => user_id, "field" => field}} = conn
+    %Plug.Conn{params: %{"field" => field}} = conn
 
     {:ok, put_body, conn} = Plug.Conn.read_body(conn)
 
     case validate_resource_access(conn) do
-      :ok ->
+      {:ok, user_id} ->
         case Lanyard.KV.Interface.set(String.to_integer(user_id), field, put_body) do
           {:ok, _v} ->
             Util.respond(conn, {:ok})
@@ -82,10 +80,10 @@ defmodule Lanyard.Api.Routes.V1.Users do
   end
 
   delete "/:id/kv/:field" do
-    %Plug.Conn{params: %{"id" => user_id, "field" => field}} = conn
+    %Plug.Conn{params: %{"field" => field}} = conn
 
     case validate_resource_access(conn) do
-      :ok ->
+      {:ok, user_id} ->
         Lanyard.KV.Interface.del(String.to_integer(user_id), field)
         Util.respond(conn, {:ok})
 
@@ -99,15 +97,15 @@ defmodule Lanyard.Api.Routes.V1.Users do
   end
 
   defp validate_resource_access(conn) do
-    %Plug.Conn{params: %{"id" => user_id}} = conn
+    %Plug.Conn{params: %{"id" => id}} = conn
     key = Util.authorization_header(conn)
 
     if key == nil do
       :no_permission
     else
       case Redis.get("api_key:#{key}") do
-        ^user_id ->
-          :ok
+        resolved_id when is_binary(resolved_id) and (id == "@me" or id == resolved_id) ->
+          {:ok, resolved_id}
 
         _ ->
           :no_permission
