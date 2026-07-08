@@ -71,7 +71,11 @@ defmodule Lanyard.Presence do
 
   def handle_info({:DOWN, _ref, :process, object, _reason}, state) do
     {:noreply,
-     %{state | subscriber_pids: state.subscriber_pids |> Enum.reject(fn sub -> sub == object end)}}
+     %{
+       state
+       | subscriber_pids: state.subscriber_pids |> Enum.reject(fn sub -> sub == object end),
+         refmap: Map.delete(state.refmap, object)
+     }}
   end
 
   def handle_info({:add_subscriber, pid}, state) do
