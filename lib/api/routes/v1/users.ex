@@ -11,12 +11,16 @@ defmodule Lanyard.Api.Routes.V1.Users do
   get "/@me" do
     key = Util.authorization_header(conn)
 
-    case Redis.get("api_key:#{key}") do
-      user_id when is_binary(user_id) ->
-        Util.respond(conn, Presence.get_pretty_presence(user_id))
+    if key == nil do
+      Util.no_permission(conn)
+    else
+      case Redis.get("api_key:#{key}") do
+        user_id when is_binary(user_id) ->
+          Util.respond(conn, Presence.get_pretty_presence(user_id))
 
-      _ ->
-        Util.no_permission(conn)
+        _ ->
+          Util.no_permission(conn)
+      end
     end
   end
 
@@ -98,12 +102,16 @@ defmodule Lanyard.Api.Routes.V1.Users do
     %Plug.Conn{params: %{"id" => user_id}} = conn
     key = Util.authorization_header(conn)
 
-    case Redis.get("api_key:#{key}") do
-      ^user_id ->
-        :ok
+    if key == nil do
+      :no_permission
+    else
+      case Redis.get("api_key:#{key}") do
+        ^user_id ->
+          :ok
 
-      _ ->
-        :no_permission
+        _ ->
+          :no_permission
+      end
     end
   end
 end
