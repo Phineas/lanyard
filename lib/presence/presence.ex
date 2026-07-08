@@ -49,6 +49,11 @@ defmodule Lanyard.Presence do
 
     subscriber_pids = Lanyard.SocketHandler.get_global_subscriber_list()
 
+    refmap =
+      Enum.reduce(subscriber_pids, %{}, fn pid, acc ->
+        Map.put(acc, pid, Process.monitor(pid))
+      end)
+
     Manifold.send(
       subscriber_pids,
       {:remote_send, %{op: 0, t: "PRESENCE_UPDATE", d: pretty_presence}}
@@ -61,7 +66,7 @@ defmodule Lanyard.Presence do
        discord_user: state.discord_user,
        kv: kv,
        subscriber_pids: subscriber_pids,
-       refmap: %{}
+       refmap: refmap
      }}
   end
 
@@ -70,8 +75,7 @@ defmodule Lanyard.Presence do
   end
 
   def handle_info({:DOWN, _ref, :process, object, _reason}, state) do
-    {:noreply,
-     %{state | subscriber_pids: state.subscriber_pids |> Enum.reject(fn sub -> sub == object end)}}
+    {:noreply, drop_subscriber(state, object)}
   end
 
   def handle_info({:add_subscriber, pid}, state) do
@@ -92,18 +96,21 @@ defmodule Lanyard.Presence do
   end
 
   def handle_info({:remove_subscriber, pid}, state) do
+    {:noreply, drop_subscriber(state, pid)}
+  end
+
+  defp drop_subscriber(state, pid) do
     ref = Map.get(state.refmap, pid)
 
     unless ref == nil do
       Process.demonitor(ref)
     end
 
-    {:noreply,
-     %{
-       state
-       | refmap: Map.delete(state.refmap, pid),
-         subscriber_pids: List.delete(state.subscriber_pids, pid)
-     }}
+    %{
+      state
+      | refmap: Map.delete(state.refmap, pid),
+        subscriber_pids: List.delete(state.subscriber_pids, pid)
+    }
   end
 
   def handle_cast({:sync, new_state}, state) do
