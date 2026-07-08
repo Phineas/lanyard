@@ -1,4 +1,4 @@
-defmodule Lanyard.Api.Util do
+ defmodule Lanyard.Api.Util do
   import Plug.Conn
 
   @spec redirect(Plug.Conn.t(), binary) :: Plug.Conn.t()
@@ -10,9 +10,11 @@ defmodule Lanyard.Api.Util do
 
   @spec authorization_header(Plug.Conn.t()) :: binary | nil
   def authorization_header(conn) do
-    conn
-    |> get_req_header("authorization")
-    |> List.first()
+    case conn |> get_req_header("authorization") |> List.first() do
+      nil -> nil
+      "" -> nil
+      key -> key
+    end
   end
 
   @spec respond(Plug.Conn.t(), {:ok}) :: Plug.Conn.t()
