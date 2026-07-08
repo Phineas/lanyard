@@ -78,10 +78,14 @@ defmodule Lanyard.SocketHandler do
                         [id | acc]
                       end)
 
-                    :ets.insert(
-                      :global_subscribers,
-                      {"subscribers", [self() | get_global_subscriber_list()]}
-                    )
+                    global_subscribers = get_global_subscriber_list()
+
+                    unless self() in global_subscribers do
+                      :ets.insert(
+                        :global_subscribers,
+                        {"subscribers", [self() | global_subscribers]}
+                      )
+                    end
 
                     Process.flag(:trap_exit, true)
 

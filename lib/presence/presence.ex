@@ -75,14 +75,20 @@ defmodule Lanyard.Presence do
   end
 
   def handle_info({:add_subscriber, pid}, state) do
-    ref = Process.monitor(pid)
+    if Map.has_key?(state.refmap, pid) do
+      # Already subscribed - avoid a duplicate entry (and duplicate updates)
+      # and a leaked monitor if the client re-inits with the same id.
+      {:noreply, state}
+    else
+      ref = Process.monitor(pid)
 
-    {:noreply,
-     %{
-       state
-       | subscriber_pids: [pid | state.subscriber_pids],
-         refmap: Map.put(state.refmap, pid, ref)
-     }}
+      {:noreply,
+       %{
+         state
+         | subscriber_pids: [pid | state.subscriber_pids],
+           refmap: Map.put(state.refmap, pid, ref)
+       }}
+    end
   end
 
   def handle_info({:remove_subscriber, pid}, state) do
