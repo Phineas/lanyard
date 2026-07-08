@@ -8,4 +8,5 @@ config :lanyard,
   bot_presence_type: String.to_integer(System.get_env("BOT_PRESENCE_TYPE") || "3"),
   bot_token: System.get_env("BOT_TOKEN"),
   redis_uri:
-    System.get_env("REDIS_DSN") || System.get_env("REDIS_URI") || System.get_env("REDIS_URL")
+    System.get_env("REDIS_DSN") || System.get_env("REDIS_URI") || System.get_env("REDIS_URL"),
+  redis_inet6: System.get_env("REDIS_IPV6") == "true"

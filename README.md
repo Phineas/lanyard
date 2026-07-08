@@ -317,7 +317,7 @@ Events are received on `Opcode 0: Event` - the event type will be part of the ro
   seq: 2,
   t: "PRESENCE_UPDATE",
   d: {
-    // Full Lanyard presence and an extra "user_id" field
+    // Full Lanyard presence
   }
 }
 ```
@@ -411,7 +411,6 @@ Below is a curated selection of websites using Lanyard right now, check them out
 - [chezzer.dev](https://chezzer.dev)
 - [dan.onl](https://dan.onl/)
 - [cnrad.dev](https://cnrad.dev)
-- [venqoi.lol](https://venqoi.lol/)
 - [phineas.io](https://phineas.io)
 - [timcole.me](https://timcole.me)
 - [itspolar.dev](https://itspolar.dev)
