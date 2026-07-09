@@ -382,6 +382,8 @@ defmodule Lanyard.Gateway.Client do
   end
 
   defp cleanup_transient_processes(state) when is_map(state) do
+    # Reconnect/close paths can exit normally, which won't take linked helpers
+    # down with the gateway process.
     stop_process(state[:heartbeat_pid])
     stop_process(state[:agent_seq_num])
 

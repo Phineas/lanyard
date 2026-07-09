@@ -21,6 +21,8 @@ defmodule Lanyard.Gateway.Heartbeat do
       agent_seq_num: agent_seq_num,
       interval: interval,
       socket_pid: socket_pid,
+      # Normal gateway exits do not stop linked processes, so tie heartbeat
+      # shutdown to the owning socket process explicitly.
       socket_ref: Process.monitor(socket_pid),
       timer: nil,
       ack?: true

@@ -14,6 +14,8 @@ defmodule Lanyard.DiscordBot do
   end
 
   def init(state) do
+    # The gateway is both linked and monitored; trap exits so the :DOWN restart
+    # path below can run instead of losing the bot process first.
     Process.flag(:trap_exit, true)
 
     {:ok, %__MODULE__{token: state.token, gateway_client_pid: nil}, {:continue, :setup_bot}}
