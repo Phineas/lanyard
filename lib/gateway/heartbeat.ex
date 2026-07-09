@@ -21,6 +21,7 @@ defmodule Lanyard.Gateway.Heartbeat do
       agent_seq_num: agent_seq_num,
       interval: interval,
       socket_pid: socket_pid,
+      socket_ref: Process.monitor(socket_pid),
       timer: nil,
       ack?: true
     }
@@ -40,6 +41,13 @@ defmodule Lanyard.Gateway.Heartbeat do
   def handle_info(:beat, %{socket_pid: socket_pid, ack?: false} = state) do
     send(socket_pid, :heartbeat_stale)
     {:noreply, %{state | timer: nil}}
+  end
+
+  def handle_info(
+        {:DOWN, ref, :process, pid, _reason},
+        %{socket_pid: pid, socket_ref: ref} = state
+      ) do
+    {:stop, :normal, state}
   end
 
   def handle_call(:ack, _from, state) do

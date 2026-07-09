@@ -14,6 +14,8 @@ defmodule Lanyard.DiscordBot do
   end
 
   def init(state) do
+    Process.flag(:trap_exit, true)
+
     {:ok, %__MODULE__{token: state.token, gateway_client_pid: nil}, {:continue, :setup_bot}}
   end
 
@@ -42,9 +44,21 @@ defmodule Lanyard.DiscordBot do
     {:noreply, %{state | resume_data: nil}}
   end
 
-  def handle_info({:DOWN, _ref, :process, _pid, reason}, state) do
-    Logger.warning("Discord bot crashed with reason: #{reason}. Restarting.")
+  def handle_info({:EXIT, pid, _reason}, %{gateway_client_pid: pid} = state) do
+    {:noreply, state}
+  end
+
+  def handle_info({:EXIT, _pid, _reason}, state) do
+    {:noreply, state}
+  end
+
+  def handle_info({:DOWN, _ref, :process, pid, reason}, %{gateway_client_pid: pid} = state) do
+    Logger.warning("Discord bot crashed with reason: #{inspect(reason)}. Restarting.")
 
     {:noreply, state, {:continue, :setup_bot}}
+  end
+
+  def handle_info({:DOWN, _ref, :process, _pid, _reason}, state) do
+    {:noreply, state}
   end
 end

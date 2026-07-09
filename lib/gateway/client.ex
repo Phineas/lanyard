@@ -94,7 +94,7 @@ defmodule Lanyard.Gateway.Client do
       )
     end
 
-    {:close, reason, state}
+    close_gateway(reason, state)
   end
 
   def websocket_handle({:text, payload}, _socket, state) do
@@ -121,6 +121,8 @@ defmodule Lanyard.Gateway.Client do
     # Discord sends hello op immediately after connection
     # Start sending heartbeat with interval defined by the hello packet
     Logger.debug("Discord: Hello")
+
+    stop_process(state[:heartbeat_pid])
 
     {:ok, heartbeat_pid} =
       Heartbeat.start_link(
@@ -169,13 +171,13 @@ defmodule Lanyard.Gateway.Client do
        }}
     )
 
-    {:close, "Reconnecting for resume", state}
+    close_gateway("Reconnecting for resume", state)
   end
 
   defp _handle_data(%{op: :invalid_session} = _data, state) do
     Logger.warning("Discord: Invalid session, starting new session")
     send(:discord_bot, :clear_resume)
-    {:close, "Invalid session, starting new session", state}
+    close_gateway("Invalid session, starting new session", state)
   end
 
   def websocket_info(:start, _connection, state) do
@@ -220,12 +222,16 @@ defmodule Lanyard.Gateway.Client do
        }}
     )
 
-    {:close, "Heartbeat stale", state}
+    close_gateway("Heartbeat stale", state)
   end
 
   @spec websocket_terminate(any(), any(), nil | keyword() | map()) :: :ok
   def websocket_terminate(reason, _conn_state, state) do
-    Logger.info("Discord: Websocket closed in state #{inspect(state)} with reason #{inspect(reason)}")
+    Logger.info(
+      "Discord: Websocket closed in state #{inspect(state)} with reason #{inspect(reason)}"
+    )
+
+    cleanup_transient_processes(state)
 
     :ok
   end
@@ -370,6 +376,33 @@ defmodule Lanyard.Gateway.Client do
       agent_update(state[:agent_seq_num], data.seq_num)
     end
   end
+
+  defp close_gateway(reason, state) do
+    {:close, reason, cleanup_transient_processes(state)}
+  end
+
+  defp cleanup_transient_processes(state) when is_map(state) do
+    stop_process(state[:heartbeat_pid])
+    stop_process(state[:agent_seq_num])
+
+    state
+    |> Map.put(:heartbeat_pid, nil)
+    |> Map.put(:agent_seq_num, nil)
+  end
+
+  defp cleanup_transient_processes(state), do: state
+
+  defp stop_process(pid) when is_pid(pid) do
+    if Process.alive?(pid) do
+      try do
+        GenServer.stop(pid, :normal, 1_000)
+      catch
+        :exit, _ -> :ok
+      end
+    end
+  end
+
+  defp stop_process(_pid), do: :ok
 
   defp create_member_presences(payload) do
     Task.start(fn ->
