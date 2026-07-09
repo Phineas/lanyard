@@ -15,7 +15,8 @@ defmodule Lanyard.Presence.PrettyPresence do
             listening_to_spotify: false,
             spotify: nil,
             activities: [],
-            kv: %{}
+            kv: %{},
+            guild_tag: nil
 end
 
 defmodule Lanyard.Presence do
@@ -212,6 +213,8 @@ defmodule Lanyard.Presence do
 
     has_presence? = raw_data.discord_presence !== nil
 
+    guild_tag = extract_guild_tag(raw_data.discord_user)
+
     pretty_fields =
       if has_presence? do
         %Lanyard.Presence.PrettyPresence{
@@ -228,18 +231,34 @@ defmodule Lanyard.Presence do
           listening_to_spotify: spotify_activity !== nil,
           spotify: Spotify.build_pretty_spotify(spotify_activity),
           activities: Activity.build_pretty_activities(raw_data.discord_presence["activities"]),
-          kv: raw_data.kv
+          kv: raw_data.kv,
+          guild_tag: guild_tag
         }
       else
         %Lanyard.Presence.PrettyPresence{
           discord_user: raw_data.discord_user,
-          kv: raw_data.kv
+          kv: raw_data.kv,
+          guild_tag: guild_tag
         }
       end
 
     :ets.insert(:cached_presences, {"#{raw_data.discord_user["id"]}", pretty_fields})
 
     {:ok, pretty_fields}
+  end
+
+  defp extract_guild_tag(discord_user) do
+    clan_data = discord_user["primary_guild"] || discord_user["clan"]
+
+    if clan_data && clan_data["tag"] && clan_data["identity_enabled"] do
+      %{
+        "tag" => clan_data["tag"],
+        "badge" => clan_data["badge"],
+        "guild_id" => clan_data["identity_guild_id"]
+      }
+    else
+      nil
+    end
   end
 
   def subscribe_to_ids_and_build(ids) do

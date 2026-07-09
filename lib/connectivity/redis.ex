@@ -79,6 +79,12 @@ defmodule Lanyard.Connectivity.Redis do
     {:noreply, state}
   end
 
+  def handle_cast({:setex, key, ttl, value}, state) do
+    Redix.command(state.client, ["SETEX", key, ttl, value])
+
+    {:noreply, state}
+  end
+
   def handle_cast({:del, key}, state) do
     Redix.command(state.client, ["DEL", key])
 
@@ -111,6 +117,10 @@ defmodule Lanyard.Connectivity.Redis do
 
   def set(key, value) do
     GenServer.cast(:local_redis_client, {:set, key, value})
+  end
+
+  def setex(key, ttl, value) do
+    GenServer.cast(:local_redis_client, {:setex, key, ttl, value})
   end
 
   def del(key) do
