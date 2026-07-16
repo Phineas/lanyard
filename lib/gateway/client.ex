@@ -80,6 +80,9 @@ defmodule Lanyard.Gateway.Client do
       "Discord: Websocket disconnected with reason #{inspect(reason)}, will attempt resume"
     )
 
+    Lanyard.Metrics.Collector.set(:gauge, :lanyard_gateway_connected, 0)
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_gateway_reconnects_total, ["disconnect"])
+
     if state[:session_id] && state[:resume_gateway_url] do
       seq_num = agent_value(state[:agent_seq_num])
 
@@ -151,11 +154,15 @@ defmodule Lanyard.Gateway.Client do
 
     event = normalize_atom(event_name)
 
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_gateway_events_total, [to_string(event)])
+
     handle_event({event, data}, state)
   end
 
   defp _handle_data(%{op: :reconnect} = _data, state) do
     Logger.warning("Discord enforced Reconnect, will resume session")
+
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_gateway_reconnects_total, ["reconnect"])
 
     seq_num = agent_value(state[:agent_seq_num])
 
@@ -174,6 +181,7 @@ defmodule Lanyard.Gateway.Client do
 
   defp _handle_data(%{op: :invalid_session} = _data, state) do
     Logger.warning("Discord: Invalid session, starting new session")
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_gateway_reconnects_total, ["invalid_session"])
     send(:discord_bot, :clear_resume)
     {:close, "Invalid session, starting new session", state}
   end
@@ -208,6 +216,8 @@ defmodule Lanyard.Gateway.Client do
   def websocket_info(:heartbeat_stale, _connection, state) do
     Logger.warning("Discord: Heartbeat stale, will resume session")
 
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_gateway_reconnects_total, ["heartbeat_stale"])
+
     seq_num = agent_value(state[:agent_seq_num])
 
     send(
@@ -227,6 +237,8 @@ defmodule Lanyard.Gateway.Client do
   def websocket_terminate(reason, _conn_state, state) do
     Logger.info("Discord: Websocket closed in state #{inspect(state)} with reason #{inspect(reason)}")
 
+    Lanyard.Metrics.Collector.set(:gauge, :lanyard_gateway_connected, 0)
+
     :ok
   end
 
@@ -235,6 +247,8 @@ defmodule Lanyard.Gateway.Client do
       state
       |> Map.put(:session_id, payload.data["session_id"])
       |> Map.put(:resume_gateway_url, payload.data["resume_gateway_url"])
+
+    Lanyard.Metrics.Collector.set(:gauge, :lanyard_gateway_connected, 1)
 
     Logger.info("Discord: Ready")
 

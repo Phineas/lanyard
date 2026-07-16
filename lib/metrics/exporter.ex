@@ -17,6 +17,8 @@ defmodule Lanyard.Metrics.Exporter do
           GenRegistry.count(Lanyard.Presence)
         )
 
+        Lanyard.Metrics.Collector.refresh_runtime_gauges()
+
         {content_type, scrape} = scrape_data(conn)
 
         conn
@@ -30,7 +32,11 @@ defmodule Lanyard.Metrics.Exporter do
   end
 
   def scrape_data(conn) do
-    [accept] = Plug.Conn.get_req_header(conn, "accept")
+    accept =
+      case Plug.Conn.get_req_header(conn, "accept") do
+        [value | _] -> value
+        _ -> :prometheus_text_format.content_type()
+      end
 
     format =
       :accept_header.negotiate(
@@ -41,6 +47,6 @@ defmodule Lanyard.Metrics.Exporter do
         ]
       )
 
-    {format.content_type, format.format(unquote(registry))}
+    {format.content_type(), format.format(unquote(registry))}
   end
 end

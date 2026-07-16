@@ -56,55 +56,55 @@ defmodule Lanyard.Connectivity.Redis do
   end
 
   def handle_call({:hgetall, key}, _from, state) do
-    value = Redix.command(state[:client], ["HGETALL", key])
+    value = command(state[:client], ["HGETALL", key])
 
     {:reply, value, state}
   end
 
   def handle_call({:hget, key, field}, _from, state) do
-    value = Redix.command(state[:client], ["HGET", key, field])
+    value = command(state[:client], ["HGET", key, field])
 
     {:reply, value, state}
   end
 
   def handle_call({:get, key}, _from, state) do
-    value = Redix.command(state[:client], ["GET", key])
+    value = command(state[:client], ["GET", key])
 
     {:reply, value, state}
   end
 
   def handle_cast({:set, key, value}, state) do
-    Redix.command(state.client, ["SET", key, value])
+    command(state.client, ["SET", key, value])
 
     {:noreply, state}
   end
 
   def handle_cast({:del, key}, state) do
-    Redix.command(state.client, ["DEL", key])
+    command(state.client, ["DEL", key])
 
     {:noreply, state}
   end
 
   def handle_cast({:hset, key, valuepairs}, state) do
-    Redix.command(state.client, Enum.concat(["HSET", key], valuepairs))
+    command(state.client, Enum.concat(["HSET", key], valuepairs))
 
     {:noreply, state}
   end
 
   def handle_cast({:hincrby, key, field, amount}, state) do
-    Redix.command(state.client, ["HINCRBY", key, field, amount])
+    command(state.client, ["HINCRBY", key, field, amount])
 
     {:noreply, state}
   end
 
   def handle_cast({:hdel, key, field}, state) do
-    Redix.command(state.client, ["HDEL", key, field])
+    command(state.client, ["HDEL", key, field])
 
     {:noreply, state}
   end
 
   def handle_cast({:publish, channel, message}, state) do
-    Redix.command(state.client, ["PUBLISH", channel, message])
+    command(state.client, ["PUBLISH", channel, message])
 
     {:noreply, state}
   end
@@ -155,6 +155,24 @@ defmodule Lanyard.Connectivity.Redis do
 
   def publish(channel, message) do
     GenServer.cast(:local_redis_client, {:publish, channel, message})
+  end
+
+  defp command(client, [cmd | _] = args) do
+    result = Redix.command(client, args)
+
+    status =
+      case result do
+        {:ok, _} -> "ok"
+        _ -> "error"
+      end
+
+    Lanyard.Metrics.Collector.inc(
+      :counter,
+      :lanyard_redis_commands_total,
+      [String.downcase(cmd), status]
+    )
+
+    result
   end
 
   defp normalize_kv(l) do

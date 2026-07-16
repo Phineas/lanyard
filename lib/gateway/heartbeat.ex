@@ -33,11 +33,13 @@ defmodule Lanyard.Gateway.Heartbeat do
     value = agent_value(state[:agent_seq_num])
     payload = payload_build_json(opcode(opcodes(), :heartbeat), value)
     :websocket_client.cast(socket_pid, {:binary, payload})
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_heartbeats_sent_total)
     timer = Process.send_after(self(), :beat, interval)
     {:noreply, %{state | ack?: false, timer: timer}}
   end
 
   def handle_info(:beat, %{socket_pid: socket_pid, ack?: false} = state) do
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_heartbeat_stale_total)
     send(socket_pid, :heartbeat_stale)
     {:noreply, %{state | timer: nil}}
   end

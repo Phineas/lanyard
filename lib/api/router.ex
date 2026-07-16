@@ -25,17 +25,26 @@ defmodule Lanyard.Api.Router do
   def metrics_handle(conn, _opts) do
     stat =
       cond do
+        is_nil(conn.status) ->
+          nil
+
         conn.status >= 200 && conn.status < 300 ->
           :lanyard_2xx_responses
+
+        conn.status >= 300 && conn.status < 400 ->
+          :lanyard_3xx_responses
 
         conn.status >= 400 && conn.status < 500 ->
           :lanyard_4xx_responses
 
         conn.status >= 500 ->
           :lanyard_5xx_responses
+
+        true ->
+          nil
       end
 
-    Lanyard.Metrics.Collector.inc(:counter, stat)
+    if stat, do: Lanyard.Metrics.Collector.inc(:counter, stat)
 
     conn
   end
