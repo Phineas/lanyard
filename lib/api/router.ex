@@ -52,11 +52,22 @@ defmodule Lanyard.Api.Router do
   end
 
   get "/socket" do
-    conn = %Plug.Conn{query_params: params} = fetch_query_params(conn)
+    %Plug.Conn{query_params: params} = fetch_query_params(conn)
 
-    conn
-    |> WebSockAdapter.upgrade(Lanyard.SocketHandler, params, timeout: 60_000)
-    |> halt()
+    try do
+      conn
+      |> WebSockAdapter.upgrade(Lanyard.SocketHandler, params, timeout: 60_000)
+      |> halt()
+    rescue
+      WebSockAdapter.UpgradeError ->
+        conn
+        |> Util.respond({:error, 400, :upgrade_failed, "Request failed to upgrade"})
+        |> halt()
+
+      # i would image this is effectively useless as only the Upgrade could throw
+      other ->
+        reraise other, __STACKTRACE__
+    end
   end
 
   forward("/v1", to: V1)

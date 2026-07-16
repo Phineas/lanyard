@@ -11,6 +11,12 @@ defmodule Lanyard.Metrics.Exporter do
   def call(conn, _opts) do
     case conn.request_path do
       unquote(path) ->
+        Lanyard.Metrics.Collector.set(
+          :gauge,
+          :lanyard_monitored_users,
+          GenRegistry.count(Lanyard.Presence)
+        )
+
         {content_type, scrape} = scrape_data(conn)
 
         conn

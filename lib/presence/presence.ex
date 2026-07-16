@@ -24,6 +24,7 @@ defmodule Lanyard.Presence do
   alias Lanyard.Connectivity.Redis
   alias Lanyard.Presence.Spotify
   alias Lanyard.Presence.Activity
+  require Logger
 
   @derive Jason.Encoder
   defstruct user_id: nil,
@@ -48,6 +49,11 @@ defmodule Lanyard.Presence do
 
     subscriber_pids = Lanyard.SocketHandler.get_global_subscriber_list()
 
+    refmap =
+      Enum.reduce(subscriber_pids, %{}, fn pid, acc ->
+        Map.put(acc, pid, Process.monitor(pid))
+      end)
+
     Manifold.send(
       subscriber_pids,
       {:remote_send, %{op: 0, t: "PRESENCE_UPDATE", d: pretty_presence}}
@@ -60,7 +66,7 @@ defmodule Lanyard.Presence do
        discord_user: state.discord_user,
        kv: kv,
        subscriber_pids: subscriber_pids,
-       refmap: %{}
+       refmap: refmap
      }}
   end
 
@@ -69,34 +75,42 @@ defmodule Lanyard.Presence do
   end
 
   def handle_info({:DOWN, _ref, :process, object, _reason}, state) do
-    {:noreply,
-     %{state | subscriber_pids: state.subscriber_pids |> Enum.reject(fn sub -> sub == object end)}}
+    {:noreply, drop_subscriber(state, object)}
   end
 
   def handle_info({:add_subscriber, pid}, state) do
-    ref = Process.monitor(pid)
+    if Map.has_key?(state.refmap, pid) do
+      # Already subscribed - avoid a duplicate entry (and duplicate updates)
+      # and a leaked monitor if the client re-inits with the same id.
+      {:noreply, state}
+    else
+      ref = Process.monitor(pid)
 
-    {:noreply,
-     %{
-       state
-       | subscriber_pids: [pid | state.subscriber_pids],
-         refmap: Map.put(state.refmap, pid, ref)
-     }}
+      {:noreply,
+       %{
+         state
+         | subscriber_pids: [pid | state.subscriber_pids],
+           refmap: Map.put(state.refmap, pid, ref)
+       }}
+    end
   end
 
   def handle_info({:remove_subscriber, pid}, state) do
+    {:noreply, drop_subscriber(state, pid)}
+  end
+
+  defp drop_subscriber(state, pid) do
     ref = Map.get(state.refmap, pid)
 
     unless ref == nil do
       Process.demonitor(ref)
     end
 
-    {:noreply,
-     %{
-       state
-       | refmap: Map.delete(state.refmap, pid),
-         subscriber_pids: List.delete(state.subscriber_pids, pid)
-     }}
+    %{
+      state
+      | refmap: Map.delete(state.refmap, pid),
+        subscriber_pids: List.delete(state.subscriber_pids, pid)
+    }
   end
 
   def handle_cast({:sync, new_state}, state) do
@@ -131,7 +145,7 @@ defmodule Lanyard.Presence do
       {:remote_send, %{op: 0, t: "PRESENCE_UPDATE", d: pretty_presence}}
     )
 
-    {:noreply, Map.merge(state, new_state)}
+    {:noreply, Map.merge(state, normalized_new_state)}
   end
 
   @spec get_public_fields(map()) :: %Lanyard.Presence.PublicFields{}
@@ -251,7 +265,7 @@ defmodule Lanyard.Presence do
     with {:ok, pid} <-
            GenRegistry.lookup(__MODULE__, user_id) do
       GenServer.cast(pid, {:sync, payload})
-      IO.inspect("Syncing presence for user #{user_id}")
+      Logger.debug("Syncing presence for user #{user_id}")
 
       unless from_global_sync do
         Task.start(fn ->

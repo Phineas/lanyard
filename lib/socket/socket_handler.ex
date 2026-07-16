@@ -78,10 +78,14 @@ defmodule Lanyard.SocketHandler do
                         [id | acc]
                       end)
 
-                    :ets.insert(
-                      :global_subscribers,
-                      {"subscribers", [self() | get_global_subscriber_list()]}
-                    )
+                    global_subscribers = get_global_subscriber_list()
+
+                    unless self() in global_subscribers do
+                      :ets.insert(
+                        :global_subscribers,
+                        {"subscribers", [self() | global_subscribers]}
+                      )
+                    end
 
                     Process.flag(:trap_exit, true)
 
@@ -107,12 +111,46 @@ defmodule Lanyard.SocketHandler do
           # Unsubscribe
           4 ->
             case json["d"] do
-              %{"unsubscribe_from_id" => id} ->
-                {:ok, pid} = GenRegistry.lookup(Lanyard.Presence, id)
+              %{"unsubscribe_from_ids" => ids} when is_list(ids) ->
+                Enum.each(ids, fn id ->
+                  case GenRegistry.lookup(Lanyard.Presence, id) do
+                    {:ok, pid} ->
+                      if Process.alive?(pid) do
+                        send(pid, {:remove_subscriber, self()})
+                      end
 
-                unless not Process.alive?(pid) do
-                  send(pid, {:remove_subscriber, pid})
+                    _ ->
+                      nil
+                  end
+                end)
+
+              %{"unsubscribe_from_id" => id} ->
+                case GenRegistry.lookup(Lanyard.Presence, id) do
+                  {:ok, pid} ->
+                    if Process.alive?(pid) do
+                      send(pid, {:remove_subscriber, self()})
+                    end
+
+                  _ ->
+                    nil
                 end
+
+              %{"unsubscribe_from_all" => true} ->
+                :ets.insert(
+                  :global_subscribers,
+                  {"subscribers", List.delete(get_global_subscriber_list(), self())}
+                )
+
+                GenRegistry.reduce(Lanyard.Presence, nil, fn {_id, pid}, _acc ->
+                  if Process.alive?(pid) do
+                    send(pid, {:remove_subscriber, self()})
+                  end
+
+                  nil
+                end)
+
+              _ ->
+                nil
             end
 
             {:ok, state}

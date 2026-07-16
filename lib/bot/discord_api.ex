@@ -20,6 +20,21 @@ defmodule Lanyard.DiscordBot.DiscordApi do
     |> Finch.request(Lanyard.Finch)
   end
 
+  def send_message(channel_id, %{} = embed) do
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_discord_messages_sent)
+
+    :post
+    |> Finch.build(
+      "#{@api_host}/channels/#{channel_id}/messages",
+      [
+        {"Authorization", "Bot " <> Application.get_env(:lanyard, :bot_token)},
+        {"Content-Type", "application/json"}
+      ],
+      Jason.encode!(%{embeds: [embed]})
+    )
+    |> Finch.request(Lanyard.Finch)
+  end
+
   def create_dm(recipient) do
     {:ok, response} =
       :post
