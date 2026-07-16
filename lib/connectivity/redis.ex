@@ -43,13 +43,16 @@ defmodule Lanyard.Connectivity.Redis do
     case Jason.decode!(payload) do
       %{"node_id" => ^node_id} ->
         # Ignore messages from the same node
+        Lanyard.Metrics.Collector.inc(:counter, :lanyard_global_sync_messages_total, ["ignored"])
         {:noreply, state}
 
       %{"user_id" => uid, "diff" => diff} ->
+        Lanyard.Metrics.Collector.inc(:counter, :lanyard_global_sync_messages_total, ["applied"])
         Presence.sync(uid, diff, true)
         {:noreply, state}
 
       _ ->
+        Lanyard.Metrics.Collector.inc(:counter, :lanyard_global_sync_messages_total, ["invalid"])
         Logger.error("Redis: Unknown payload format: #{inspect(payload)}")
         {:noreply, state}
     end
@@ -158,7 +161,13 @@ defmodule Lanyard.Connectivity.Redis do
   end
 
   defp command(client, [cmd | _] = args) do
+    cmd = String.downcase(cmd)
+    start = System.monotonic_time()
     result = Redix.command(client, args)
+
+    elapsed =
+      System.convert_time_unit(System.monotonic_time() - start, :native, :microsecond) /
+        1_000_000
 
     status =
       case result do
@@ -166,10 +175,13 @@ defmodule Lanyard.Connectivity.Redis do
         _ -> "error"
       end
 
-    Lanyard.Metrics.Collector.inc(
-      :counter,
-      :lanyard_redis_commands_total,
-      [String.downcase(cmd), status]
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_redis_commands_total, [cmd, status])
+
+    Lanyard.Metrics.Collector.observe(
+      :histogram,
+      :lanyard_redis_command_duration_seconds,
+      [cmd],
+      elapsed
     )
 
     result

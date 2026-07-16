@@ -18,6 +18,8 @@ defmodule Lanyard.DiscordBot do
   end
 
   def handle_continue(:setup_bot, state) do
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_gateway_client_starts_total)
+
     gateway_state = %{token: state.token}
 
     gateway_state =

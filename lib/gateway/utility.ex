@@ -61,8 +61,10 @@ defmodule Lanyard.Gateway.Utility do
   @doc "Get the atom value of and opcode using an integer value"
   @spec opcode(map, integer) :: atom
   def opcode(codes, value) when is_integer(value) do
-    {k, _value} = Enum.find(codes, fn {_key, v} -> v == value end)
-    k
+    case Enum.find(codes, fn {_key, v} -> v == value end) do
+      {k, _value} -> k
+      nil -> :unknown
+    end
   end
 
   @doc "Generic function for getting the value from an agent process"

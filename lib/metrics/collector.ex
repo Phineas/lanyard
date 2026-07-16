@@ -164,6 +164,129 @@ defmodule Lanyard.Metrics.Collector do
       labels: [],
       help: "Total run-queue length across all schedulers."
     )
+
+    Counter.new(
+      name: :lanyard_http_exceptions_total,
+      registry: @registry,
+      labels: [],
+      help: "HTTP requests that raised an exception during dispatch."
+    )
+
+    Histogram.new(
+      name: :lanyard_http_request_duration_seconds,
+      registry: @registry,
+      labels: [],
+      buckets: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5],
+      help: "HTTP request duration in seconds."
+    )
+
+    Counter.new(
+      name: :lanyard_gateway_unhandled_ops_total,
+      registry: @registry,
+      labels: [:op],
+      help: "Gateway opcodes received that have no handler clause."
+    )
+
+    Counter.new(
+      name: :lanyard_gateway_client_starts_total,
+      registry: @registry,
+      labels: [],
+      help: "Gateway client process starts (initial connect plus every restart)."
+    )
+
+    Counter.new(
+      name: :lanyard_gateway_sessions_total,
+      registry: @registry,
+      labels: [:type],
+      help: "Gateway sessions begun, by type (identify or resume)."
+    )
+
+    Histogram.new(
+      name: :lanyard_heartbeat_ack_latency_seconds,
+      registry: @registry,
+      labels: [],
+      buckets: [0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
+      help: "Round-trip latency between a heartbeat send and its ACK."
+    )
+
+    Gauge.new(
+      name: :lanyard_global_subscribers,
+      registry: @registry,
+      labels: [],
+      help: "Sockets subscribed to every presence (subscribe_to_all)."
+    )
+
+    Histogram.new(
+      name: :lanyard_presence_fanout_size,
+      registry: @registry,
+      labels: [],
+      buckets: [0, 1, 2, 5, 10, 25, 50, 100, 250, 500, 1000],
+      help: "Subscriber count per presence broadcast."
+    )
+
+    Counter.new(
+      name: :lanyard_presence_subscriptions_total,
+      registry: @registry,
+      labels: [:op],
+      help: "Presence subscriber changes, by op (subscribe, unsubscribe, down)."
+    )
+
+    Counter.new(
+      name: :lanyard_presence_cache_lookups_total,
+      registry: @registry,
+      labels: [:result],
+      help: "Cached-presence ETS lookups, by result (hit or miss)."
+    )
+
+    Counter.new(
+      name: :lanyard_discord_api_requests_total,
+      registry: @registry,
+      labels: [:status],
+      help: "Outbound Discord REST responses, by status class."
+    )
+
+    Counter.new(
+      name: :lanyard_cdn_proxy_requests_total,
+      registry: @registry,
+      labels: [:status],
+      help: "Avatar CDN proxy upstream responses, by status class."
+    )
+
+    Counter.new(
+      name: :lanyard_global_sync_messages_total,
+      registry: @registry,
+      labels: [:type],
+      help: "Cross-node global-sync messages (published, applied, ignored, invalid)."
+    )
+
+    Counter.new(
+      name: :lanyard_socket_closes_total,
+      registry: @registry,
+      labels: [:code],
+      help: "Socket error closes, by close code."
+    )
+
+    Counter.new(
+      name: :lanyard_socket_inits_total,
+      registry: @registry,
+      labels: [:type, :compression],
+      help: "Socket op-2 inits, by subscription type and compression mode."
+    )
+
+    Histogram.new(
+      name: :lanyard_redis_command_duration_seconds,
+      registry: @registry,
+      labels: [:command],
+      buckets: [0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5],
+      help: "Redis command duration in seconds."
+    )
+
+    Counter.new(
+      name: :lanyard_kv_validation_failures_total,
+      registry: @registry,
+      labels: [:reason],
+      help: "KV writes rejected by validation, by reason."
+    )
   end
 
   def dec(:gauge, stat) do
@@ -190,6 +313,20 @@ defmodule Lanyard.Metrics.Collector do
     Gauge.set([name: stat, registry: @registry], value)
   end
 
+  def observe(:histogram, stat, value) do
+    Histogram.observe([name: stat, registry: @registry], value)
+  end
+
+  def observe(:histogram, stat, labels, value) when is_list(labels) do
+    Histogram.observe([name: stat, registry: @registry, labels: labels], value)
+  end
+
+  def status_class(429), do: "429"
+  def status_class(status) when status < 300, do: "2xx"
+  def status_class(status) when status < 400, do: "3xx"
+  def status_class(status) when status < 500, do: "4xx"
+  def status_class(_status), do: "5xx"
+
   def refresh_runtime_gauges do
     mem = :erlang.memory()
 
@@ -200,6 +337,7 @@ defmodule Lanyard.Metrics.Collector do
     set(:gauge, :lanyard_erlang_process_count, :erlang.system_info(:process_count))
     set(:gauge, :lanyard_erlang_run_queue, :erlang.statistics(:total_run_queue_lengths))
     set(:gauge, :lanyard_redis_client_queue_length, redis_client_queue_length())
+    set(:gauge, :lanyard_global_subscribers, length(Lanyard.SocketHandler.get_global_subscriber_list()))
   end
 
   defp redis_client_queue_length do

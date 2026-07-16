@@ -17,18 +17,30 @@ defmodule Lanyard.Api.Quicklinks.DiscordCdn do
 
     case presence do
       {:ok, p} ->
-        {:ok, %Finch.Response{body: b, headers: h, status: status_code}} =
-          get_proxied_avatar(
-            user_id,
-            p.discord_user["avatar"],
-            p.discord_user["discriminator"],
-            file_type
-          )
+        case get_proxied_avatar(
+               user_id,
+               p.discord_user["avatar"],
+               p.discord_user["discriminator"],
+               file_type
+             ) do
+          {:ok, %Finch.Response{body: b, headers: h, status: status_code}} ->
+            Lanyard.Metrics.Collector.inc(:counter, :lanyard_cdn_proxy_requests_total, [
+              Lanyard.Metrics.Collector.status_class(status_code)
+            ])
 
-        conn
-        |> merge_resp_headers(h)
-        |> delete_resp_header("content-length")
-        |> send_resp(status_code, b)
+            conn
+            |> merge_resp_headers(h)
+            |> delete_resp_header("content-length")
+            |> send_resp(status_code, b)
+
+          {:error, _reason} ->
+            Lanyard.Metrics.Collector.inc(:counter, :lanyard_cdn_proxy_requests_total, ["error"])
+
+            Util.respond(
+              conn,
+              {:error, 502, :upstream_error, "Failed to fetch avatar from Discord CDN"}
+            )
+        end
 
       error ->
         Util.respond(conn, error)

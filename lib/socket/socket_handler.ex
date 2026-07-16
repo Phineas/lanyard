@@ -43,6 +43,7 @@ defmodule Lanyard.SocketHandler do
         case json["op"] do
           2 ->
             if json["d"] == nil || !is_map(json["d"]) || map_size(json["d"]) == 0 do
+              Lanyard.Metrics.Collector.inc(:counter, :lanyard_socket_closes_total, ["4005"])
               {:stop, :normal, {4005, "requires_data_object"}, state}
             else
               init_state =
@@ -96,8 +97,22 @@ defmodule Lanyard.SocketHandler do
                 end
 
               if init_state == nil do
+                Lanyard.Metrics.Collector.inc(:counter, :lanyard_socket_closes_total, ["4006"])
                 {:stop, :normal, {4006, "invalid_payload"}, state}
               else
+                sub_type =
+                  case json["d"] do
+                    %{"subscribe_to_ids" => _} -> "ids"
+                    %{"subscribe_to_id" => _} -> "single"
+                    %{"subscribe_to_all" => true} -> "all"
+                    _ -> "invalid"
+                  end
+
+                Lanyard.Metrics.Collector.inc(:counter, :lanyard_socket_inits_total, [
+                  sub_type,
+                  Atom.to_string(state.compression)
+                ])
+
                 {:reply, :ok,
                  construct_socket_msg(state.compression, %{op: 0, t: "INIT_STATE", d: init_state}),
                  state}
@@ -156,10 +171,12 @@ defmodule Lanyard.SocketHandler do
             {:ok, state}
 
           _ ->
+            Lanyard.Metrics.Collector.inc(:counter, :lanyard_socket_closes_total, ["4004"])
             {:stop, :normal, {4004, "unknown_opcode"}, state}
         end
 
       _ ->
+        Lanyard.Metrics.Collector.inc(:counter, :lanyard_socket_closes_total, ["4006"])
         {:stop, :normal, {4006, "invalid_payload"}, state}
     end
   end

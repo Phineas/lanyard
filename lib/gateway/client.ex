@@ -163,6 +163,7 @@ defmodule Lanyard.Gateway.Client do
     Logger.warning("Discord enforced Reconnect, will resume session")
 
     Lanyard.Metrics.Collector.inc(:counter, :lanyard_gateway_reconnects_total, ["reconnect"])
+    Lanyard.Metrics.Collector.set(:gauge, :lanyard_gateway_connected, 0)
 
     seq_num = agent_value(state[:agent_seq_num])
 
@@ -182,8 +183,21 @@ defmodule Lanyard.Gateway.Client do
   defp _handle_data(%{op: :invalid_session} = _data, state) do
     Logger.warning("Discord: Invalid session, starting new session")
     Lanyard.Metrics.Collector.inc(:counter, :lanyard_gateway_reconnects_total, ["invalid_session"])
+    Lanyard.Metrics.Collector.set(:gauge, :lanyard_gateway_connected, 0)
     send(:discord_bot, :clear_resume)
     {:close, "Invalid session, starting new session", state}
+  end
+
+  defp _handle_data(%{op: :heartbeat} = _data, state) do
+    value = agent_value(state[:agent_seq_num])
+    payload = payload_build_json(opcode(opcodes(), :heartbeat), value)
+    :websocket_client.cast(self(), {:binary, payload})
+    {:ok, state}
+  end
+
+  defp _handle_data(%{op: op} = _data, state) do
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_gateway_unhandled_ops_total, [to_string(op)])
+    {:ok, state}
   end
 
   def websocket_info(:start, _connection, state) do
@@ -217,6 +231,7 @@ defmodule Lanyard.Gateway.Client do
     Logger.warning("Discord: Heartbeat stale, will resume session")
 
     Lanyard.Metrics.Collector.inc(:counter, :lanyard_gateway_reconnects_total, ["heartbeat_stale"])
+    Lanyard.Metrics.Collector.set(:gauge, :lanyard_gateway_connected, 0)
 
     seq_num = agent_value(state[:agent_seq_num])
 
@@ -342,6 +357,8 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def resume(state) do
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_gateway_sessions_total, ["resume"])
+
     data = %{
       "token" => state.token,
       "session_id" => state[:session_id],
@@ -353,6 +370,8 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def identify(state) do
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_gateway_sessions_total, ["identify"])
+
     data = %{
       "token" => state.token,
       "properties" => %{

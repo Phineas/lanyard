@@ -22,7 +22,8 @@ defmodule Lanyard.Gateway.Heartbeat do
       interval: interval,
       socket_pid: socket_pid,
       timer: nil,
-      ack?: true
+      ack?: true,
+      last_beat_at: nil
     }
 
     send(self(), :beat)
@@ -35,7 +36,7 @@ defmodule Lanyard.Gateway.Heartbeat do
     :websocket_client.cast(socket_pid, {:binary, payload})
     Lanyard.Metrics.Collector.inc(:counter, :lanyard_heartbeats_sent_total)
     timer = Process.send_after(self(), :beat, interval)
-    {:noreply, %{state | ack?: false, timer: timer}}
+    {:noreply, %{state | ack?: false, timer: timer, last_beat_at: System.monotonic_time()}}
   end
 
   def handle_info(:beat, %{socket_pid: socket_pid, ack?: false} = state) do
@@ -45,7 +46,22 @@ defmodule Lanyard.Gateway.Heartbeat do
   end
 
   def handle_call(:ack, _from, state) do
-    {:reply, :ok, %{state | ack?: true}}
+    if state.last_beat_at do
+      elapsed =
+        System.convert_time_unit(
+          System.monotonic_time() - state.last_beat_at,
+          :native,
+          :microsecond
+        ) / 1_000_000
+
+      Lanyard.Metrics.Collector.observe(
+        :histogram,
+        :lanyard_heartbeat_ack_latency_seconds,
+        elapsed
+      )
+    end
+
+    {:reply, :ok, %{state | ack?: true, last_beat_at: nil}}
   end
 
   def handle_call(:reset, _from, %{timer: nil} = state) do

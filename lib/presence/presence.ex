@@ -54,6 +54,12 @@ defmodule Lanyard.Presence do
         Map.put(acc, pid, Process.monitor(pid))
       end)
 
+    Lanyard.Metrics.Collector.observe(
+      :histogram,
+      :lanyard_presence_fanout_size,
+      length(subscriber_pids)
+    )
+
     Manifold.send(
       subscriber_pids,
       {:remote_send, %{op: 0, t: "PRESENCE_UPDATE", d: pretty_presence}}
@@ -75,6 +81,7 @@ defmodule Lanyard.Presence do
   end
 
   def handle_info({:DOWN, _ref, :process, object, _reason}, state) do
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_presence_subscriptions_total, ["down"])
     {:noreply, drop_subscriber(state, object)}
   end
 
@@ -86,6 +93,10 @@ defmodule Lanyard.Presence do
     else
       ref = Process.monitor(pid)
 
+      Lanyard.Metrics.Collector.inc(:counter, :lanyard_presence_subscriptions_total, [
+        "subscribe"
+      ])
+
       {:noreply,
        %{
          state
@@ -96,6 +107,10 @@ defmodule Lanyard.Presence do
   end
 
   def handle_info({:remove_subscriber, pid}, state) do
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_presence_subscriptions_total, [
+      "unsubscribe"
+    ])
+
     {:noreply, drop_subscriber(state, pid)}
   end
 
@@ -139,6 +154,12 @@ defmodule Lanyard.Presence do
         |> Map.merge(normalized_new_state)
       )
       |> build_pretty_presence()
+
+    Lanyard.Metrics.Collector.observe(
+      :histogram,
+      :lanyard_presence_fanout_size,
+      length(state.subscriber_pids)
+    )
 
     Manifold.send(
       state.subscriber_pids,
@@ -188,9 +209,12 @@ defmodule Lanyard.Presence do
   def get_pretty_presence(user_id) do
     case :ets.lookup(:cached_presences, user_id) do
       [{_id, cached}] ->
+        Lanyard.Metrics.Collector.inc(:counter, :lanyard_presence_cache_lookups_total, ["hit"])
         {:ok, cached}
 
       _ ->
+        Lanyard.Metrics.Collector.inc(:counter, :lanyard_presence_cache_lookups_total, ["miss"])
+
         case get_presence(user_id) do
           {:ok, raw_presence} ->
             build_pretty_presence(raw_presence)
@@ -274,6 +298,10 @@ defmodule Lanyard.Presence do
             |> Map.put(:node_id, :erlang.phash2(node()))
             |> Map.put(:user_id, user_id)
             |> Map.put(:diff, payload)
+
+          Lanyard.Metrics.Collector.inc(:counter, :lanyard_global_sync_messages_total, [
+            "published"
+          ])
 
           Redis.publish("lanyard:global_sync", Jason.encode!(global_sync_payload))
         end)

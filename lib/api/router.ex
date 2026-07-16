@@ -8,6 +8,7 @@ defmodule Lanyard.Api.Router do
   alias Lanyard.Api.Quicklinks
 
   use Plug.Router
+  use Plug.ErrorHandler
 
   @supported_quicktypes ["png", "gif", "webp", "jpg", "jpeg"]
 
@@ -18,35 +19,56 @@ defmodule Lanyard.Api.Router do
     allow_headers: :all
   )
 
+  plug(:track_request)
   plug(:match)
   plug(:dispatch)
-  plug(:metrics_handle)
 
-  def metrics_handle(conn, _opts) do
-    stat =
-      cond do
-        is_nil(conn.status) ->
-          nil
+  def track_request(conn, _opts) do
+    start = System.monotonic_time()
 
-        conn.status >= 200 && conn.status < 300 ->
-          :lanyard_2xx_responses
+    register_before_send(conn, fn conn ->
+      elapsed =
+        System.convert_time_unit(System.monotonic_time() - start, :native, :microsecond) /
+          1_000_000
 
-        conn.status >= 300 && conn.status < 400 ->
-          :lanyard_3xx_responses
+      Lanyard.Metrics.Collector.observe(
+        :histogram,
+        :lanyard_http_request_duration_seconds,
+        elapsed
+      )
 
-        conn.status >= 400 && conn.status < 500 ->
-          :lanyard_4xx_responses
+      stat =
+        cond do
+          is_nil(conn.status) ->
+            nil
 
-        conn.status >= 500 ->
-          :lanyard_5xx_responses
+          conn.status >= 200 && conn.status < 300 ->
+            :lanyard_2xx_responses
 
-        true ->
-          nil
-      end
+          conn.status >= 300 && conn.status < 400 ->
+            :lanyard_3xx_responses
 
-    if stat, do: Lanyard.Metrics.Collector.inc(:counter, stat)
+          conn.status >= 400 && conn.status < 500 ->
+            :lanyard_4xx_responses
 
-    conn
+          conn.status >= 500 ->
+            :lanyard_5xx_responses
+
+          true ->
+            nil
+        end
+
+      if stat, do: Lanyard.Metrics.Collector.inc(:counter, stat)
+
+      conn
+    end)
+  end
+
+  @impl Plug.ErrorHandler
+  def handle_errors(conn, _error) do
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_http_exceptions_total)
+
+    send_resp(conn, conn.status, "Internal Server Error")
   end
 
   get "/" do
@@ -69,6 +91,8 @@ defmodule Lanyard.Api.Router do
       |> halt()
     rescue
       WebSockAdapter.UpgradeError ->
+        Lanyard.Metrics.Collector.inc(:counter, :lanyard_socket_closes_total, ["upgrade_failed"])
+
         conn
         |> Util.respond({:error, 400, :upgrade_failed, "Request failed to upgrade"})
         |> halt()

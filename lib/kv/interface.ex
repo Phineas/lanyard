@@ -22,6 +22,10 @@ defmodule Lanyard.KV.Interface do
 
     cond do
       Map.keys(kv) |> length > 511 ->
+        Lanyard.Metrics.Collector.inc(:counter, :lanyard_kv_validation_failures_total, [
+          "key_limit"
+        ])
+
         {:error, "request would exceed key limit (512), please delete keys first"}
 
       true ->
@@ -54,12 +58,24 @@ defmodule Lanyard.KV.Interface do
   def validate_pair({key, value}) do
     cond do
       String.length(key) > 255 ->
+        Lanyard.Metrics.Collector.inc(:counter, :lanyard_kv_validation_failures_total, [
+          "key_too_long"
+        ])
+
         {:error, "key must be 255 characters or less"}
 
       not String.match?(key, ~r/^[a-zA-Z0-9_]*$/) ->
+        Lanyard.Metrics.Collector.inc(:counter, :lanyard_kv_validation_failures_total, [
+          "key_invalid"
+        ])
+
         {:error, "key must be alphanumeric (a-zA-Z0-9_)"}
 
       String.length(value) > 30000 ->
+        Lanyard.Metrics.Collector.inc(:counter, :lanyard_kv_validation_failures_total, [
+          "value_too_long"
+        ])
+
         {:error, "value must be 30000 characters or less"}
 
       true ->
