@@ -81,13 +81,16 @@ Example response:
     },
     // Below is a custom crafted "spotify" object, which will be null if listening_to_spotify is false
     "spotify": {
+      // null when a local file is playing
       "track_id": "3kdlVcMVsSkbsUy8eQcBjI",
       "timestamps": {
         "start": 1615529820677,
         "end": 1615530068733
       },
       "song": "Let Go",
+      // null when a local file is playing
       "artist": "Ark Patrol; Veronika Redd",
+      // null when a local file is playing
       "album_art_url": "https://i.scdn.co/image/ab67616d0000b27364840995fe43bb2ec73a241d",
       "album": "Let Go"
     },
@@ -145,6 +148,12 @@ Example response:
   }
 }
 ```
+
+#### Spotify local files
+
+When someone plays a local file, Spotify has no catalog track to point at, so Discord leaves `state`, `sync_id` and `assets.large_image` out of the activity. Lanyard still sets `listening_to_spotify` to `true` and still sends the `spotify` object, but `artist`, `track_id` and `album_art_url` are `null` — only `song`, `album` and `timestamps` are guaranteed.
+
+Treat those three fields as nullable. `artist` in particular is a `"; "` separated list when it's present, so splitting it without a null check is a common way to break a page as soon as someone plays a local file.
 
 ### KV
 
