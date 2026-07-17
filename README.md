@@ -1,4 +1,4 @@
-<img src="https://storage.googleapis.com/lanyard/static/lanyardtemplogo.png" alt="Lanyard Logo" width="300"/>
+<img src="https://r2cdn.dstn.to/lanyard/logo.png" alt="Lanyard Logo" width="300"/>
 
 # 🏷️ Expose your Discord presence and activities to a RESTful API and WebSocket in less than 10 seconds
 
