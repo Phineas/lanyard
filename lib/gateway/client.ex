@@ -182,7 +182,9 @@ defmodule Lanyard.Gateway.Client do
 
   defp _handle_data(%{op: :invalid_session} = _data, state) do
     Logger.warning("Discord: Invalid session, starting new session")
+
     Lanyard.Metrics.Collector.inc(:counter, :lanyard_gateway_reconnects_total, ["invalid_session"])
+
     Lanyard.Metrics.Collector.set(:gauge, :lanyard_gateway_connected, 0)
     send(:discord_bot, :clear_resume)
     {:close, "Invalid session, starting new session", state}
@@ -204,18 +206,18 @@ defmodule Lanyard.Gateway.Client do
     {:ok, state}
   end
 
-  @doc "Look into state - grab key value and pass it back to calling process"
+  # Look into state - grab key value and pass it back to calling process
   def websocket_info({:get_state, key, pid}, _connection, state) do
     send(pid, {key, state[key]})
     {:ok, state}
   end
 
-  @doc "Ability to update websocket client state"
+  # Ability to update websocket client state
   def websocket_info({:update_state, update_values}, _connection, state) do
     {:ok, Map.merge(state, update_values)}
   end
 
-  @doc "Remove key from state"
+  # Remove key from state
   def websocket_info({:clear_from_state, keys}, _connection, state) do
     new_state = Map.drop(state, keys)
     {:ok, new_state}
@@ -231,6 +233,7 @@ defmodule Lanyard.Gateway.Client do
     Logger.warning("Discord: Heartbeat stale, will resume session")
 
     Lanyard.Metrics.Collector.inc(:counter, :lanyard_gateway_reconnects_total, ["heartbeat_stale"])
+
     Lanyard.Metrics.Collector.set(:gauge, :lanyard_gateway_connected, 0)
 
     seq_num = agent_value(state[:agent_seq_num])
@@ -250,7 +253,9 @@ defmodule Lanyard.Gateway.Client do
 
   @spec websocket_terminate(any(), any(), nil | keyword() | map()) :: :ok
   def websocket_terminate(reason, _conn_state, state) do
-    Logger.info("Discord: Websocket closed in state #{inspect(state)} with reason #{inspect(reason)}")
+    Logger.info(
+      "Discord: Websocket closed in state #{inspect(state)} with reason #{inspect(reason)}"
+    )
 
     Lanyard.Metrics.Collector.set(:gauge, :lanyard_gateway_connected, 0)
 
