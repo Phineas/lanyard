@@ -73,7 +73,12 @@ defmodule Lanyard.Gateway.Utility do
 
   defp encode_opcode(value), do: Map.fetch!(@opcodes, value)
   defp decode_opcode(value), do: Map.get(@opcodes_by_value, value, :unknown)
-  defp decode_dispatch_event(value), do: Map.get(@dispatch_events, value, :unknown)
+
+  defp decode_dispatch_event(value) do
+    Map.get_lazy(@dispatch_events, value, fn ->
+      String.downcase(value)
+    end)
+  end
 
   # Makes it easy to just update and pipe a payload
   defp _update_payload(load, var, key, value) do

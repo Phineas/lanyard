@@ -137,10 +137,9 @@ defmodule Lanyard.Gateway.Client do
     {:ok, state}
   end
 
+  # event can be an atop or string fallback for analytics, only known events are atoms
   defp _handle_data(%{op: :dispatch, event_name: event} = data, state) do
-    Lanyard.Metrics.Collector.inc(:counter, :lanyard_gateway_events_total, [
-      Atom.to_string(event)
-    ])
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_gateway_events_total, [to_string(event)])
 
     handle_event({event, data}, state)
   end
