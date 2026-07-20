@@ -20,33 +20,32 @@ defmodule Lanyard.Gateway.Client do
 
   @intents_mask Enum.reduce(@intents, 0, fn {_k, bit}, acc -> acc ||| bit end)
 
-  def opcodes do
-    %{
-      :dispatch => 0,
-      :heartbeat => 1,
-      :identify => 2,
-      :status_update => 3,
-      :voice_state_update => 4,
-      :voice_server_ping => 5,
-      :resume => 6,
-      :reconnect => 7,
-      :request_guild_members => 8,
-      :invalid_session => 9,
-      :hello => 10,
-      :heartbeat_ack => 11
-    }
-  end
+  @encoding "json"
+  @gateway_version 10
 
   def start_link(state) do
     :ssl.start()
 
     url =
       case state[:resume_gateway_url] do
-        nil -> "wss://gateway.discord.gg/?v=10&encoding=json"
-        resume_url -> "#{resume_url}?v=10&encoding=json"
+        nil -> "wss://gateway.discord.gg/?v=#{@gateway_version}&encoding=#{@encoding}"
+        resume_url -> "#{resume_url}?v=#{@gateway_version}&encoding=#{@encoding}"
       end
 
-    :websocket_client.start_link(url, __MODULE__, [state])
+    :websocket_client.start_link(url, __MODULE__, [state], websocket_options())
+  end
+
+  @doc false
+  def websocket_options do
+    [
+      ssl_verify: :verify_peer,
+      socket_opts: [
+        cacerts: :public_key.cacerts_get(),
+        customize_hostname_check: [
+          match_fun: :public_key.pkix_verify_hostname_match_fun(:https)
+        ]
+      ]
+    ]
   end
 
   def init([state]) do
@@ -101,7 +100,7 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def websocket_handle({:text, payload}, _socket, state) do
-    data = payload_decode(opcodes(), {:text, payload})
+    data = payload_decode({:text, payload})
 
     # Keeps the sequence tracker process updated
     _update_agent_sequence(data, state)
@@ -110,14 +109,9 @@ defmodule Lanyard.Gateway.Client do
     _handle_data(data, state)
   end
 
-  def websocket_handle({:binary, payload}, _socket, state) do
-    data = payload_decode(opcodes(), {:binary, payload})
-
-    # Keeps the sequence tracker process updated
-    _update_agent_sequence(data, state)
-
-    # Handle data based on opcode sent by Discord
-    _handle_data(data, state)
+  def websocket_handle({:binary, _payload}, _socket, state) do
+    Logger.warning("Discord: Received an unexpected binary payload while using JSON encoding")
+    {:close, "Unexpected binary payload", state}
   end
 
   defp _handle_data(%{op: :hello} = data, state) do
@@ -143,18 +137,10 @@ defmodule Lanyard.Gateway.Client do
     {:ok, state}
   end
 
-  defp _handle_data(%{op: :dispatch, event_name: event_name} = data, state) do
-    event_name = String.to_atom(event_name)
-
-    # Dispatch op carries actual content like channel messages
-    if event_name == :READY do
-      # Client is ready
-      # Logger.debug(fn -> "Discord: Dispatch #{event_name}" end)
-    end
-
-    event = normalize_atom(event_name)
-
-    Lanyard.Metrics.Collector.inc(:counter, :lanyard_gateway_events_total, [to_string(event)])
+  defp _handle_data(%{op: :dispatch, event_name: event} = data, state) do
+    Lanyard.Metrics.Collector.inc(:counter, :lanyard_gateway_events_total, [
+      Atom.to_string(event)
+    ])
 
     handle_event({event, data}, state)
   end
@@ -192,7 +178,7 @@ defmodule Lanyard.Gateway.Client do
 
   defp _handle_data(%{op: :heartbeat} = _data, state) do
     value = agent_value(state[:agent_seq_num])
-    payload = payload_build_json(opcode(opcodes(), :heartbeat), value)
+    payload = payload_build_json(:heartbeat, value)
     :websocket_client.cast(self(), {:binary, payload})
     {:ok, state}
   end
@@ -224,7 +210,7 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def websocket_info({:update_status, new_status}, _connection, state) do
-    payload = payload_build_json(opcode(opcodes(), :status_update), new_status)
+    payload = payload_build_json(:status_update, new_status)
     :websocket_client.cast(self(), {:binary, payload})
     {:ok, state}
   end
@@ -251,10 +237,12 @@ defmodule Lanyard.Gateway.Client do
     {:close, "Heartbeat stale", state}
   end
 
-  @spec websocket_terminate(any(), any(), nil | keyword() | map()) :: :ok
+  @spec websocket_terminate(any(), any(), map()) :: :ok
   def websocket_terminate(reason, _conn_state, state) do
+    redacted_state = Map.replace(state, :token, "[REDACTED]")
+
     Logger.info(
-      "Discord: Websocket closed in state #{inspect(state)} with reason #{inspect(reason)}"
+      "Discord: Websocket closed in state #{inspect(redacted_state)} with reason #{inspect(reason)}"
     )
 
     Lanyard.Metrics.Collector.set(:gauge, :lanyard_gateway_connected, 0)
@@ -290,7 +278,7 @@ defmodule Lanyard.Gateway.Client do
 
     # The Lanyard guild is above the large_threshold, so we need to use Opcode 8: Request Guild Members
     request_payload =
-      payload_build_json(opcode(opcodes(), :request_guild_members), %{
+      payload_build_json(:request_guild_members, %{
         "guild_id" => payload.data["id"],
         "limit" => 0,
         "query" => "",
@@ -317,7 +305,7 @@ defmodule Lanyard.Gateway.Client do
     Logger.debug("User #{payload.data["user"]["id"]} joined guild")
 
     request_payload =
-      payload_build_json(opcode(opcodes(), :request_guild_members), %{
+      payload_build_json(:request_guild_members, %{
         "guild_id" => payload.data["guild_id"],
         "user_ids" => [payload.data["user"]["id"]],
         "limit" => 1,
@@ -370,7 +358,7 @@ defmodule Lanyard.Gateway.Client do
       "seq" => state[:seq_num]
     }
 
-    payload = payload_build_json(opcode(opcodes(), :resume), data)
+    payload = payload_build_json(:resume, data)
     :websocket_client.cast(self(), {:binary, payload})
   end
 
@@ -399,7 +387,7 @@ defmodule Lanyard.Gateway.Client do
       "intents" => @intents_mask
     }
 
-    payload = payload_build_json(opcode(opcodes(), :identify), data)
+    payload = payload_build_json(:identify, data)
     :websocket_client.cast(self(), {:binary, payload})
   end
 

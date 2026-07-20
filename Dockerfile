@@ -22,7 +22,7 @@ RUN \
 
 FROM elixir:1.19-alpine
 
-RUN apk add redis
+RUN apk add ca-certificates redis
 
 COPY --from=build /app/_build/prod/rel/lanyard /opt/lanyard
 

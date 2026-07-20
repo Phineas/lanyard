@@ -1,7 +1,6 @@
 defmodule Lanyard.Gateway.Heartbeat do
   use GenServer
   require Logger
-  import Lanyard.Gateway.Client, only: [opcodes: 0]
   import Lanyard.Gateway.Utility
 
   def start_link(agent_seq_num, interval, socket_pid, opts \\ []) do
@@ -32,7 +31,7 @@ defmodule Lanyard.Gateway.Heartbeat do
 
   def handle_info(:beat, %{interval: interval, socket_pid: socket_pid, ack?: true} = state) do
     value = agent_value(state[:agent_seq_num])
-    payload = payload_build_json(opcode(opcodes(), :heartbeat), value)
+    payload = payload_build_json(:heartbeat, value)
     :websocket_client.cast(socket_pid, {:binary, payload})
     Lanyard.Metrics.Collector.inc(:counter, :lanyard_heartbeats_sent_total)
     timer = Process.send_after(self(), :beat, interval)

@@ -1,4 +1,4 @@
- defmodule Lanyard.Api.Util do
+defmodule Lanyard.Api.Util do
   import Plug.Conn
 
   @spec redirect(Plug.Conn.t(), binary) :: Plug.Conn.t()

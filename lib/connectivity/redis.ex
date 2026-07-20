@@ -82,6 +82,12 @@ defmodule Lanyard.Connectivity.Redis do
     {:noreply, state}
   end
 
+  def handle_cast({:mset, list}, state) do
+    command(state.client, ["MSET" | list])
+
+    {:noreply, state}
+  end
+
   def handle_cast({:del, key}, state) do
     command(state.client, ["DEL", key])
 
@@ -114,6 +120,10 @@ defmodule Lanyard.Connectivity.Redis do
 
   def set(key, value) do
     GenServer.cast(:local_redis_client, {:set, key, value})
+  end
+
+  def mset(list) do
+    GenServer.cast(:local_redis_client, {:mset, list})
   end
 
   def del(key) do

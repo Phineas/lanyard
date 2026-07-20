@@ -273,7 +273,7 @@ defmodule Lanyard.Presence do
         {:ok, pid} ->
           {:ok, presence} = get_pretty_presence(id)
           send(pid, {:add_subscriber, self()})
-          %{"#{id}": presence} |> Map.merge(acc)
+          %{"#{id}" => presence} |> Map.merge(acc)
 
         _ ->
           acc

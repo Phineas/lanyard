@@ -7,17 +7,8 @@ defmodule Lanyard.DiscordBot.Commands.ApiKey do
   end
 
   def handle(_, payload) do
-    key = generate_api_key()
-
     user_id = payload["author"]["id"]
-    existing_key? = Redis.get("user_api_key:#{user_id}")
-
-    if existing_key? do
-      Redis.del("api_key:#{existing_key?}")
-    end
-
-    Redis.set("api_key:#{key}", user_id)
-    Redis.set("user_api_key:#{user_id}", key)
+    key = generate_api_key(user_id)
 
     Lanyard.DiscordBot.DiscordApi.send_message(payload["channel_id"], %{
       title: "Lanyard API Key",
@@ -31,38 +22,21 @@ defmodule Lanyard.DiscordBot.Commands.ApiKey do
     })
   end
 
-  def validate_api_key(user_id, key) when is_binary(key) do
-    case Redis.get("user_api_key:#{user_id}") do
-      ^key ->
-        {true}
+  def contains_api_key?(user_id, candidates) do
+    stored_key = Redis.get("user_api_key:#{user_id}")
 
-      _ ->
-        {false}
-    end
+    candidates
+    |> List.wrap()
+    |> Enum.any?(&(&1 == stored_key))
   end
 
-  def validate_api_key(user_id, key) when is_list(key) do
-    Enum.map(key, fn apikey ->
-      case Redis.get("user_api_key:#{user_id}") do
-        ^apikey ->
-          {true}
+  def generate_and_send_new(original_channel, user_id) do
+    DiscordApi.send_message(
+      original_channel,
+      ":x: Whoops, you just posted your API key, this is meant to stay private, regenerating this for you, check your DM"
+    )
 
-        _ ->
-          {false}
-      end
-    end)
-  end
-
-  def generate_and_send_new(user_id) do
-    key = generate_api_key()
-    existing_key? = Redis.get("user_api_key:#{user_id}")
-
-    if existing_key? do
-      Redis.del("api_key:#{existing_key?}")
-    end
-
-    Redis.set("api_key:#{key}", user_id)
-    Redis.set("user_api_key:#{user_id}", key)
+    key = generate_api_key(user_id)
 
     dm_channel = DiscordApi.create_dm(user_id)
 
@@ -72,7 +46,17 @@ defmodule Lanyard.DiscordBot.Commands.ApiKey do
     )
   end
 
-  def generate_api_key() do
-    "lnyd_" <> (:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower))
+  def generate_api_key(user_id) do
+    key = "lnyd_#{:crypto.strong_rand_bytes(16) |> Base.encode16(case: :lower)}"
+
+    existing_key? = Redis.get("user_api_key:#{user_id}")
+
+    if existing_key? do
+      Redis.del("api_key:#{existing_key?}")
+    end
+
+    Redis.mset(["api_key:#{key}", user_id, "user_api_key:#{user_id}", key])
+
+    key
   end
 end

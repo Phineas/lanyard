@@ -1,24 +1,36 @@
 defmodule Lanyard.Gateway.Utility do
-  @spec normalize_atom(atom) :: atom()
-  def normalize_atom(atom) do
-    atom |> Atom.to_string() |> String.downcase() |> String.to_atom()
-  end
+  @opcodes %{
+    dispatch: 0,
+    heartbeat: 1,
+    identify: 2,
+    status_update: 3,
+    voice_state_update: 4,
+    voice_server_ping: 5,
+    resume: 6,
+    reconnect: 7,
+    request_guild_members: 8,
+    invalid_session: 9,
+    hello: 10,
+    heartbeat_ack: 11
+  }
 
-  @doc "Build a binary payload for discord communication"
-  @spec payload_build(number, map, number, String.t()) :: binary
-  def payload_build(op, data, seq_num \\ nil, event_name \\ nil) do
-    load = %{"op" => op, "d" => data}
+  @opcodes_by_value Map.new(@opcodes, fn {name, value} -> {value, name} end)
 
-    load
-    |> _update_payload(seq_num, "s", seq_num)
-    |> _update_payload(event_name, "t", event_name)
-    |> :erlang.term_to_binary()
-  end
+  @dispatch_events %{
+    "READY" => :ready,
+    "MESSAGE_CREATE" => :message_create,
+    "GUILD_CREATE" => :guild_create,
+    "PRESENCE_UPDATE" => :presence_update,
+    "GUILD_MEMBER_ADD" => :guild_member_add,
+    "GUILD_MEMBER_UPDATE" => :guild_member_update,
+    "GUILD_MEMBER_REMOVE" => :guild_member_remove,
+    "GUILD_MEMBERS_CHUNK" => :guild_members_chunk
+  }
 
   @doc "Build a json  payload for discord communication"
-  @spec payload_build_json(number, map, number, String.t()) :: binary
+  @spec payload_build_json(atom(), map(), number(), String.t()) :: binary()
   def payload_build_json(op, data, seq_num \\ nil, event_name \\ nil) do
-    load = %{"op" => op, "d" => data}
+    load = %{"op" => encode_opcode(op), "d" => data}
 
     load
     |> _update_payload(seq_num, "s", seq_num)
@@ -26,42 +38,22 @@ defmodule Lanyard.Gateway.Utility do
     |> Jason.encode!()
   end
 
-  @doc "Decode binary payload received from discord into a map"
-  @spec payload_decode(list(), {:binary, binary()}) :: map
-  def payload_decode(codes, {:binary, payload}) do
-    payload = :erlang.binary_to_term(payload)
-
-    %{
-      op: opcode(codes, payload[:op] || payload["op"]),
-      data: payload[:d] || payload["d"],
-      seq_num: payload[:s] || payload["s"],
-      event_name: payload[:t] || payload["t"]
-    }
-  end
-
-  @spec payload_decode(list(), {:text, binary()}) :: map
-  def payload_decode(codes, {:text, payload}) do
+  @spec payload_decode({:text, binary()}) :: map()
+  def payload_decode({:text, payload}) do
     payload = Jason.decode!(payload)
+    op = decode_opcode(payload["op"])
 
-    %{
-      op: opcode(codes, payload["op"]),
+    data = %{
+      op: op,
       data: payload["d"],
-      seq_num: payload["s"],
-      event_name: payload["t"]
+      seq_num: payload["s"]
     }
-  end
 
-  @doc "Get the integer value for an opcode using it's name"
-  @spec opcode(map, atom) :: integer
-  def opcode(codes, value) when is_atom(value) do
-    codes[value]
-  end
-
-  @spec opcode(map, integer) :: atom
-  def opcode(codes, value) when is_integer(value) do
-    case Enum.find(codes, fn {_key, v} -> v == value end) do
-      {k, _value} -> k
-      nil -> :unknown
+    # only dispatch as `t`
+    if op == :dispatch do
+      Map.put(data, :event_name, decode_dispatch_event(payload["t"]))
+    else
+      data
     end
   end
 
@@ -78,6 +70,10 @@ defmodule Lanyard.Gateway.Utility do
       Agent.update(agent, fn _a -> n end)
     end
   end
+
+  defp encode_opcode(value), do: Map.fetch!(@opcodes, value)
+  defp decode_opcode(value), do: Map.get(@opcodes_by_value, value, :unknown)
+  defp decode_dispatch_event(value), do: Map.get(@dispatch_events, value, :unknown)
 
   # Makes it easy to just update and pipe a payload
   defp _update_payload(load, var, key, value) do
