@@ -251,7 +251,7 @@ defmodule Lanyard.Presence do
           active_on_discord_vr: Map.has_key?(raw_data.discord_presence["client_status"], "vr"),
           listening_to_spotify: spotify_activity !== nil,
           spotify: Spotify.build_pretty_spotify(spotify_activity),
-          activities: Activity.build_pretty_activities(raw_data.discord_presence["activities"]),
+          activities: Activity.build_pretty_activities(activities),
           kv: raw_data.kv
         }
       else
