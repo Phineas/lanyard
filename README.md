@@ -34,6 +34,21 @@ Just [join this Discord server](https://discord.gg/UrXF2cfJ7F) and your presence
 - [Showcase](#showcase)
 - [Todo](#todo)
 
+## In a React app
+
+Many Lanyard users render their presence on websites. The recommended library for React is [`use-lanyard`](https://github.com/alii/use-lanyard). It subscribes over the WebSocket, so presences update live, and any number of hooks across your app share a single connection.
+
+```tsx
+import { useLanyard } from 'use-lanyard';
+
+export function App() {
+	const presence = useLanyard(YOUR_DISCORD_ID);
+	return <p>Hi, I'm {presence?.discord_user.username}!</p>;
+}
+```
+
+The hook returns `undefined` until the first presence arrives. You can also pass an array of IDs to subscribe to multiple users at once. Refer to the [`use-lanyard` readme](https://github.com/alii/use-lanyard/blob/main/README.md) for further documentation.
+
 ## Community Projects
 
 The Lanyard community has worked on some pretty cool projects that allows you to extend the functionality of Lanyard. PR to add a project!
@@ -42,7 +57,6 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [lanyard-profile-readme](https://github.com/cnrad/lanyard-profile-readme) - Utilize Lanyard to display your Discord Presence in your GitHub Profile \
 [vue-lanyard](https://github.com/eggsy/vue-lanyard) - Lanyard API plugin for Vue. Supports REST and WebSocket methods \
 [react-use-lanyard](https://github.com/barbarbar338/react-use-lanyard) - React hook for Lanyard - supports REST & WebSocket \
-[use-lanyard](https://github.com/alii/use-lanyard) - Another React hook for Lanyard that uses SWR \
 [lanyard-visualizer](https://lanyard-visualizer.netlify.app/) - Beautifully display your Discord presence on a website \
 [js-lanyard](https://github.com/xaronnn/js-lanyard/) - Use Lanyard in your Web App. \
 [go-lanyard](https://github.com/barbarbar338/go-lanyard) - Lanyard API wrapper for GoLang - supports REST & WebSocket \
@@ -280,12 +294,12 @@ Example of `Opcode 4: Unsubscribe` from all:
 
 ### List of Opcodes
 
-| Opcode | Name       | Description                                                                                                                 | Client Send/Recv |
-| ------ | ---------- | --------------------------------------------------------------------------------------------------------------------------- | ---------------- |
-| 0      | Event      | This is the default opcode when receiving core events from Lanyard, like `INIT_STATE`                                       | Receive          |
-| 1      | Hello      | Lanyard sends this when clients initially connect, and it includes the heartbeat interval                                   | Receive Only     |
-| 2      | Initialize | Sent by the client after Opcode 1 to subscribe to presences - its data should contain `subscribe_to_ids` (array of IDs), `subscribe_to_id` (single ID), or `subscribe_to_all` (bool) | Send only        |
-| 3      | Heartbeat  | Clients should send Opcode 3 every 30 seconds (or whatever the Hello Opcode says to heartbeat at)                           | Send only        |
+| Opcode | Name        | Description                                                                                                                                                                           | Client Send/Recv |
+| ------ | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| 0      | Event       | This is the default opcode when receiving core events from Lanyard, like `INIT_STATE`                                                                                                 | Receive          |
+| 1      | Hello       | Lanyard sends this when clients initially connect, and it includes the heartbeat interval                                                                                             | Receive Only     |
+| 2      | Initialize  | Sent by the client after Opcode 1 to subscribe to presences - its data should contain `subscribe_to_ids` (array of IDs), `subscribe_to_id` (single ID), or `subscribe_to_all` (bool)  | Send only        |
+| 3      | Heartbeat   | Clients should send Opcode 3 every 30 seconds (or whatever the Hello Opcode says to heartbeat at)                                                                                     | Send only        |
 | 4      | Unsubscribe | Sent by the client to unsubscribe from presences - its data should contain `unsubscribe_from_ids` (array of IDs), `unsubscribe_from_id` (single ID), or `unsubscribe_from_all` (bool) | Send only        |
 
 ### Events
@@ -378,7 +392,7 @@ Create a bot here: https://discord.com/developers/applications
 If you'd like to run Lanyard with `docker-compose`, here's an example:
 
 ```yml
-version: "3.8"
+version: '3.8'
 
 services:
   redis:
