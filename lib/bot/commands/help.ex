@@ -6,7 +6,7 @@ defmodule Lanyard.DiscordBot.Commands.Help do
 
     DiscordApi.send_message(payload["channel_id"], %{
       title: "Lanyard Bot Commands",
-      description: "Manage your Lanyard KV store right from Discord.",
+      description: "Store and manage custom data on your Lanyard profile.",
       color: 0x5865F2,
       fields: [
         %{name: "#{prefix}get <key>", value: "Get the value of a key", inline: false},
