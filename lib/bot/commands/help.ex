@@ -9,15 +9,11 @@ defmodule Lanyard.DiscordBot.Commands.Help do
       description: "Store and manage custom data on your Lanyard profile.",
       color: 0x5865F2,
       fields: [
-        %{name: "#{prefix}get <key>", value: "Get the value of a key", inline: false},
-        %{name: "#{prefix}set <key> <value>", value: "Set a key to a value", inline: false},
-        %{name: "#{prefix}del <key>", value: "Delete a key", inline: false},
-        %{name: "#{prefix}kv", value: "List all of your current keys", inline: false},
-        %{
-          name: "#{prefix}apikey",
-          value: "Get (or regenerate) your Lanyard API key, sent via DM",
-          inline: false
-        },
+        %{name: "`#{prefix}get <key>`", value: "Get the value of a key", inline: false},
+        %{name: "`#{prefix}set <key> <value>`", value: "Set a key to a value", inline: false},
+        %{name: "`#{prefix}del <key>`", value: "Delete a key", inline: false},
+        %{name: "`#{prefix}kv`", value: "List all of your current keys", inline: false},
+        %{name: "`#{prefix}apikey`", value: "Get (or regenerate) your Lanyard API key, sent via DM", inline: false},
         %{
           name: "Docs & Source",
           value:
