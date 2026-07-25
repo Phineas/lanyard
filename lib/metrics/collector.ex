@@ -337,7 +337,12 @@ defmodule Lanyard.Metrics.Collector do
     set(:gauge, :lanyard_erlang_process_count, :erlang.system_info(:process_count))
     set(:gauge, :lanyard_erlang_run_queue, :erlang.statistics(:total_run_queue_lengths))
     set(:gauge, :lanyard_redis_client_queue_length, redis_client_queue_length())
-    set(:gauge, :lanyard_global_subscribers, length(Lanyard.SocketHandler.get_global_subscriber_list()))
+
+    set(
+      :gauge,
+      :lanyard_global_subscribers,
+      length(Lanyard.SocketHandler.get_global_subscriber_list())
+    )
   end
 
   defp redis_client_queue_length do
