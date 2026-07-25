@@ -174,7 +174,7 @@ Lanyard KV is a a dynamic, real-time key->value store which is added to the Lany
 
 1. Keys and values can only be strings
 2. Values can be 30,000 characters maximum
-3. Keys must be alphanumeric (a-zA-Z0-9) and 255 characters max length
+3. Keys must contain only letters, numbers, and underscores (a-zA-Z0-9) and be at most 255 characters long
 4. Your user can have a maximum of 512 key->value pairs linked
 
 #### Getting an API Key
