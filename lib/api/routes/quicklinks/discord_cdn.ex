@@ -7,12 +7,18 @@ defmodule Lanyard.Api.Quicklinks.DiscordCdn do
   @discord_cdn "https://cdn.discordapp.com"
 
   def proxy_image(conn) do
-    [user_id, file_type] =
+    segment =
       conn.request_path
       |> String.split("/")
       |> Enum.at(1)
-      |> String.split(".")
 
+    case String.split(segment, ".") do
+      [user_id, file_type] -> do_proxy_image(conn, user_id, file_type)
+      _ -> Util.not_found(conn)
+    end
+  end
+
+  defp do_proxy_image(conn, user_id, file_type) do
     presence = Lanyard.Presence.get_pretty_presence(user_id)
 
     case presence do
