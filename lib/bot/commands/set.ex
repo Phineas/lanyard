@@ -5,7 +5,7 @@ defmodule Lanyard.DiscordBot.Commands.Set do
   def handle([key | value_s], payload) when length(value_s) > 0 do
     value = Enum.join(value_s, " ")
 
-    if ApiKey.contains_api_key?(payload["author"]["id"], key) do
+    if ApiKey.contains_api_key?(payload["author"]["id"], [key, value]) do
       ApiKey.generate_and_send_new(payload["channel_id"], payload["author"]["id"])
     else
       case Lanyard.KV.Interface.set(payload["author"]["id"], key, value) do
