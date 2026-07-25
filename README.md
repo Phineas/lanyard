@@ -425,7 +425,7 @@ Below is a curated selection of websites using Lanyard right now, check them out
 - [chezzer.dev](https://chezzer.dev)
 - [dan.onl](https://dan.onl/)
 - [cnrad.dev](https://cnrad.dev)
-- [phineas.io](https://phineas.io)
+- [phin.moe](https://phin.moe)
 - [timcole.me](https://timcole.me)
 - [itspolar.dev](https://itspolar.dev)
 - [vasc.dev](https://vasc.dev)
