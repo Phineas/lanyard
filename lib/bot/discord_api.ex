@@ -1,12 +1,13 @@
 defmodule Lanyard.DiscordBot.DiscordApi do
   @api_host "https://discord.com/api/v9"
+  @max_content_length 2_000
 
   def send_message(channel_id, content) when is_binary(content) do
     Lanyard.Metrics.Collector.inc(:counter, :lanyard_discord_messages_sent)
 
     sanitized_content =
       content
-      |> String.replace("@", "@​\u200b")
+      |> sanitize_content()
 
     :post
     |> Finch.build(
@@ -35,6 +36,14 @@ defmodule Lanyard.DiscordBot.DiscordApi do
     )
     |> Finch.request(Lanyard.Finch)
     |> track_response()
+  end
+
+  @doc false
+  def content_within_limit?(content) when is_binary(content) do
+    content
+    |> sanitize_content()
+    |> String.length()
+    |> Kernel.<=(@max_content_length)
   end
 
   def create_dm(recipient) do
@@ -72,5 +81,9 @@ defmodule Lanyard.DiscordBot.DiscordApi do
     Lanyard.Metrics.Collector.inc(:counter, :lanyard_discord_api_requests_total, ["error"])
 
     result
+  end
+
+  defp sanitize_content(content) do
+    String.replace(content, "@", "@​\u200b")
   end
 end

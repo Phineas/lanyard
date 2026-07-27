@@ -10,7 +10,7 @@ defmodule Lanyard.DiscordBot.Commands.Get do
         {:ok, v} ->
           DiscordApi.send_message(
             payload["channel_id"],
-            ":white_check_mark: Key: `#{key}` | Value: ```#{String.replace(v, "`", "`\u200b")}```"
+            response_content(key, v, payload["author"]["id"])
           )
 
         {:error, msg} ->
@@ -30,5 +30,17 @@ defmodule Lanyard.DiscordBot.Commands.Get do
     end
 
     :ok
+  end
+
+  @doc false
+  def response_content(key, value, user_id) do
+    content =
+      ":white_check_mark: Key: `#{key}` | Value: ```#{String.replace(value, "`", "`\u200b")}```"
+
+    if DiscordApi.content_within_limit?(content) do
+      content
+    else
+      ":x: The value for `#{key}` is too long to display in Discord.\nView it at #{Application.get_env(:lanyard, :external_url)}/v1/users/#{user_id}"
+    end
   end
 end
