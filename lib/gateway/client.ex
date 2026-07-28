@@ -75,9 +75,7 @@ defmodule Lanyard.Gateway.Client do
   end
 
   def ondisconnect(reason, state) do
-    Logger.warning(
-      "Discord: Websocket disconnected with reason #{inspect(reason)}, will attempt resume"
-    )
+    Logger.warning("Discord: Websocket disconnected with reason #{inspect(reason)}, will attempt resume")
 
     Lanyard.Metrics.Collector.set(:gauge, :lanyard_gateway_connected, 0)
     Lanyard.Metrics.Collector.inc(:counter, :lanyard_gateway_reconnects_total, ["disconnect"])
@@ -240,9 +238,7 @@ defmodule Lanyard.Gateway.Client do
   def websocket_terminate(reason, _conn_state, state) do
     redacted_state = Map.replace(state, :token, "[REDACTED]")
 
-    Logger.info(
-      "Discord: Websocket closed in state #{inspect(redacted_state)} with reason #{inspect(reason)}"
-    )
+    Logger.info("Discord: Websocket closed in state #{inspect(redacted_state)} with reason #{inspect(reason)}")
 
     Lanyard.Metrics.Collector.set(:gauge, :lanyard_gateway_connected, 0)
 

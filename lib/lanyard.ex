@@ -13,8 +13,7 @@ defmodule Lanyard do
       {Lanyard.Metrics, :normal},
       {Lanyard.Connectivity.Redis, []},
       {Lanyard.DiscordBot, %{token: Application.get_env(:lanyard, :bot_token)}},
-      {Bandit,
-       plug: Lanyard.Api.Router, scheme: :http, port: Application.get_env(:lanyard, :http_port)}
+      {Bandit, plug: Lanyard.Api.Router, scheme: :http, port: Application.get_env(:lanyard, :http_port)}
     ]
 
     opts = [strategy: :one_for_one, name: Lanyard.Supervisor]

@@ -57,8 +57,7 @@ defmodule Lanyard.KV.Interface do
             "key_limit"
           ])
 
-          {:error,
-           "request would exceed the key limit (#{@key_count_limit}), please delete some keys first"}
+          {:error, "request would exceed the key limit (#{@key_count_limit}), please delete some keys first"}
 
         true ->
           Redis.hset("lanyard_kv:#{user_id}", map_to_list(map))

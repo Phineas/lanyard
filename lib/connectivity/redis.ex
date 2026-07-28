@@ -34,8 +34,7 @@ defmodule Lanyard.Connectivity.Redis do
   end
 
   def handle_info(
-        {:redix_pubsub, _pubsub, _pid, :message,
-         %{channel: "lanyard:global_sync", payload: payload}},
+        {:redix_pubsub, _pubsub, _pid, :message, %{channel: "lanyard:global_sync", payload: payload}},
         state
       ) do
     node_id = :erlang.phash2(node())

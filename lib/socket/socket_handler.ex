@@ -26,9 +26,7 @@ defmodule Lanyard.SocketHandler do
 
     Lanyard.Metrics.Collector.inc(:gauge, :lanyard_connected_sessions)
 
-    {:reply, :ok,
-     construct_socket_msg(state.compression, %{op: 1, d: %{"heartbeat_interval" => 30000}}),
-     state}
+    {:reply, :ok, construct_socket_msg(state.compression, %{op: 1, d: %{"heartbeat_interval" => 30000}}), state}
   end
 
   def handle_control({_message, [opcode: :ping]}, state) do
@@ -49,9 +47,7 @@ defmodule Lanyard.SocketHandler do
               init_state =
                 case json["d"] do
                   %{"subscribe_to_ids" => ids} ->
-                    Logger.debug(
-                      "Sockets | Socket initialized and subscribed to list: #{inspect(ids)}"
-                    )
+                    Logger.debug("Sockets | Socket initialized and subscribed to list: #{inspect(ids)}")
 
                     Presence.subscribe_to_ids_and_build(ids)
 
@@ -63,9 +59,7 @@ defmodule Lanyard.SocketHandler do
 
                         send(pid, {:add_subscriber, self()})
 
-                        Logger.debug(
-                          "Sockets | Socket initialized and subscribed to singleton: #{id}"
-                        )
+                        Logger.debug("Sockets | Socket initialized and subscribed to singleton: #{id}")
 
                         presence
 
@@ -113,9 +107,7 @@ defmodule Lanyard.SocketHandler do
                   Atom.to_string(state.compression)
                 ])
 
-                {:reply, :ok,
-                 construct_socket_msg(state.compression, %{op: 0, t: "INIT_STATE", d: init_state}),
-                 state}
+                {:reply, :ok, construct_socket_msg(state.compression, %{op: 0, t: "INIT_STATE", d: init_state}), state}
               end
             end
 
