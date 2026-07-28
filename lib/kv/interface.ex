@@ -2,6 +2,10 @@ defmodule Lanyard.KV.Interface do
   alias Lanyard.Connectivity.Redis
   alias Lanyard.Presence
 
+  @key_count_limit 512
+  @key_length_limit 255
+  @value_length_limit 30000
+
   def get_all(user_id) do
     {:ok, %{kv: kv}} = Presence.get_presence(user_id)
     kv
@@ -19,14 +23,15 @@ defmodule Lanyard.KV.Interface do
 
   def set(user_id, key, value) do
     kv = get_all(user_id)
+    new_key_count = Map.merge(kv, %{key => value}) |> Map.keys() |> length
 
     cond do
-      Map.keys(kv) |> length > 511 ->
+      new_key_count > @key_count_limit ->
         Lanyard.Metrics.Collector.inc(:counter, :lanyard_kv_validation_failures_total, [
           "key_limit"
         ])
 
-        {:error, "request would exceed key limit (512), please delete keys first"}
+        {:error, "request would exceed key limit (#{@key_count_limit}), please delete keys first"}
 
       true ->
         case validate_pair({key, value}) do
@@ -42,23 +47,24 @@ defmodule Lanyard.KV.Interface do
   end
 
   def multiset(user_id, map) when is_map(map) do
-    kv = get_all(user_id)
-    new_key_count = Map.keys(Map.merge(kv, map)) |> length
+    with {:ok} <- validate_pairs(map) do
+      kv = get_all(user_id)
+      new_key_count = Map.merge(kv, map) |> Map.keys() |> length
 
-    cond do
-      new_key_count > 511 ->
-        Lanyard.Metrics.Collector.inc(:counter, :lanyard_kv_validation_failures_total, [
-          "key_limit"
-        ])
+      cond do
+        new_key_count > @key_count_limit ->
+          Lanyard.Metrics.Collector.inc(:counter, :lanyard_kv_validation_failures_total, [
+            "key_limit"
+          ])
 
-        {:error, "request would exceed the key limit (512), please delete some keys first"}
+          {:error,
+           "request would exceed the key limit (#{@key_count_limit}), please delete some keys first"}
 
-      true ->
-        Redis.hset("lanyard_kv:#{user_id}", map_to_list(map))
-
-        full_kv = get_all(user_id)
-        Presence.sync(user_id, %{kv: Map.merge(full_kv, map)})
-        {:ok}
+        true ->
+          Redis.hset("lanyard_kv:#{user_id}", map_to_list(map))
+          Presence.sync(user_id, %{kv: Map.merge(kv, map)})
+          {:ok}
+      end
     end
   end
 
@@ -71,12 +77,12 @@ defmodule Lanyard.KV.Interface do
 
   def validate_pair({key, value}) do
     cond do
-      String.length(key) > 255 ->
+      String.length(key) > @key_length_limit ->
         Lanyard.Metrics.Collector.inc(:counter, :lanyard_kv_validation_failures_total, [
           "key_too_long"
         ])
 
-        {:error, "key must be 255 characters or less"}
+        {:error, "key must be #{@key_length_limit} characters or less"}
 
       not String.match?(key, ~r/^[a-zA-Z0-9_]*$/) ->
         Lanyard.Metrics.Collector.inc(:counter, :lanyard_kv_validation_failures_total, [
@@ -85,16 +91,25 @@ defmodule Lanyard.KV.Interface do
 
         {:error, "key must be alphanumeric (a-zA-Z0-9_)"}
 
-      String.length(value) > 30000 ->
+      String.length(value) > @value_length_limit ->
         Lanyard.Metrics.Collector.inc(:counter, :lanyard_kv_validation_failures_total, [
           "value_too_long"
         ])
 
-        {:error, "value must be 30000 characters or less"}
+        {:error, "value must be #{@value_length_limit} characters or less"}
 
       true ->
         {:ok}
     end
+  end
+
+  defp validate_pairs(map) do
+    Enum.reduce_while(map, {:ok}, fn pair, _acc ->
+      case validate_pair(pair) do
+        {:ok} -> {:cont, {:ok}}
+        {:error, _reason} = error -> {:halt, error}
+      end
+    end)
   end
 
   defp map_to_list(map) when is_map(map) do

@@ -38,12 +38,6 @@ defmodule Lanyard.Api.Routes.V1.Users do
         try do
           {:ok, parsed} = Jason.decode(body)
 
-          Enum.each(parsed, fn {k, v} ->
-            with {:error, _reason} = err <- Lanyard.KV.Interface.validate_pair({k, v}) do
-              throw(err)
-            end
-          end)
-
           case Lanyard.KV.Interface.multiset(user_id, parsed) do
             {:ok} ->
               Util.respond(conn, {:ok})
@@ -54,8 +48,6 @@ defmodule Lanyard.Api.Routes.V1.Users do
         rescue
           _e ->
             Util.respond(conn, {:error, :invalid_kv_value, "body must be an object"})
-        catch
-          {:error, reason} -> Util.respond(conn, {:error, :kv_validation_failed, reason})
         end
 
       :no_permission ->
