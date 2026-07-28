@@ -44,9 +44,13 @@ defmodule Lanyard.Api.Routes.V1.Users do
             end
           end)
 
-          Lanyard.KV.Interface.multiset(user_id, parsed)
+          case Lanyard.KV.Interface.multiset(user_id, parsed) do
+            {:ok} ->
+              Util.respond(conn, {:ok})
 
-          Util.respond(conn, {:ok})
+            {:error, reason} ->
+              Util.respond(conn, {:error, :kv_validation_failed, reason})
+          end
         rescue
           _e ->
             Util.respond(conn, {:error, :invalid_kv_value, "body must be an object"})
