@@ -42,10 +42,24 @@ defmodule Lanyard.KV.Interface do
   end
 
   def multiset(user_id, map) when is_map(map) do
-    Redis.hset("lanyard_kv:#{user_id}", map_to_list(map))
+    kv = get_all(user_id)
+    new_key_count = Map.keys(Map.merge(kv, map)) |> length
 
-    full_kv = get_all(user_id)
-    Presence.sync(user_id, %{kv: Map.merge(full_kv, map)})
+    cond do
+      new_key_count > 511 ->
+        Lanyard.Metrics.Collector.inc(:counter, :lanyard_kv_validation_failures_total, [
+          "key_limit"
+        ])
+
+        {:error, "request would exceed the key limit (512), please delete some keys first"}
+
+      true ->
+        Redis.hset("lanyard_kv:#{user_id}", map_to_list(map))
+
+        full_kv = get_all(user_id)
+        Presence.sync(user_id, %{kv: Map.merge(full_kv, map)})
+        {:ok}
+    end
   end
 
   def del(user_id, key) do
