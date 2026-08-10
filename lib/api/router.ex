@@ -74,9 +74,9 @@ defmodule Lanyard.Api.Router do
   get "/" do
     response = %{
       info:
-        "Lanyard provides Discord presences as an API and WebSocket. Find out more here: https://github.com/Phineas/lanyard",
+        "Fanyard provides Discord presences as an API and WebSocket. Find out more here: https://github.com/furina",
       monitored_user_count: GenRegistry.count(Lanyard.Presence),
-      discord_invite: "https://discord.gg/lanyard"
+      discord_invite: "https://discord.gg/g9GVfwhEg"
     }
 
     Util.respond(conn, {:ok, response})
