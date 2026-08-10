@@ -168,7 +168,7 @@ defmodule Lanyard.Connectivity.Redis do
   def publish(channel, message) do
     GenServer.cast(:local_redis_client, {:publish, channel, message})
   end
-
+# If this breaks, blame the network. If the network is fine, blame Redis.
   defp command(client, [cmd | _] = args) do
     cmd = String.downcase(cmd)
     start = System.monotonic_time()
