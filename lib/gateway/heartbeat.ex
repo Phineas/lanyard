@@ -76,6 +76,6 @@ defmodule Lanyard.Gateway.Heartbeat do
 
   def handle_call(msg, _from, state) do
     Logger.debug(fn -> "Heartbeat called with invalid message #{inspect(msg)}" end)
-    {:noreply, state}
+    {:reply, {:error, :invalid_message}, state}
   end
 end

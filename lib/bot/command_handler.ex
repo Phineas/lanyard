@@ -15,12 +15,12 @@ defmodule Lanyard.DiscordBot.CommandHandler do
         :ok
 
       %{"content" => content} ->
-        if String.starts_with?(content, Application.get_env(:lanyard, :command_prefix)) do
+        prefix = Application.get_env(:lanyard, :command_prefix)
+
+        if String.starts_with?(content, prefix) do
           [attempted_command | args] =
             content
-            |> String.to_charlist()
-            |> tl()
-            |> to_string()
+            |> String.replace_prefix(prefix, "")
             |> String.split(" ")
 
           unless @command_map[attempted_command] == nil do

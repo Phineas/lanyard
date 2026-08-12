@@ -211,6 +211,7 @@ defmodule Lanyard.SocketHandler do
         data = :zlib.deflate(z, data, :finish)
 
         :zlib.deflateEnd(z)
+        :zlib.close(z)
 
         {:binary, data}
 

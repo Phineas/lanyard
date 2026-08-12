@@ -3,7 +3,10 @@ defmodule Lanyard.DiscordBot.Commands.KV do
 
   def handle(_, payload) do
     kv =
-      Lanyard.KV.Interface.get_all(payload["author"]["id"])
+      case Lanyard.KV.Interface.get_all(payload["author"]["id"]) do
+        {:ok, kv} -> kv
+        {:error, _code, _reason} -> %{}
+      end
       |> Enum.map(fn {k, _v} -> k end)
       |> Enum.join(", ")
 

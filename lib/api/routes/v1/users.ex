@@ -80,8 +80,13 @@ defmodule Lanyard.Api.Routes.V1.Users do
 
     case validate_resource_access(conn) do
       {:ok, user_id} ->
-        Lanyard.KV.Interface.del(String.to_integer(user_id), field)
-        Util.respond(conn, {:ok})
+        case Lanyard.KV.Interface.del(String.to_integer(user_id), field) do
+          {:ok} ->
+            Util.respond(conn, {:ok})
+
+          {:error, reason} ->
+            Util.respond(conn, {:error, :kv_validation_failed, reason})
+        end
 
       :no_permission ->
         Util.no_permission(conn)

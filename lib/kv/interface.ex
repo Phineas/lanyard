@@ -7,8 +7,10 @@ defmodule Lanyard.KV.Interface do
   @value_length_limit 30000
 
   def get_all(user_id) do
-    {:ok, %{kv: kv}} = Presence.get_presence(user_id)
-    kv
+    case Presence.get_presence(user_id) do
+      {:ok, %{kv: kv}} -> {:ok, kv}
+      {:error, _reason, _msg} = error -> error
+    end
   end
 
   def get(user_id, key) do
@@ -22,33 +24,34 @@ defmodule Lanyard.KV.Interface do
   end
 
   def set(user_id, key, value) do
-    kv = get_all(user_id)
-    new_key_count = Map.merge(kv, %{key => value}) |> Map.keys() |> length
+    with {:ok, kv} <- fetch_kv(user_id) do
+      new_key_count = Map.merge(kv, %{key => value}) |> Map.keys() |> length
 
-    cond do
-      new_key_count > @key_count_limit ->
-        Lanyard.Metrics.Collector.inc(:counter, :lanyard_kv_validation_failures_total, [
-          "key_limit"
-        ])
+      cond do
+        new_key_count > @key_count_limit ->
+          Lanyard.Metrics.Collector.inc(:counter, :lanyard_kv_validation_failures_total, [
+            "key_limit"
+          ])
 
-        {:error, "request would exceed key limit (#{@key_count_limit}), please delete keys first"}
+          {:error, "request would exceed key limit (#{@key_count_limit}), please delete keys first"}
 
-      true ->
-        case validate_pair({key, value}) do
-          {:error, _msg} = err ->
-            err
+        true ->
+          case validate_pair({key, value}) do
+            {:error, _msg} = err ->
+              err
 
-          {:ok} ->
-            Redis.hset("lanyard_kv:#{user_id}", key, value)
-            Presence.sync(user_id, %{kv: Map.put(kv, key, value)})
-            {:ok, value}
-        end
+            {:ok} ->
+              Redis.hset("lanyard_kv:#{user_id}", key, value)
+              Presence.sync(user_id, %{kv: Map.put(kv, key, value)})
+              {:ok, value}
+          end
+      end
     end
   end
 
   def multiset(user_id, map) when is_map(map) do
-    with {:ok} <- validate_pairs(map) do
-      kv = get_all(user_id)
+    with {:ok} <- validate_pairs(map),
+         {:ok, kv} <- fetch_kv(user_id) do
       new_key_count = Map.merge(kv, map) |> Map.keys() |> length
 
       cond do
@@ -70,8 +73,19 @@ defmodule Lanyard.KV.Interface do
   def del(user_id, key) do
     Redis.hdel("lanyard_kv:#{user_id}", key)
 
-    kv = get_all(user_id)
-    Presence.sync(user_id, %{kv: Map.delete(kv, key)})
+    with {:ok, kv} <- fetch_kv(user_id) do
+      Presence.sync(user_id, %{kv: Map.delete(kv, key)})
+      {:ok}
+    end
+  end
+
+  # Wraps get_all/1's presence-lookup error into the same {:error, binary}
+  # shape the rest of this module (and its callers) expect.
+  defp fetch_kv(user_id) do
+    case get_all(user_id) do
+      {:ok, kv} -> {:ok, kv}
+      {:error, _code, reason} -> {:error, reason}
+    end
   end
 
   def validate_pair({key, value}) do

@@ -128,18 +128,18 @@ defmodule Lanyard.Presence do
     }
   end
 
+  # Only these fields may be updated via {:sync, _} - anything else (e.g.
+  # subscriber_pids/refmap) is internal bookkeeping and must never be
+  # overwritable from a cast payload, which can originate from another
+  # node's global sync broadcast over Redis.
+  @syncable_fields ~w(discord_presence discord_user kv)a
+
   def handle_cast({:sync, new_state}, state) do
-    original_keys = Map.keys(state) |> MapSet.new()
-
     normalized_new_state =
-      for {k, v} <- new_state, into: %{} do
-        key =
-          cond do
-            is_atom(k) -> k
-            is_binary(k) and MapSet.member?(original_keys, String.to_atom(k)) -> String.to_atom(k)
-            true -> k
-          end
-
+      for {k, v} <- new_state,
+          key = if(is_atom(k), do: k, else: safe_to_existing_atom(k)),
+          key in @syncable_fields,
+          into: %{} do
         {key, v}
       end
 
@@ -167,6 +167,12 @@ defmodule Lanyard.Presence do
     )
 
     {:noreply, Map.merge(state, normalized_new_state)}
+  end
+
+  defp safe_to_existing_atom(k) do
+    String.to_existing_atom(k)
+  rescue
+    ArgumentError -> nil
   end
 
   @spec get_public_fields(map()) :: %Lanyard.Presence.PublicFields{}

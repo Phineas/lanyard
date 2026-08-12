@@ -61,7 +61,8 @@ defmodule Lanyard.Api.Quicklinks.DiscordCdn do
         file_type
       end
 
-    constructed_cdn_url = "#{@discord_cdn}/avatars/#{id}/#{avatar}.#{file_type}?size=1024"
+    constructed_cdn_url =
+      "#{@discord_cdn}/avatars/#{URI.encode_www_form(id)}/#{URI.encode_www_form(avatar)}.#{URI.encode_www_form(file_type)}?size=1024"
 
     :get
     |> Finch.build(constructed_cdn_url)
