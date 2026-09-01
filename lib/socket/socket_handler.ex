@@ -46,12 +46,12 @@ defmodule Lanyard.SocketHandler do
             else
               init_state =
                 case json["d"] do
-                  %{"subscribe_to_ids" => ids} ->
+                  %{"subscribe_to_ids" => ids} when is_list(ids) ->
                     Logger.debug("Sockets | Socket initialized and subscribed to list: #{inspect(ids)}")
 
                     Presence.subscribe_to_ids_and_build(ids)
 
-                  %{"subscribe_to_id" => id} ->
+                  %{"subscribe_to_id" => id} when is_binary(id) ->
                     case GenRegistry.lookup(Lanyard.Presence, id) do
                       {:ok, pid} ->
                         {:ok, raw_data} = Presence.get_presence(id)
@@ -96,8 +96,8 @@ defmodule Lanyard.SocketHandler do
               else
                 sub_type =
                   case json["d"] do
-                    %{"subscribe_to_ids" => _} -> "ids"
-                    %{"subscribe_to_id" => _} -> "single"
+                    %{"subscribe_to_ids" => ids} when is_list(ids) -> "ids"
+                    %{"subscribe_to_id" => id} when is_binary(id) -> "single"
                     %{"subscribe_to_all" => true} -> "all"
                     _ -> "invalid"
                   end
