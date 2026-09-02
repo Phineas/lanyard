@@ -201,4 +201,16 @@ defmodule Lanyard.Connectivity.Redis do
     |> Enum.chunk_every(2)
     |> Map.new(fn [k, v] -> {k, v} end)
   end
+
+  def get_last_played_spotify(user_id) do
+    case command(["GET", "lanyard_last_spotify:#{user_id}"]) do
+      {:ok, nil} -> nil
+      {:ok, data} -> Jason.decode!(data)
+      _ -> nil
+    end
+  end
+
+  def set_last_played_spotify(user_id, spotify_data) do
+    command(["SET", "lanyard_last_spotify:#{user_id}", Jason.encode!(spotify_data)])
+  end
 end

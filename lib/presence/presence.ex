@@ -14,6 +14,7 @@ defmodule Lanyard.Presence.PrettyPresence do
             active_on_discord_vr: false,
             listening_to_spotify: false,
             spotify: nil,
+            last_played_spotify: nil,
             activities: [],
             kv: %{}
 end
@@ -236,6 +237,20 @@ defmodule Lanyard.Presence do
 
     has_presence? = raw_data.discord_presence !== nil
 
+    pretty_spotify = Spotify.build_pretty_spotify(spotify_activity)
+
+    if spotify_activity !== nil do
+      Task.start(fn ->
+        Redis.set_last_played_spotify(raw_data.discord_user["id"], pretty_spotify)
+      end)
+    end
+
+    last_played_spotify = if spotify_activity == nil do
+      Redis.get_last_played_spotify(raw_data.discord_user["id"])
+    else
+      nil
+    end
+
     pretty_fields =
       if has_presence? do
         %Lanyard.Presence.PrettyPresence{
@@ -247,13 +262,15 @@ defmodule Lanyard.Presence do
           active_on_discord_embedded: Map.has_key?(raw_data.discord_presence["client_status"], "embedded"),
           active_on_discord_vr: Map.has_key?(raw_data.discord_presence["client_status"], "vr"),
           listening_to_spotify: spotify_activity !== nil,
-          spotify: Spotify.build_pretty_spotify(spotify_activity),
+          spotify: pretty_spotify,
+          last_played_spotify: last_played_spotify,
           activities: Activity.build_pretty_activities(activities),
           kv: raw_data.kv
         }
       else
         %Lanyard.Presence.PrettyPresence{
           discord_user: raw_data.discord_user,
+          last_played_spotify: last_played_spotify,
           kv: raw_data.kv
         }
       end
