@@ -439,4 +439,4 @@ Below is a curated selection of websites using Lanyard right now, check them out
 - [littlepriceonu.com](https://littlepriceonu.com/)
 - [orangc](https://orangc.net)
 - [kie.ac](https://kie.ac)
-- [jello](https://pinkytooth.lol)
+- [pinkytooth.lol](https://pinkytooth.lol)
