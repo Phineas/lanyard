@@ -57,7 +57,7 @@ The Lanyard community has worked on some pretty cool projects that allows you to
 [lanyard-profile-readme](https://github.com/cnrad/lanyard-profile-readme) - Utilize Lanyard to display your Discord Presence in your GitHub Profile \
 [vue-lanyard](https://github.com/eggsy/vue-lanyard) - Lanyard API plugin for Vue. Supports REST and WebSocket methods \
 [react-use-lanyard](https://github.com/barbarbar338/react-use-lanyard) - React hook for Lanyard - supports REST & WebSocket \
-[lanyard-visualizer](https://lanyard-visualizer.netlify.app/) - Beautifully display your Discord presence on a website \
+[lanyard-visualizer](https://lanyard.akryst.moe) - Beautifully display your Discord presence on a website \
 [js-lanyard](https://github.com/xaronnn/js-lanyard/) - Use Lanyard in your Web App. \
 [go-lanyard](https://github.com/barbarbar338/go-lanyard) - Lanyard API wrapper for GoLang - supports REST & WebSocket \
 [use-lanyard](https://github.com/LeonardSSH/use-lanyard) - Lanyard with Composition API for Vue. Supports REST and WebSocket methods \
@@ -440,3 +440,4 @@ Below is a curated selection of websites using Lanyard right now, check them out
 - [orangc](https://orangc.net)
 - [kie.ac](https://kie.ac)
 - [terrified.cc](https://terrified.cc)
+- [akryst.moe](https://akryst.moe)
