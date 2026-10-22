@@ -440,4 +440,5 @@ Below is a curated selection of websites using Lanyard right now, check them out
 - [orangc](https://orangc.net)
 - [kie.ac](https://kie.ac)
 - [terrified.cc](https://terrified.cc)
+- [zeusgmj.com](https://zeusgmj.com)
 - [akryst.moe](https://akryst.moe)
