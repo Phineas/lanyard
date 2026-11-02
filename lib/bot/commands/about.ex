@@ -5,7 +5,7 @@ defmodule Lanyard.DiscordBot.Commands.About do
   def definition do
     %{
       name: "about",
-      description: "View Lanyard's privacy policy and terms of service"
+      description: "View Lanyard's privacy policy"
     }
   end
 
@@ -18,12 +18,10 @@ defmodule Lanyard.DiscordBot.Commands.About do
   end
 
   defp embed do
-    base = Application.get_env(:lanyard, :external_url)
-
     Embed.info(%{
       title: "Lanyard",
       description:
-        "Discord presence as an API. Embed your status on websites, dashboards, and more.\n\n:lock: **Privacy Policy:** #{base}/privacy\n:scroll: **Terms of Service:** #{base}/terms",
+        "Discord presence as an API. Embed your status on websites, dashboards, and more.\n\n:lock: **Privacy Policy:** https://privacy.lanyard.rest/",
       footer: %{text: "lanyard.rest"}
     })
   end

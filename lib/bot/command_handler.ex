@@ -69,7 +69,7 @@ defmodule Lanyard.DiscordBot.CommandHandler do
       Embed.info(%{
         title: ":wave: Hi! I'm Lanyard",
         description:
-          "Looking for your API key? Use #{CommandCache.mention("apikey")} — the response is private to you.\n\n**Other slash commands:**\n#{CommandCache.mention("kv")} — view your K/V keys\n#{CommandCache.mention("get")} — get a value\n#{CommandCache.mention("set")} — set a key\n#{CommandCache.mention("del")} — delete a key\n#{CommandCache.mention("about")} — privacy policy & terms of service",
+          "Looking for your API key? Use #{CommandCache.mention("apikey")} — the response is private to you.\n\n**Other slash commands:**\n#{CommandCache.mention("kv")} — view your K/V keys\n#{CommandCache.mention("get")} — get a value\n#{CommandCache.mention("set")} — set a key\n#{CommandCache.mention("del")} — delete a key\n#{CommandCache.mention("about")} — privacy policy",
         footer: %{text: "Type / in any channel to see my commands"}
       })
 
@@ -81,7 +81,7 @@ defmodule Lanyard.DiscordBot.CommandHandler do
       Embed.info(%{
         title: ":wave: Hi, I'm Lanyard",
         description:
-          "I expose your Discord presence as a public API. Embed your status on websites, dashboards, and more.\n\n**Slash commands:**\n#{CommandCache.mention("kv")} — view your K/V keys\n#{CommandCache.mention("get")} — get a value\n#{CommandCache.mention("set")} — set a key\n#{CommandCache.mention("del")} — delete a key\n#{CommandCache.mention("apikey")} — generate or rotate your private API key (response is private to you)\n#{CommandCache.mention("about")} — privacy policy & terms of service",
+          "I expose your Discord presence as a public API. Embed your status on websites, dashboards, and more.\n\n**Slash commands:**\n#{CommandCache.mention("kv")} — view your K/V keys\n#{CommandCache.mention("get")} — get a value\n#{CommandCache.mention("set")} — set a key\n#{CommandCache.mention("del")} — delete a key\n#{CommandCache.mention("apikey")} — generate or rotate your private API key (response is private to you)\n#{CommandCache.mention("about")} — privacy policy",
         footer: %{text: "Type / in any channel to see my commands"}
       })
 

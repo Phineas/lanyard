@@ -22,7 +22,7 @@ defmodule Lanyard.DiscordBot.Commands.Help do
     Embed.info(%{
       title: "Lanyard Bot Commands",
       description:
-        "Store and manage custom data on your Lanyard profile.\n\n#{CommandCache.mention("get")} `<key>` — get the value of a key\n#{CommandCache.mention("set")} `<key> <value>` — set a key to a value\n#{CommandCache.mention("del")} `<key>` — delete a key\n#{CommandCache.mention("kv")} — list all of your current keys\n#{CommandCache.mention("apikey")} — get (or regenerate) your API key, only visible to you\n#{CommandCache.mention("about")} — privacy policy & terms of service",
+        "Store and manage custom data on your Lanyard profile.\n\n#{CommandCache.mention("get")} `<key>` — get the value of a key\n#{CommandCache.mention("set")} `<key> <value>` — set a key to a value\n#{CommandCache.mention("del")} `<key>` — delete a key\n#{CommandCache.mention("kv")} — list all of your current keys\n#{CommandCache.mention("apikey")} — get (or regenerate) your API key, only visible to you\n#{CommandCache.mention("about")} — privacy policy",
       fields: [
         %{
           name: "Docs & Source",
