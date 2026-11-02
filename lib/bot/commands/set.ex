@@ -1,41 +1,96 @@
 defmodule Lanyard.DiscordBot.Commands.Set do
+  alias Lanyard.DiscordBot.CommandCache
   alias Lanyard.DiscordBot.DiscordApi
+  alias Lanyard.DiscordBot.Embed
   alias Lanyard.DiscordBot.Commands.ApiKey
+  alias Lanyard.DiscordBot.InteractionHandler
 
-  def handle([key | value_s], payload) when length(value_s) > 0 do
-    value = Enum.join(value_s, " ")
+  def definition do
+    %{
+      name: "set",
+      description: "Set a key in your Lanyard K/V store",
+      options: [
+        %{name: "key", description: "The key to set", type: 3, required: true},
+        %{name: "value", description: "The value to store", type: 3, required: true}
+      ]
+    }
+  end
 
-    if ApiKey.contains_api_key?(payload["author"]["id"], [key, value]) do
-      ApiKey.generate_and_send_new(payload["channel_id"], payload["author"]["id"])
+  def handle(args, payload) do
+    user_id = payload["author"]["id"]
+    channel_id = payload["channel_id"]
+
+    if ApiKey.contains_api_key?(user_id, args) do
+      DiscordApi.send_message(channel_id, ApiKey.leak_warning_embed())
     else
-      case Lanyard.KV.Interface.set(payload["author"]["id"], key, value) do
-        {:error, reason} ->
-          DiscordApi.send_message(
-            payload["channel_id"],
-            ":x: #{reason}"
-          )
+      embed =
+        case args do
+          [key | value_parts] when value_parts != [] ->
+            case kv_set_embed(user_id, key, Enum.join(value_parts, " ")) do
+              {_kind, e} -> e
+            end
 
-        _ ->
-          DiscordApi.send_message(
-            payload["channel_id"],
-            ":white_check_mark: `#{key}` was set. View it with `#{Application.get_env(:lanyard, :command_prefix)}get #{key}` or go to #{Application.get_env(:lanyard, :external_url)}/v1/users/#{payload["author"]["id"]}"
-          )
+          _ ->
+            usage_embed()
+        end
+
+      DiscordApi.send_message(channel_id, embed)
+    end
+
+    :ok
+  end
+
+  def handle_interaction(interaction) do
+    user_id = InteractionHandler.user_id(interaction)
+    key = InteractionHandler.option(interaction, "key")
+    value = InteractionHandler.option(interaction, "value")
+    interaction_id = interaction["id"]
+    interaction_token = interaction["token"]
+
+    if ApiKey.contains_api_key?(user_id, [key, value]) do
+      DiscordApi.respond_to_interaction(
+        interaction_id,
+        interaction_token,
+        ApiKey.leak_warning_embed(),
+        ephemeral: true
+      )
+    else
+      case kv_set_embed(user_id, key, value) do
+        {:ok, embed} ->
+          DiscordApi.respond_to_interaction(interaction_id, interaction_token, embed)
+
+        {:error, embed} ->
+          DiscordApi.respond_to_interaction(interaction_id, interaction_token, embed, ephemeral: true)
       end
     end
 
     :ok
   end
 
-  def handle(args, payload) do
-    if ApiKey.contains_api_key?(payload["author"]["id"], args) do
-      ApiKey.generate_and_send_new(payload["channel_id"], payload["author"]["id"])
-    else
-      DiscordApi.send_message(
-        payload["channel_id"],
-        "Invalid usage. Example `set` command usage:\n`#{Application.get_env(:lanyard, :command_prefix)}set <key> <value>`"
-      )
-    end
+  defp kv_set_embed(user_id, key, value) do
+    case Lanyard.KV.Interface.set(user_id, key, value) do
+      {:error, reason} ->
+        {:error, Embed.error(%{title: ":x: Could not set key", description: reason})}
 
-    :ok
+      _ ->
+        external_url = Application.get_env(:lanyard, :external_url)
+        profile_url = "#{external_url}/v1/users/#{user_id}"
+
+        {:ok,
+         Embed.success(%{
+           title: ":white_check_mark: Key Set",
+           description: "View it with #{CommandCache.mention("get")} or open [your profile](#{profile_url}).",
+           fields: [
+             %{name: "Key", value: "`#{key}`", inline: true}
+           ]
+         })}
+    end
+  end
+
+  defp usage_embed do
+    Embed.error(%{
+      title: ":x: Invalid usage",
+      description: "Usage: `#{Application.get_env(:lanyard, :command_prefix)}set <key> <value>`"
+    })
   end
 end

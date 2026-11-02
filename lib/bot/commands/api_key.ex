@@ -1,25 +1,32 @@
 defmodule Lanyard.DiscordBot.Commands.ApiKey do
   alias Lanyard.Connectivity.Redis
   alias Lanyard.DiscordBot.DiscordApi
+  alias Lanyard.DiscordBot.Embed
 
-  def handle(_, %{"channel_id" => channel_id, "guild_id" => _guild_id} = _p) do
-    DiscordApi.send_message(channel_id, ":x: You can only perform this command in DMs with me")
+  def definition do
+    %{
+      name: "apikey",
+      description: "Generate (or regenerate) your private Lanyard API key"
+    }
   end
 
   def handle(_, payload) do
     user_id = payload["author"]["id"]
     key = generate_api_key(user_id)
 
-    Lanyard.DiscordBot.DiscordApi.send_message(payload["channel_id"], %{
-      title: "Lanyard API Key",
-      description:
-        "**Absolutely do not share or post this key anywhere, it is a secret key that will allow anyone to manage your Lanyard K/V**\n\n**This key is not to be used in a front-end application/website**\n\nIf you are looking for the public endpoint for your data, you would use your discord user ID like so\n#{Application.get_env(:lanyard, :external_url)}/v1/users/#{user_id}",
-      color: 0x5865F2,
-      footer: %{text: "Run this command again if you need to re-generate your key"},
-      fields: [
-        %{name: "Key", value: "||`#{key}`||\n-# *click above to reveal*", inline: false}
-      ]
-    })
+    DiscordApi.send_message(payload["channel_id"], key_embed(user_id, key, ephemeral?: false))
+  end
+
+  def handle_interaction(interaction) do
+    user_id = interaction_user_id(interaction)
+    key = generate_api_key(user_id)
+
+    DiscordApi.respond_to_interaction(
+      interaction["id"],
+      interaction["token"],
+      key_embed(user_id, key, ephemeral?: true),
+      ephemeral: true
+    )
   end
 
   def contains_api_key?(user_id, candidates) do
@@ -30,20 +37,12 @@ defmodule Lanyard.DiscordBot.Commands.ApiKey do
     |> Enum.any?(&(&1 == stored_key))
   end
 
-  def generate_and_send_new(original_channel, user_id) do
-    DiscordApi.send_message(
-      original_channel,
-      ":x: Whoops, you just posted your API key, this is meant to stay private, regenerating this for you, check your DM"
-    )
-
-    key = generate_api_key(user_id)
-
-    dm_channel = DiscordApi.create_dm(user_id)
-
-    DiscordApi.send_message(
-      dm_channel,
-      ":repeat: **We've regenerated your api key as you used it in a K/V command.**\nYour new Lanyard API key is `#{key}`\n\n**ABSOLUTELY DO NOT SHARE OR POST THIS KEY ANYWHERE IT WILL ALLOW ANYONE TO MANAGE YOUR LANYARD K/V**\n*Run `.apikey` in this DM if you need to re-generate your key*"
-    )
+  def leak_warning_embed do
+    Embed.warn(%{
+      title: ":warning: That looks like your API key",
+      description:
+        "Your private Lanyard API key isn't a K/V key or value — it's a separate credential for the HTTP API and shouldn't be pasted as a command argument.\n\nIf you think the key has been exposed and want to rotate it, run #{Lanyard.DiscordBot.CommandCache.mention("apikey")}."
+    })
   end
 
   def generate_api_key(user_id) do
@@ -58,5 +57,35 @@ defmodule Lanyard.DiscordBot.Commands.ApiKey do
     Redis.mset(["api_key:#{key}", user_id, "user_api_key:#{user_id}", key])
 
     key
+  end
+
+  defp key_embed(user_id, key, opts) do
+    base = Application.get_env(:lanyard, :external_url)
+    ephemeral? = Keyword.get(opts, :ephemeral?, false)
+
+    save_line =
+      if ephemeral? do
+        "**Save this key now — this message is only visible to you and won't stick around.** You can always run #{Lanyard.DiscordBot.CommandCache.mention("apikey")} to generate a new one, but the old one will stop working."
+      else
+        "**Save this key somewhere safe.** You can always run #{Lanyard.DiscordBot.CommandCache.mention("apikey")} to generate a new one, but the old one will stop working."
+      end
+
+    Embed.info(%{
+      title: "Lanyard API Key",
+      description:
+        "#{save_line}\n\n**Do not share or post this key anywhere — it lets anyone manage your Lanyard K/V.**\n\nThis key is not meant for front-end applications. For the public read endpoint, use your Discord user ID:\n#{base}/v1/users/#{user_id}",
+      fields: [
+        %{name: "Key", value: "||`#{key}`||\n-# *click to reveal*", inline: false}
+      ],
+      footer: %{text: "Run /apikey again if you need to regenerate"}
+    })
+  end
+
+  defp interaction_user_id(interaction) do
+    cond do
+      user = interaction["user"] -> user["id"]
+      member = interaction["member"] -> member["user"]["id"]
+      true -> nil
+    end
   end
 end

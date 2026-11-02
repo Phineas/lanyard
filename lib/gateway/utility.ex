@@ -19,6 +19,7 @@ defmodule Lanyard.Gateway.Utility do
   @dispatch_events %{
     "READY" => :ready,
     "MESSAGE_CREATE" => :message_create,
+    "INTERACTION_CREATE" => :interaction_create,
     "GUILD_CREATE" => :guild_create,
     "PRESENCE_UPDATE" => :presence_update,
     "GUILD_MEMBER_ADD" => :guild_member_add,
