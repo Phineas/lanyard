@@ -10,16 +10,6 @@ defmodule Lanyard.DiscordBot.Commands.ApiKey do
     }
   end
 
-  def handle(_, %{"channel_id" => channel_id, "guild_id" => _guild_id} = _p) do
-    embed =
-      Embed.error(%{
-        title: ":x: DM only",
-        description: "You can only perform this command in DMs with me."
-      })
-
-    DiscordApi.send_message(channel_id, embed)
-  end
-
   def handle(_, payload) do
     user_id = payload["author"]["id"]
     key = generate_api_key(user_id)

@@ -1,5 +1,4 @@
 defmodule Lanyard.DiscordBot.Commands.Get do
-  alias Lanyard.DiscordBot.CommandCache
   alias Lanyard.DiscordBot.DiscordApi
   alias Lanyard.DiscordBot.Embed
   alias Lanyard.DiscordBot.Commands.ApiKey
@@ -19,26 +18,21 @@ defmodule Lanyard.DiscordBot.Commands.Get do
     user_id = payload["author"]["id"]
     channel_id = payload["channel_id"]
 
-    cond do
-      ApiKey.contains_api_key?(user_id, args) ->
-        DiscordApi.send_message(channel_id, ApiKey.leak_warning_embed())
+    if ApiKey.contains_api_key?(user_id, args) do
+      DiscordApi.send_message(channel_id, ApiKey.leak_warning_embed())
+    else
+      embed =
+        case args do
+          [key] ->
+            case kv_get_embed(user_id, key) do
+              {_kind, e} -> e
+            end
 
-      dm?(payload) ->
-        embed =
-          case args do
-            [key] ->
-              case kv_get_embed(user_id, key) do
-                {_kind, e} -> e
-              end
+          _ ->
+            usage_embed()
+        end
 
-            _ ->
-              usage_embed()
-          end
-
-        DiscordApi.send_message(channel_id, embed)
-
-      true ->
-        DiscordApi.send_message(channel_id, moved_embed("get"))
+      DiscordApi.send_message(channel_id, embed)
     end
 
     :ok
@@ -102,15 +96,6 @@ defmodule Lanyard.DiscordBot.Commands.Get do
     Embed.error(%{
       title: ":x: Invalid usage",
       description: "Usage: `#{Application.get_env(:lanyard, :command_prefix)}get <key>`"
-    })
-  end
-
-  defp dm?(payload), do: is_nil(payload["guild_id"])
-
-  defp moved_embed(name) do
-    Embed.info(%{
-      title: ":sparkles: K/V commands have moved",
-      description: "Use #{CommandCache.mention(name)} instead."
     })
   end
 end

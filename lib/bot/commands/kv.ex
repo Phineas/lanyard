@@ -12,15 +12,7 @@ defmodule Lanyard.DiscordBot.Commands.KV do
   end
 
   def handle(_, payload) do
-    user_id = payload["author"]["id"]
-    channel_id = payload["channel_id"]
-
-    embed =
-      if dm?(payload),
-        do: kv_list_embed(user_id),
-        else: moved_embed()
-
-    DiscordApi.send_message(channel_id, embed)
+    DiscordApi.send_message(payload["channel_id"], kv_list_embed(payload["author"]["id"]))
   end
 
   def handle_interaction(interaction) do
@@ -41,7 +33,7 @@ defmodule Lanyard.DiscordBot.Commands.KV do
     keys_value =
       case keys do
         [] -> "_No keys yet._"
-        list -> "```#{Enum.join(list, ", ")}```"
+        list -> keys_field(list, user_id)
       end
 
     Embed.info(%{
@@ -54,13 +46,32 @@ defmodule Lanyard.DiscordBot.Commands.KV do
     })
   end
 
-  defp moved_embed do
-    Embed.info(%{
-      title: ":sparkles: K/V commands have moved",
-      description:
-        "Use #{CommandCache.mention("kv")} to view your keys, #{CommandCache.mention("get")} to retrieve, #{CommandCache.mention("set")} to update, or #{CommandCache.mention("del")} to remove."
-    })
-  end
+  # Embed field values are capped at 1024 chars, users can have 512 keys of up to 255 chars each
+  @max_field_length 1_024
+  # Room for the code fence and the "...and N more" footer
+  @reserved_length 120
 
-  defp dm?(payload), do: is_nil(payload["guild_id"])
+  @doc false
+  def keys_field(keys, user_id) do
+    {shown, _length} =
+      keys
+      |> Enum.map(&String.replace(&1, "`", "`\u200b"))
+      |> Enum.reduce_while({[], 0}, fn key, {acc, length} ->
+        new_length = length + String.length(key) + 2
+
+        if new_length > @max_field_length - @reserved_length,
+          do: {:halt, {acc, length}},
+          else: {:cont, {[key | acc], new_length}}
+      end)
+
+    content = "```#{shown |> Enum.reverse() |> Enum.join(", ")}```"
+
+    case length(keys) - length(shown) do
+      0 ->
+        content
+
+      hidden ->
+        "#{content}…and #{hidden} more, see all at #{Application.get_env(:lanyard, :external_url)}/v1/users/#{user_id}"
+    end
+  end
 end

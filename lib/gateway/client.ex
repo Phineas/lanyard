@@ -254,21 +254,17 @@ defmodule Lanyard.Gateway.Client do
 
     Logger.info("Discord: Ready")
 
-    bot_user_id =
-      get_in(payload.data, ["user", "id"]) || get_in(payload.data, ["application", "id"])
+    bot_user_id = payload.data["user"]["id"]
+    Application.put_env(:lanyard, :bot_user_id, bot_user_id)
 
-    if bot_user_id do
-      Application.put_env(:lanyard, :bot_user_id, bot_user_id)
-    end
+    # READY also fires on full reconnects, commands only need registering once per boot
+    if Application.get_env(:lanyard, :is_idempotent) and
+         not :persistent_term.get(:lanyard_commands_registered, false) do
+      :persistent_term.put(:lanyard_commands_registered, true)
 
-    if Application.get_env(:lanyard, :is_idempotent) do
-      application_id = get_in(payload.data, ["application", "id"])
-
-      if application_id do
-        Task.start(fn ->
-          Lanyard.DiscordBot.CommandRegistration.register(application_id)
-        end)
-      end
+      Task.start(fn ->
+        Lanyard.DiscordBot.CommandRegistration.register(bot_user_id)
+      end)
     end
 
     {:ok, new_state}
