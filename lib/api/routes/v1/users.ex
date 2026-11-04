@@ -101,7 +101,7 @@ defmodule Lanyard.Api.Routes.V1.Users do
     else
       case Redis.get("api_key:#{key}") do
         resolved_id when is_binary(resolved_id) and (id == "@me" or id == resolved_id) ->
-          {:ok, resolved_id}
+          if Presence.monitored?(resolved_id), do: {:ok, resolved_id}, else: :no_permission
 
         _ ->
           :no_permission

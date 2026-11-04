@@ -8,4 +8,11 @@ defmodule Lanyard.DiscordBot.Embed do
   def error(fields), do: Map.put(fields, :color, @error)
   def info(fields), do: Map.put(fields, :color, @info)
   def warn(fields), do: Map.put(fields, :color, @warn)
+
+  def not_monitored do
+    error(%{
+      title: ":x: Not monitored",
+      description: "Lanyard only works for members of its Discord server: https://discord.gg/lanyard"
+    })
+  end
 end

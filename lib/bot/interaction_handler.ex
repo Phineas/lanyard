@@ -1,4 +1,7 @@
 defmodule Lanyard.DiscordBot.InteractionHandler do
+  alias Lanyard.DiscordBot.DiscordApi
+  alias Lanyard.DiscordBot.Embed
+
   @command_map %{
     "get" => Lanyard.DiscordBot.Commands.Get,
     "set" => Lanyard.DiscordBot.Commands.Set,
@@ -13,8 +16,20 @@ defmodule Lanyard.DiscordBot.InteractionHandler do
 
   def handle_interaction(%{"type" => @application_command, "data" => %{"name" => name}} = interaction) do
     case @command_map[name] do
-      nil -> :ok
-      module -> module.handle_interaction(interaction)
+      nil ->
+        :ok
+
+      module ->
+        if Lanyard.Presence.monitored?(user_id(interaction)) do
+          module.handle_interaction(interaction)
+        else
+          DiscordApi.respond_to_interaction(
+            interaction["id"],
+            interaction["token"],
+            Embed.not_monitored(),
+            ephemeral: true
+          )
+        end
     end
   end
 

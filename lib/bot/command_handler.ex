@@ -51,8 +51,10 @@ defmodule Lanyard.DiscordBot.CommandHandler do
       |> to_string()
       |> String.split(" ")
 
-    unless @command_map[attempted_command] == nil do
-      @command_map[attempted_command].handle(args, data)
+    cond do
+      @command_map[attempted_command] == nil -> :ok
+      Lanyard.Presence.monitored?(data["author"]["id"]) -> @command_map[attempted_command].handle(args, data)
+      true -> DiscordApi.send_message(data["channel_id"], Embed.not_monitored())
     end
   end
 

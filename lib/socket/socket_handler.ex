@@ -73,14 +73,7 @@ defmodule Lanyard.SocketHandler do
                         [id | acc]
                       end)
 
-                    global_subscribers = get_global_subscriber_list()
-
-                    unless self() in global_subscribers do
-                      :ets.insert(
-                        :global_subscribers,
-                        {"subscribers", [self() | global_subscribers]}
-                      )
-                    end
+                    :ets.insert(:global_subscribers, {self()})
 
                     Process.flag(:trap_exit, true)
 
@@ -143,10 +136,7 @@ defmodule Lanyard.SocketHandler do
                 end
 
               %{"unsubscribe_from_all" => true} ->
-                :ets.insert(
-                  :global_subscribers,
-                  {"subscribers", List.delete(get_global_subscriber_list(), self())}
-                )
+                :ets.delete(:global_subscribers, self())
 
                 GenRegistry.reduce(Lanyard.Presence, nil, fn {_id, pid}, _acc ->
                   if Process.alive?(pid) do
@@ -178,10 +168,7 @@ defmodule Lanyard.SocketHandler do
   end
 
   def terminate(_reason, _state) do
-    :ets.insert(
-      :global_subscribers,
-      {"subscribers", List.delete(get_global_subscriber_list(), self())}
-    )
+    :ets.delete(:global_subscribers, self())
 
     Lanyard.Metrics.Collector.dec(:gauge, :lanyard_connected_sessions)
 
@@ -189,13 +176,7 @@ defmodule Lanyard.SocketHandler do
   end
 
   def get_global_subscriber_list do
-    case :ets.lookup(:global_subscribers, "subscribers") do
-      [{_, subscribers}] ->
-        subscribers
-
-      _ ->
-        []
-    end
+    :ets.select(:global_subscribers, [{{:"$1"}, [], [:"$1"]}])
   end
 
   defp construct_socket_msg(compression, data) do
