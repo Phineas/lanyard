@@ -183,6 +183,8 @@ defmodule Lanyard.Presence do
   # Public API
   #
 
+  def monitored?(user_id), do: match?({:ok, _}, GenRegistry.lookup(__MODULE__, user_id))
+
   @spec get_presence(number) ::
           {:ok, Lanyard.Presence.PrettyPresence} | {:error, atom, binary}
   def get_presence(user_id) when is_number(user_id) do
