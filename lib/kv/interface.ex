@@ -76,7 +76,7 @@ defmodule Lanyard.KV.Interface do
 
   def validate_pair({key, value}) do
     cond do
-      String.length(key) > @key_length_limit ->
+      byte_size(key) > @key_length_limit ->
         Lanyard.Metrics.Collector.inc(:counter, :lanyard_kv_validation_failures_total, [
           "key_too_long"
         ])
@@ -90,12 +90,19 @@ defmodule Lanyard.KV.Interface do
 
         {:error, "key must be alphanumeric (a-zA-Z0-9_)"}
 
-      String.length(value) > @value_length_limit ->
+      not (is_binary(value) and String.valid?(value)) ->
+        Lanyard.Metrics.Collector.inc(:counter, :lanyard_kv_validation_failures_total, [
+          "value_invalid"
+        ])
+
+        {:error, "value must be a UTF-8 string"}
+
+      byte_size(value) > @value_length_limit ->
         Lanyard.Metrics.Collector.inc(:counter, :lanyard_kv_validation_failures_total, [
           "value_too_long"
         ])
 
-        {:error, "value must be #{@value_length_limit} characters or less"}
+        {:error, "value must be #{@value_length_limit} bytes or less"}
 
       true ->
         {:ok}
