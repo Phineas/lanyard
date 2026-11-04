@@ -39,13 +39,13 @@ defmodule Lanyard.Connectivity.Redis do
       ) do
     node_id = :erlang.phash2(node())
 
-    case Jason.decode!(payload) do
-      %{"node_id" => ^node_id} ->
+    case Jason.decode(payload) do
+      {:ok, %{"node_id" => ^node_id}} ->
         # Ignore messages from the same node
         Lanyard.Metrics.Collector.inc(:counter, :lanyard_global_sync_messages_total, ["ignored"])
         {:noreply, state}
 
-      %{"user_id" => uid, "diff" => diff} ->
+      {:ok, %{"user_id" => uid, "diff" => diff}} ->
         Lanyard.Metrics.Collector.inc(:counter, :lanyard_global_sync_messages_total, ["applied"])
         Presence.sync(uid, diff, true)
         {:noreply, state}
@@ -55,6 +55,12 @@ defmodule Lanyard.Connectivity.Redis do
         Logger.error("Redis: Unknown payload format: #{inspect(payload)}")
         {:noreply, state}
     end
+  end
+
+  # :disconnected / :unsubscribed; Redix.PubSub reconnects and resubscribes itself
+  def handle_info({:redix_pubsub, _pubsub, _ref, type, props}, state) do
+    Logger.warning("Redis: pubsub #{type}: #{inspect(props)}")
+    {:noreply, state}
   end
 
   def handle_call({:hgetall, key}, _from, state) do
