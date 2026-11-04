@@ -442,3 +442,4 @@ Below is a curated selection of websites using Lanyard right now, check them out
 - [terrified.cc](https://terrified.cc)
 - [zeusgmj.com](https://zeusgmj.com)
 - [akryst.moe](https://akryst.moe)
+- [milproject.xyz](https://milproject.xyz)
