@@ -39,7 +39,7 @@ Just [join this Discord server](https://discord.gg/UrXF2cfJ7F) and your presence
 Many Lanyard users render their presence on websites. The recommended library for React is [`use-lanyard`](https://github.com/alii/use-lanyard). It subscribes over the WebSocket, so presences update live, and any number of hooks across your app share a single connection.
 
 ```tsx
-import { useLanyard } from 'use-lanyard';
+import { useLanyard } from "use-lanyard";
 
 export function App() {
 	const presence = useLanyard(YOUR_DISCORD_ID);
@@ -53,25 +53,25 @@ The hook returns `undefined` until the first presence arrives. You can also pass
 
 The Lanyard community has worked on some pretty cool projects that allows you to extend the functionality of Lanyard. PR to add a project!
 
-[lanyard-web](https://lanyard.eggsy.xyz) - Landing page and API documentation concept for Lanyard API with a sleek UI. \
-[lanyard-profile-readme](https://github.com/cnrad/lanyard-profile-readme) - Utilize Lanyard to display your Discord Presence in your GitHub Profile \
-[vue-lanyard](https://github.com/eggsy/vue-lanyard) - Lanyard API plugin for Vue. Supports REST and WebSocket methods \
-[react-use-lanyard](https://github.com/barbarbar338/react-use-lanyard) - React hook for Lanyard - supports REST & WebSocket \
-[lanyard-visualizer](https://lanyard.akryst.moe) - Beautifully display your Discord presence on a website \
-[js-lanyard](https://github.com/xaronnn/js-lanyard/) - Use Lanyard in your Web App. \
-[go-lanyard](https://github.com/barbarbar338/go-lanyard) - Lanyard API wrapper for GoLang - supports REST & WebSocket \
-[use-lanyard](https://github.com/LeonardSSH/use-lanyard) - Lanyard with Composition API for Vue. Supports REST and WebSocket methods \
-[use-listen-along](https://github.com/punctuations/use-listen-along) - Mock the discord 'Listen Along' feature within a react hook powered by the Lanyard API. \
-[lanyard-graphql](https://github.com/CesiumLabs/lanyard-graphql) - A GraphQL port of the Lanyard API. \
-[sk-lanyard](https://github.com/nebulatgs/sk-lanyard) - SvelteKit integration with Lanyard, supports REST & WebSocket. \
-[svelte-lanyard](https://github.com/iGalaxyYT/svelte-lanyard) - A Lanyard API wrapper for Svelte. Supports REST & WebSocket. \
-[denyard](https://github.com/xHyroM/denyard) - Lanyard API wrapper for Deno - Supports REST & WebSocket. \
-[lanyard-ui](https://lanyard.sakurajima.cloud/) - Lanyard visualizer focused on the KV aspect \
-[discord-status-actions](https://github.com/CompeyDev/discord-status-action) - Updates a file to include your discord status using the Lanyard API. \
-[discordstatus-website](https://github.com/lucaledd/discordstatus-website) - Display your Discord status on your own website with premade CSS, and JS \
-[osu-nowplaying](https://github.com/Hexality/osu-nowplaying) - A small tool to scrape the info of the map you're curently playing on osu!lazer and dump into a file for obs to read. \
-[landart](https://pub.dev/packages/landart) - A featureful API wrapper for Lanyard & Lanyard KV written in Dart. \
-[lanyard.py](https://github.com/nerma-now/lanyard.py) - Modern and fully asynchronous wrapper for Lanyard API written in Python 3.12+. \
+[lanyard-web](https://lanyard.eggsy.xyz) - Landing page and API documentation concept for Lanyard API with a sleek UI.\
+[lanyard-profile-readme](https://github.com/cnrad/lanyard-profile-readme) - Utilize Lanyard to display your Discord Presence in your GitHub Profile\
+[vue-lanyard](https://github.com/eggsy/vue-lanyard) - Lanyard API plugin for Vue. Supports REST and WebSocket methods\
+[react-use-lanyard](https://github.com/barbarbar338/react-use-lanyard) - React hook for Lanyard - supports REST & WebSocket\
+[lanyard-visualizer](https://lanyard.akryst.moe) - Beautifully display your Discord presence on a website\
+[js-lanyard](https://github.com/xaronnn/js-lanyard/) - Use Lanyard in your Web App.\
+[go-lanyard](https://github.com/barbarbar338/go-lanyard) - Lanyard API wrapper for GoLang - supports REST & WebSocket\
+[use-lanyard](https://github.com/LeonardSSH/use-lanyard) - Lanyard with Composition API for Vue. Supports REST and WebSocket methods\
+[use-listen-along](https://github.com/punctuations/use-listen-along) - Mock the discord 'Listen Along' feature within a react hook powered by the Lanyard API.\
+[lanyard-graphql](https://github.com/CesiumLabs/lanyard-graphql) - A GraphQL port of the Lanyard API.\
+[sk-lanyard](https://github.com/nebulatgs/sk-lanyard) - SvelteKit integration with Lanyard, supports REST & WebSocket.\
+[svelte-lanyard](https://github.com/iGalaxyYT/svelte-lanyard) - A Lanyard API wrapper for Svelte. Supports REST & WebSocket.\
+[denyard](https://github.com/xHyroM/denyard) - Lanyard API wrapper for Deno - Supports REST & WebSocket.\
+[lanyard-ui](https://lanyard.sakurajima.cloud/) - Lanyard visualizer focused on the KV aspect\
+[discord-status-actions](https://github.com/CompeyDev/discord-status-action) - Updates a file to include your discord status using the Lanyard API.\
+[discordstatus-website](https://github.com/lucaledd/discordstatus-website) - Display your Discord status on your own website with premade CSS, and JS\
+[osu-nowplaying](https://github.com/Hexality/osu-nowplaying) - A small tool to scrape the info of the map you're curently playing on osu!lazer and dump into a file for obs to read.\
+[landart](https://pub.dev/packages/landart) - A featureful API wrapper for Lanyard & Lanyard KV written in Dart.\
+[lanyard.py](https://github.com/nerma-now/lanyard.py) - Modern and fully asynchronous wrapper for Lanyard API written in Python 3.12+.\
 [lanyard-mcp-server](https://github.com/NNTin/lanyard-mcp-server) - Exposing Lanyard API in MCP - with Docker support
 
 ## API Docs
@@ -179,7 +179,11 @@ Lanyard KV is a a dynamic, real-time key->value store which is added to the Lany
 
 #### Getting an API Key
 
-DM the Lanyard bot (`Lanyard#5766`) with `.apikey` to get your API key.
+> [!CAUTION]
+> If you just want to display your Discord presence on a website or read it through the API, you do not need an API key.
+> You only need an API key to manage custom key/value data in your Lanyard KV store. Keep it private and never include it in frontend code.
+
+DM the Lanyard bot ([`Lanyard#5766`](https://discord.com/users/819287687121993768)) with `/apikey` or use it in the [Server](https://discord.gg/UrXF2cfJ7F) to get your API key.
 
 When making Lanyard KV API requests, set an `Authorization` header with the API key you received from the Lanyard bot as the value.
 
@@ -187,7 +191,7 @@ When making Lanyard KV API requests, set an `Authorization` header with the API 
 
 ##### Discord
 
-`.set <key> <value>`
+`/set key:<key> value:<value>`
 
 ##### HTTP
 
@@ -209,7 +213,7 @@ The user's KV store will be merged with the body of the request. Conflicting key
 
 ##### Discord
 
-`.del <key>`
+`/del key:<key>`
 
 ##### HTTP
 
@@ -392,7 +396,7 @@ Create a bot here: https://discord.com/developers/applications
 If you'd like to run Lanyard with `docker-compose`, here's an example:
 
 ```yml
-version: '3.8'
+version: "3.8"
 
 services:
   redis:
