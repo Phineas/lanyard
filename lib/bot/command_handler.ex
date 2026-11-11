@@ -21,7 +21,7 @@ defmodule Lanyard.DiscordBot.CommandHandler do
       %{} = data ->
         cond do
           dm?(data) -> handle_dm(data)
-          bot_mentioned?(data) -> send_mention_hint(data["channel_id"])
+          bot_mentioned?(data) -> send_mention_hint(data)
           true -> :ok
         end
 
@@ -78,15 +78,9 @@ defmodule Lanyard.DiscordBot.CommandHandler do
     DiscordApi.send_message(channel_id, embed)
   end
 
-  defp send_mention_hint(channel_id) do
-    embed =
-      Embed.info(%{
-        title: ":wave: Hi, I'm Lanyard",
-        description:
-          "I expose your Discord presence as a public API. Embed your status on websites, dashboards, and more.\n\n**Slash commands:**\n#{CommandCache.mention("kv")} — view your K/V keys\n#{CommandCache.mention("get")} — get a value\n#{CommandCache.mention("set")} — set a key\n#{CommandCache.mention("del")} — delete a key\n#{CommandCache.mention("apikey")} — generate or rotate your private API key (response is private to you)\n#{CommandCache.mention("about")} — about Lanyard, docs & privacy policy",
-        footer: %{text: "Type / in any channel to see my commands"}
-      })
+  defp send_mention_hint(data) do
+    embed = Lanyard.DiscordBot.Commands.About.embed(data["author"]["id"])
 
-    DiscordApi.send_message(channel_id, embed)
+    DiscordApi.send_message(data["channel_id"], embed)
   end
 end

@@ -21,7 +21,7 @@ defmodule Lanyard.DiscordBot.Commands.About do
     DiscordApi.respond_to_interaction(interaction["id"], interaction["token"], embed(user_id))
   end
 
-  defp embed(user_id) do
+  def embed(user_id) do
     base = Application.get_env(:lanyard, :external_url)
 
     Embed.info(%{
