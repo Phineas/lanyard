@@ -31,47 +31,43 @@ defmodule Lanyard.Api.Routes.V1.Users do
   end
 
   patch "/:id/kv" do
-    {:ok, body, conn} = Plug.Conn.read_body(conn)
+    with {:ok, user_id} <- validate_resource_access(conn),
+         {:ok, body, conn} <- read_kv_body(conn) do
+      try do
+        {:ok, parsed} = Jason.decode(body)
 
-    case validate_resource_access(conn) do
-      {:ok, user_id} ->
-        try do
-          {:ok, parsed} = Jason.decode(body)
+        case Lanyard.KV.Interface.multiset(user_id, parsed) do
+          {:ok} ->
+            Util.respond(conn, {:ok})
 
-          case Lanyard.KV.Interface.multiset(user_id, parsed) do
-            {:ok} ->
-              Util.respond(conn, {:ok})
-
-            {:error, reason} ->
-              Util.respond(conn, {:error, :kv_validation_failed, reason})
-          end
-        rescue
-          _e ->
-            Util.respond(conn, {:error, :invalid_kv_value, "body must be an object"})
+          {:error, reason} ->
+            Util.respond(conn, {:error, :kv_validation_failed, reason})
         end
-
-      :no_permission ->
-        Util.no_permission(conn)
+      rescue
+        _e ->
+          Util.respond(conn, {:error, :invalid_kv_value, "body must be an object"})
+      end
+    else
+      :no_permission -> Util.no_permission(conn)
+      {:error, conn, status, code, message} -> Util.respond(conn, {:error, status, code, message})
     end
   end
 
   put "/:id/kv/:field" do
     %Plug.Conn{params: %{"field" => field}} = conn
 
-    {:ok, put_body, conn} = Plug.Conn.read_body(conn)
+    with {:ok, user_id} <- validate_resource_access(conn),
+         {:ok, put_body, conn} <- read_kv_body(conn) do
+      case Lanyard.KV.Interface.set(String.to_integer(user_id), field, put_body) do
+        {:ok, _v} ->
+          Util.respond(conn, {:ok})
 
-    case validate_resource_access(conn) do
-      {:ok, user_id} ->
-        case Lanyard.KV.Interface.set(String.to_integer(user_id), field, put_body) do
-          {:ok, _v} ->
-            Util.respond(conn, {:ok})
-
-          {:error, reason} ->
-            Util.respond(conn, {:error, :kv_validation_failed, reason})
-        end
-
-      :no_permission ->
-        Util.no_permission(conn)
+        {:error, reason} ->
+          Util.respond(conn, {:error, :kv_validation_failed, reason})
+      end
+    else
+      :no_permission -> Util.no_permission(conn)
+      {:error, conn, status, code, message} -> Util.respond(conn, {:error, status, code, message})
     end
   end
 
@@ -90,6 +86,16 @@ defmodule Lanyard.Api.Routes.V1.Users do
 
   match _ do
     Util.not_found(conn)
+  end
+
+  # Called after authentication. Answers 413 instead of crashing on a body that does not fit in
+  # one read (Plug.Conn.read_body/2 defaults to 8 MB).
+  defp read_kv_body(conn) do
+    case Plug.Conn.read_body(conn) do
+      {:ok, body, conn} -> {:ok, body, conn}
+      {:more, _partial, conn} -> {:error, conn, 413, :body_too_large, "request body is too large"}
+      {:error, _reason} -> {:error, conn, 400, :invalid_body, "could not read the request body"}
+    end
   end
 
   defp validate_resource_access(conn) do
