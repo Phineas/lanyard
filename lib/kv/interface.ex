@@ -83,7 +83,7 @@ defmodule Lanyard.KV.Interface do
 
         {:error, "key must be #{@key_length_limit} characters or less"}
 
-      not String.match?(key, ~r/^[a-zA-Z0-9_]*$/) ->
+      not String.match?(key, ~r/^[a-zA-Z0-9_]+$/) ->
         Lanyard.Metrics.Collector.inc(:counter, :lanyard_kv_validation_failures_total, [
           "key_invalid"
         ])
