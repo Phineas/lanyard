@@ -8,6 +8,8 @@ defmodule Lanyard.Api.Routes.V1.Users do
   plug(:match)
   plug(:dispatch)
 
+  @kv_body_limit 8_000_000
+
   get "/@me" do
     key = Util.authorization_header(conn)
 
@@ -88,13 +90,24 @@ defmodule Lanyard.Api.Routes.V1.Users do
     Util.not_found(conn)
   end
 
-  # Called after authentication. Answers 413 instead of crashing on a body that does not fit in
-  # one read (Plug.Conn.read_body/2 defaults to 8 MB).
+  # Read one byte beyond the limit to distinguish oversized bodies from incomplete reads.
+  # In particular, Bandit can return :more on an HTTP/2 read timeout below the limit.
   defp read_kv_body(conn) do
-    case Plug.Conn.read_body(conn) do
-      {:ok, body, conn} -> {:ok, body, conn}
-      {:more, _partial, conn} -> {:error, conn, 413, :body_too_large, "request body is too large"}
-      {:error, _reason} -> {:error, conn, 400, :invalid_body, "could not read the request body"}
+    case Plug.Conn.read_body(conn, length: @kv_body_limit + 1) do
+      {status, body, conn} when status in [:ok, :more] and byte_size(body) > @kv_body_limit ->
+        {:error, conn, 413, :body_too_large, "request body is too large"}
+
+      {:ok, body, conn} ->
+        {:ok, body, conn}
+
+      {:more, _partial, conn} ->
+        {:error, conn, 408, :request_timeout, "request body read timed out"}
+
+      {:error, :timeout} ->
+        {:error, conn, 408, :request_timeout, "request body read timed out"}
+
+      {:error, _reason} ->
+        {:error, conn, 400, :invalid_body, "could not read the request body"}
     end
   end
 
