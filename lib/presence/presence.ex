@@ -15,6 +15,7 @@ defmodule Lanyard.Presence.PrettyPresence do
             listening_to_spotify: false,
             spotify: nil,
             activities: [],
+            badges: [],
             kv: %{}
 end
 
@@ -251,11 +252,13 @@ defmodule Lanyard.Presence do
           listening_to_spotify: spotify_activity !== nil,
           spotify: Spotify.build_pretty_spotify(spotify_activity),
           activities: Activity.build_pretty_activities(activities),
+          badges: Lanyard.Presence.Badges.from_public_flags(Map.get(raw_data.discord_user || %{}, "public_flags", 0)),
           kv: raw_data.kv
         }
       else
         %Lanyard.Presence.PrettyPresence{
           discord_user: raw_data.discord_user,
+          badges: Lanyard.Presence.Badges.from_public_flags(Map.get(raw_data.discord_user || %{}, "public_flags", 0)),
           kv: raw_data.kv
         }
       end
