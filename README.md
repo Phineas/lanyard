@@ -160,6 +160,17 @@ Example response:
 }
 ```
 
+The response also includes a top-level `badges` array derived from Discord's `discord_user.public_flags` bitfield. Each known badge is returned as an object with a stable `id` and display `name`:
+
+```json
+"badges": [
+  { "id": "early_supporter", "name": "Early Supporter" },
+  { "id": "active_developer", "name": "Active Developer" }
+]
+```
+
+The array is empty when Discord supplies no recognized public badge flags. Unknown flag bits are ignored. This uses public user flags delivered through the Discord Gateway; it does not retrieve profile About Me text, Nitro status, or private profile information.
+
 ### KV
 
 Lanyard KV is a a dynamic, real-time key->value store which is added to the Lanyard user API response. When a KV pair is updated, a `PRESENCE_UPDATE` for the user will also be emitted through the Lanyard socket.
